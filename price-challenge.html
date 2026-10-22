@@ -369,6 +369,8 @@ button:focus-visible, a:focus-visible { outline-color: var(--brand); }
 .app-outro h2 { color: var(--ink); font-size: clamp(26px, 6vw, 34px); font-weight: 900; line-height: 1.3; }
 .app-outro h2 em { font-style: normal; color: var(--brand); display: block; }
 .app-outro .outro-desc { font-size: 16px; line-height: 1.75; color: var(--text); opacity: 1; }
+.outro-scene { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 12px; margin: 0; }
+.outro-scene[hidden] { display: none; }
 .outro-shot { display: block; width: min(100%, 320px); height: auto; margin: 4px auto 0; border-radius: 16px; background: #F3F5FA; }
 .outro-shot[hidden] { display: none; }
 .app-outro .btn { background: var(--brand); color: #fff; }
@@ -868,6 +870,7 @@ function renderResult() {
     </section>
     <section class="review"><h2>${missed > 0 ? `還有 $${missed} 被賣場賺走了` : '滿分過關！一塊錢都沒被賣場多賺'}</h2>${rows}</section>
     <section class="cta app-outro" aria-labelledby="app-outro-title">
+      <img class="outro-scene" src="img/price/p25.webp" alt="六個購物角色一起在賣場拿著手機用發票存摺比價" width="1536" height="1024" loading="lazy" onerror="this.hidden=true">
       <p class="outro-kicker">遊戲結束，真的比價才開始</p>
       <h2 id="app-outro-title">遊戲裡要自己算，<em>App 幫你記著價格。</em></h2>
       <p class="outro-desc">發票存摺用你已歸戶的電子發票，記下每樣東西「你通常買多少」「你買過最低」，也看得到其他會員的成交價。下次站在貨架前，不用再心算。</p>
