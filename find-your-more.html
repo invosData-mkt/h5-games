@@ -289,7 +289,7 @@ function choose(k){
   $('feature').style.setProperty('--ac', p.accent);
   /* 下載按鈕：依裝置導商店，utm_content／ct 帶選到的 MORE 個性 */
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  $('featCta').href = ios ? 'https://apps.apple.com/tw/app/id1276986959?ct=h5_find_your_more_' + k
+  $('featCta').href = ios ? 'https://apps.apple.com/app/apple-store/id1276986959?pt=120214736&mt=8&ct=h5_find_your_more_' + k
     : 'https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&referrer=' + 'utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dfind_your_more%26utm_content%3D' + k;
   S.filtered = null; S.srcKey = null;
   reveal('s2');
