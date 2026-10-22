@@ -810,8 +810,8 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-
     </div>
     <div class="dl">
       <a class="primary" id="a-android" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dwatch_android" target="_blank" rel="noopener">我有 Android 手錶<span>Google Play 下載 →</span></a>
-      <a class="primary" id="a-apple" href="https://apps.apple.com/tw/app/id1276986959" target="_blank" rel="noopener">我有 Apple Watch<span>App Store 下載 →</span></a>
-      <a id="a-phone" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dphone" target="_blank" rel="noopener">還沒有手錶<span>先用手機刷載具 →</span></a>
+      <a class="primary" id="a-apple" href="https://apps.apple.com/tw/app/id1276986959?ct=h5_carrier_speed_apple_watch" target="_blank" rel="noopener">我有 Apple Watch<span>App Store 下載 →</span></a>
+      <a id="a-phone" data-ios="https://apps.apple.com/tw/app/id1276986959?ct=h5_carrier_speed_phone" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dphone" target="_blank" rel="noopener">還沒有手錶<span>先用手機刷載具 →</span></a>
     </div>
     <div class="share">
       <b style="font-size:17px">挑戰朋友</b>
@@ -1479,6 +1479,10 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'ArrowUp') { e.preventDefault(); unlock(); }
 });
 })();
+</script>
+<script>
+// 「還沒有手錶」：iPhone 導 App Store、其他導 Google Play（UTM／ct 依裝置帶）
+(function(){var a=document.getElementById('a-phone');if(a&&/iPhone|iPad|iPod/.test(navigator.userAgent)){a.href=a.dataset.ios;}})();
 </script>
 </body>
 </html>

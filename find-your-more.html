@@ -198,7 +198,7 @@ input[type=range]{ width:100%; accent-color:var(--ink); }
   <div class="feature" id="feature">
     <h3 id="featTitle"></h3>
     <p id="featCopy"></p>
-    <a class="btn" id="featCta" href="https://invos.com.tw" target="_blank" rel="noopener">下載發票存摺</a>
+    <a class="btn" id="featCta" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dfind_your_more%26utm_content%3Dnone" target="_blank" rel="noopener">下載發票存摺</a>
   </div>
   <p class="privacy">這張圖是在你的裝置上完成的。我們沒有收到你的照片，也不需要。</p>
 </section>
@@ -287,6 +287,10 @@ function choose(k){
   $('featTitle').textContent = `${k} — ${p.role}｜${p.feat}`;
   $('featCopy').textContent = p.featCopy;
   $('feature').style.setProperty('--ac', p.accent);
+  /* 下載按鈕：依裝置導商店，utm_content／ct 帶選到的 MORE 個性 */
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  $('featCta').href = ios ? 'https://apps.apple.com/tw/app/id1276986959?ct=h5_find_your_more_' + k
+    : 'https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&referrer=' + 'utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dfind_your_more%26utm_content%3D' + k;
   S.filtered = null; S.srcKey = null;
   reveal('s2');
   if (S.src) { refilter(); draw(); }
