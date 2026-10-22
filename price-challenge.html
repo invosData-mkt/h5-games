@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>比價直覺挑戰｜發票存摺 invos</title>
+<!-- 自足樣式與系統字型：不依賴未附上的 _ds 或外部字型 -->
+<style>
+:root {
+  --bg: var(--invos-bg-primary, #F4F6F9);
+  --surface: var(--invos-surface-primary, #FFFFFF);
+  --ink: var(--invos-text-primary, #161E2E);
+  --muted: var(--invos-text-secondary, #5B667A);
+  --line: var(--invos-border-subtle, #E2E8F0);
+  --brand: var(--invos-brand-primary, #0066FF);
+  --brand-soft: var(--invos-brand-subtle, #EBF3FF);
+  --brand-ink: var(--invos-brand-strong, #0047B3);
+  --tag: #FFD84D;
+  --tag-border: #E5BC26;
+  --tag-ink: #2B2100;
+  --promo-red: #E02424;
+  --ok: var(--invos-status-success, #0E9F6E);
+  --ok-soft: #DEF7EC;
+  --bad: var(--invos-status-danger, #E02424);
+  --bad-soft: #FDE8E8;
+  --font-ui: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-num: 'IBM Plex Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 16px;
+  padding-block: 16px 40px;
+}
+.app { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3, p { margin: 0; }
+button, a.btn { font: inherit; cursor: pointer; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-block: 4px; }
+.brand-logo { height: 24px; width: auto; display: block; }
+.pills { display: flex; gap: 6px; }
+.pill { font-family: var(--font-num); font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-variant-numeric: tabular-nums; }
+.dots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.dots i { height: 6px; border-radius: 999px; background: var(--line); transition: background 0.25s; }
+.dots i.done { background: var(--brand); }
+.dots i.now { background: var(--ink); }
+
+/* 首頁 Intro */
+.hero { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+.hero .kicker { font-size: 13px; font-weight: 700; color: var(--brand); background: var(--brand-soft); align-self: flex-start; padding: 4px 12px; border-radius: 999px; }
+.hero h1 { font-size: 34px; font-weight: 900; line-height: 1.2; letter-spacing: -0.5px; }
+.hero .lead { font-size: 15px; color: var(--muted); }
+.cases { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 4px 14px; box-shadow: 0 4px 12px rgba(22,30,46,0.04); }
+.case { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); }
+.case:first-child { border-top: 0; }
+.case .icon-badge { width: 36px; height: 36px; border-radius: 10px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 19px; }
+.case .info { display: flex; flex-direction: column; line-height: 1.3; }
+.case b { font-weight: 700; font-size: 15px; color: var(--ink); }
+.case small { font-size: 12px; color: var(--muted); }
+.case .lv { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-soft); padding: 2px 8px; border-radius: 6px; }
+
+/* 題目區塊 */
+.qhead { display: flex; flex-direction: column; gap: 6px; }
+.qmeta { display: flex; align-items: center; gap: 8px; }
+.qlevel { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-soft); padding: 2px 10px; border-radius: 999px; }
+.qtrap { font-size: 12px; color: var(--muted); font-weight: 500; }
+.qname { font-size: 25px; font-weight: 900; line-height: 1.25; }
+.qstory { font-size: 15px; color: var(--muted); }
+.qask { font-size: 16px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+
+/* 二選一卡片與圖片容器 */
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.opt { background: var(--surface); border: 2px solid var(--line); border-radius: 18px; padding: 11px; display: flex; flex-direction: column; gap: 7px; text-align: left; color: var(--ink); transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease; position: relative; }
+.opt:hover:not([disabled]) { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 102, 255, 0.1); }
+.opt[disabled] { cursor: default; }
+
+.art-wrap { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #EAE6DF; border: 1px solid rgba(0,0,0,0.06); box-shadow: inset 0 2px 6px rgba(0,0,0,0.04); }
+.art-wrap img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.art-wrap .art { width: 100%; height: 100%; display: block; }
+.letter-badge { position: absolute; top: 7px; left: 7px; width: 24px; height: 24px; border-radius: 7px; background: rgba(22, 30, 46, 0.82); color: #FFF; font-family: var(--font-num); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 2; backdrop-filter: blur(2px); }
+.spec-pill { position: absolute; bottom: 6px; right: 6px; background: rgba(255,255,255,0.94); color: var(--ink); font-size: 11px; font-weight: 900; padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.1); z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+
+.opt .name { font-size: 16px; font-weight: 900; line-height: 1.3; margin-top: 2px; }
+.opt .spec { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.opt .tag { margin-top: auto; }
+
+/* 賣場黃色標價牌 */
+.tag { background: var(--tag); color: var(--tag-ink); border: 1.5px solid var(--tag-border); border-radius: 10px; padding: 6px 10px 8px; display: flex; flex-direction: column; }
+.tag .tag-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+.tag .promo { font-size: 11px; font-weight: 900; background: var(--promo-red); color: #FFF; padding: 1px 6px; border-radius: 4px; }
+.tag .barcode { font-family: var(--font-num); font-size: 9px; opacity: 0.45; }
+.tag .price { font-family: var(--font-num); font-weight: 700; font-size: 26px; line-height: 1.05; }
+.tag .price small { font-size: 14px; margin-right: 2px; }
+
+/* 揭曉後的單位價格與狀態 */
+.opt .reveal-only { opacity: 0; transition: opacity 0.35s ease; }
+.opt.revealed .reveal-only { opacity: 1; }
+.opt .unit { display: none; font-size: 12.5px; font-weight: 700; padding: 5px 8px; border-radius: 8px; font-variant-numeric: tabular-nums; text-align: center; }
+.opt.revealed .unit { display: block; }
+.opt.win { border-color: var(--ok); background: linear-gradient(180deg, var(--surface) 75%, var(--ok-soft) 100%); }
+.opt.win .unit { background: var(--ok); color: #FFF; }
+.opt.lose { opacity: 0.82; }
+.opt.lose .unit { background: var(--bg); color: var(--muted); }
+.opt.picked { box-shadow: 0 0 0 3px var(--ink); }
+
+.verdict { border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.verdict.ok { background: var(--ok-soft); border: 1px solid rgba(14, 159, 110, 0.3); }
+.verdict.bad { background: var(--bad-soft); border: 1px solid rgba(224, 36, 36, 0.3); }
+.verdict h3 { font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.verdict.ok h3 { color: var(--ok); }
+.verdict.bad h3 { color: var(--bad); }
+.verdict p { font-size: 14.5px; }
+.verdict .save { font-family: var(--font-num); font-weight: 700; font-size: 15px; }
+.origin { border-top: 1px dashed rgba(0,0,0,0.2); padding-top: 8px; margin-top: 4px; font-size: 13.5px; }
+.origin b { display: block; margin-bottom: 2px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 12px 20px; border-radius: 999px; border: 0; background: var(--brand); color: #FFFFFF; font-weight: 700; font-size: 16px; text-decoration: none; text-align: center; }
+.btn.block { width: 100%; }
+.btn.ghost { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); }
+
+/* 結果頁 */
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 22px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.persona .kicker { font-size: 13px; font-weight: 700; color: var(--muted); }
+.persona .emblem { width: 80px; height: 80px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 38px; }
+.persona .role { font-size: 30px; font-weight: 900; color: var(--brand); line-height: 1.2; }
+.persona .desc { color: var(--muted); font-size: 15px; max-width: 30ch; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 8px; text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-family: var(--font-num); font-size: 23px; line-height: 1.2; }
+.stat b.hl { color: var(--brand); }
+.stat span { font-size: 12px; color: var(--muted); }
+.review { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.review h2, .card h2 { font-size: 16px; padding: 14px 16px 0; }
+.rv { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 14px; align-items: center; }
+.rv:first-of-type { border-top: 0; }
+.rv .mark { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.rv .mark.ok { background: var(--ok-soft); color: var(--ok); }
+.rv .mark.bad { background: var(--bad-soft); color: var(--bad); }
+.rv b { display: block; font-size: 14.5px; }
+.rv span { color: var(--muted); font-size: 13px; }
+.rv .amt { font-family: var(--font-num); font-weight: 700; }
+.rv .amt.ok { color: var(--ok); }
+.rv .amt.bad { color: var(--bad); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
+.card > *:not(h2) { margin-inline: 16px; }
+.sharecard { border-radius: 16px; background: linear-gradient(135deg, var(--brand), var(--brand-ink)); color: #FFFFFF; padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.sharecard .s1 { font-size: 12px; font-weight: 700; opacity: 0.85; }
+.sharecard .s2 { font-size: 24px; font-weight: 900; }
+.sharecard .s4 { font-size: 14px; font-weight: 700; color: var(--tag); }
+.sharecard .s3 { font-size: 12px; opacity: 0.85; }
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.copied { font-size: 13px; color: var(--ok); min-height: 20px; }
+.cta { background: var(--ink); color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.cta h2 { font-size: 21px; font-weight: 900; line-height: 1.35; }
+.cta p { font-size: 14.5px; opacity: 0.88; }
+.cta ul { margin: 0; padding-left: 20px; font-size: 14.5px; display: flex; flex-direction: column; gap: 4px; }
+.foot { font-size: 12px; color: var(--muted); text-align: center; }
+
+/* 閱讀優化：寬螢幕雙欄選項，窄螢幕保持舒適字級。 */
+body { padding: clamp(16px, 3vw, 36px) max(16px, env(safe-area-inset-right)) 48px max(16px, env(safe-area-inset-left)); }
+.app { gap: 22px; }
+.topbar { padding-bottom: 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.hero { gap: 16px; padding: 16px 0 4px; }
+.hero h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.3; }
+.hero .lead, .qstory { font-size: 17px; line-height: 1.85; max-width: 45em; }
+.cases { padding: 6px 22px; }
+.case { padding-block: 16px; }
+.case .info { gap: 5px; line-height: 1.5; }
+.case b { font-size: 17px; }
+.case small { font-size: 14px; }
+.qhead { gap: 12px; }
+.qmeta { flex-wrap: wrap; }
+.qname { font-size: clamp(25px, 4vw, 34px); line-height: 1.4; }
+.qask { font-size: 18px; line-height: 1.7; }
+.opts { gap: 20px; }
+.opt { padding: 18px; gap: 12px; border-radius: 22px; min-width: 0; }
+.art-wrap { aspect-ratio: 16 / 10; }
+.opt .name { font-size: 19px; line-height: 1.5; }
+.opt .spec { font-size: 15px; line-height: 1.6; }
+.opt .unit { font-size: 15px; }
+.tag { padding: 10px 14px 12px; }
+.tag .price { font-size: 32px; }
+.tag .promo { font-size: 13px; }
+.verdict { padding: 22px; gap: 12px; }
+.verdict h3 { font-size: 21px; }
+.verdict p { font-size: 17px; line-height: 1.85; }
+.origin { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 24px; padding-top: 22px; margin-top: 8px; }
+.origin figure { margin: 0; min-width: 0; }
+.person-image { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: center top; border-radius: 12px; background: #e4e5df; }
+.person-fallback { width: 100%; aspect-ratio: 4 / 5; border-radius: 12px; background: var(--brand-soft); align-items: center; justify-content: center; color: var(--brand-ink); text-align: center; }
+.origin figcaption { font-size: 12px; line-height: 1.7; margin-top: 8px; color: #475569; overflow-wrap: anywhere; }
+.origin figcaption strong { display: block; color: var(--ink); font-size: 15px; }
+.origin a { color: #0047a8; text-underline-offset: 3px; }
+.origin .origin-copy h4 { margin: 0 0 8px; font-size: 18px; line-height: 1.6; }
+.origin .origin-copy p { font-size: 16px; }
+.btn { min-height: 54px; line-height: 1.5; }
+button:focus-visible, a:focus-visible { outline: 3px solid #0047b3; outline-offset: 5px; }
+.review h2, .card h2 { font-size: 20px; padding: 20px 22px 4px; }
+.rv { padding: 16px 22px; }
+.rv b { font-size: 17px; }
+.rv span { font-size: 14px; }
+.stat { padding: 20px 8px; }
+.stat b { font-size: 28px; }
+.stat span, .foot { font-size: 14px; }
+.persona { padding: 30px 22px; }
+.copied { overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+ .app { gap: 18px; }
+ .opts { gap: 12px; }
+ .opt { padding: 11px; gap: 9px; border-radius: 16px; }
+ .art-wrap { aspect-ratio: 4 / 3; }
+ .opt .name { font-size: 16px; }
+ .opt .spec, .opt .unit { font-size: 14px; }
+ .tag { padding: 8px; }
+ .tag .price { font-size: 27px; }
+ .tag .promo { font-size: 11px; }
+ .cases { padding-inline: 14px; }
+ .case b { font-size: 15px; }
+ .case small { font-size: 13px; }
+ .case .lv { padding-inline: 6px; }
+ .verdict { padding: 18px; }
+ .origin { grid-template-columns: 96px minmax(0, 1fr); gap: 16px; }
+ .origin .origin-copy { grid-column: 1 / -1; }
+ .origin figure { grid-column: 1 / -1; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: center; }
+ .origin figcaption { margin: 0; }
+ .rv { padding-inline: 16px; gap: 8px; }
+ .rv b { font-size: 15px; }
+ .rv span { font-size: 13px; }
+ .row2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 359px) {
+ .opts { grid-template-columns: 1fr; }
+ .case { grid-template-columns: 30px minmax(0, 1fr); }
+ .case .lv { grid-column: 2; justify-self: start; }
+ .case .icon-badge { width: 30px; height: 30px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+
+.result-art { display:block; width:min(100%,320px); height:auto; aspect-ratio:4/5; object-fit:cover; border-radius:18px; margin:10px 0 12px; }
+.result-art[hidden] { display:none; }
+/* 古典畫冊：紙張、墨色、宋體、畫框。 */
+:root {
+ --bg:#e6dac2; --surface:#f8f0de; --ink:#342d25; --muted:#665a49; --line:#c5b18a;
+ --brand:#714b29; --brand-soft:#eee0c4; --brand-ink:#4b321f;
+ --tag:#ead7a7; --tag-border:#ac8850; --tag-ink:#3e2b16; --promo-red:#794030;
+ --ok:#45604b; --ok-soft:#e7ebdc; --bad:#8b4636; --bad-soft:#f3e3d3;
+ --font-ui:'Songti TC','Noto Serif TC','Source Han Serif TC','PMingLiU','STSong',Georgia,serif;
+ --font-num:'Baskerville','Palatino Linotype',Georgia,'Songti TC',serif;
+}
+body {
+ background-color:var(--bg);
+ background-image:radial-gradient(ellipse at 20% 0%,#faf4e6aa,transparent 55%),repeating-linear-gradient(0deg,#65502d06 0,#65502d06 1px,transparent 1px,transparent 4px);
+ padding-block:32px 56px;
+}
+.app { padding:28px 32px 32px; background:linear-gradient(100deg,#fff8e8aa,#f4e9d5dd 65%,#f8efddbb); border:1px solid #bba276; outline:1px solid #bba27680; outline-offset:6px; box-shadow:0 16px 50px #45321918; gap:24px; }
+h1,h2,h3,h4,.role { font-weight:700; }
+.topbar { border-bottom:3px double #b99c6f; padding-bottom:18px; }
+.topbar b { font-size:17px; letter-spacing:.12em; }
+.pill { border-radius:2px; background:#f7edd8; color:#624b32; border-color:#bea67e; letter-spacing:.06em; padding:4px 10px; }
+.hero { padding:18px 0 8px; gap:18px; }
+.hero .kicker { background:transparent; border-radius:0; padding:0 0 8px; border-bottom:1px solid #b79a65; font-size:13px; letter-spacing:.12em; }
+.hero h1 { font-weight:700; letter-spacing:.05em; line-height:1.45; font-size:clamp(31px,5vw,45px); }
+.hero .lead,.qstory { line-height:1.95; }
+.cases,.review,.card,.persona { border:1px solid var(--line); border-radius:3px; box-shadow:inset 0 0 0 4px #fff9ec, inset 0 0 0 5px #c7b48f70; background:#fbf4e5; }
+.case { border-color:#cfbd9b; }
+.case .icon-badge { background:transparent; border:1px solid #b99c6f; border-radius:50%; color:#87683f; font:600 15px var(--font-num); }
+.case .lv,.qlevel { border-radius:1px; background:#e8dab9; color:#604624; padding:4px 9px; font-weight:600; letter-spacing:.04em; }
+.qmeta { gap:12px; }
+.qname { font-weight:700; letter-spacing:.04em; }
+.qask { border-left:3px solid #b49762; padding:4px 0 4px 14px; }
+.dots { gap:8px; }
+.dots i { border-radius:0; height:4px; background:#d3c4a6; }
+.dots i.done { background:#a6874b; }
+.dots i.now { background:#4e493d; }
+.opts { gap:18px; }
+.opt { border-radius:3px; border:1px solid #b89d72; padding:12px; background:#fbf3e1; box-shadow:0 4px 9px #47331a12,inset 0 0 0 3px #fff8e8; gap:12px; }
+.opt:hover:not([disabled]) { border-color:#806035; box-shadow:0 8px 20px #47331a24,inset 0 0 0 3px #fff8e8; }
+.art-wrap { aspect-ratio:3/2; border:3px solid #806442; border-radius:1px; background:#45505a; box-shadow:0 0 0 1px #cfb57e,inset 0 0 0 1px #e0c28c; }
+.art-wrap img.photo { object-fit:contain; }
+.letter-badge { border-radius:1px; width:27px; height:27px; top:7px; left:7px; background:#342f25e8; border:1px solid #d5bc89; color:#fff5d9; backdrop-filter:none; }
+.spec-pill { border-radius:1px; background:#f4e6cceF; border-color:#b69965; color:#44331e; font-weight:600; font-size:12px; }
+.opt .name { font-size:19px; font-weight:700; }
+.opt .spec { font-size:15px; line-height:1.7; }
+.tag { background:linear-gradient(110deg,#eddbb2,#e5cb91); border:1px solid #b18b4b; border-radius:1px; padding:10px 12px; }
+.tag .promo { background:#754733; border-radius:0; font-weight:600; font-size:12px; letter-spacing:.05em; }
+.tag .barcode { display:none; }
+.tag .price { font-size:33px; font-weight:700; }
+.opt .unit { border-radius:1px; font-size:15px; }
+.opt.win { border:2px solid #566748; padding:11px; background:linear-gradient(#fbf3e1 70%,#e5e8d5); }
+.opt.win .unit { background:#4c634b; }
+.opt.lose { opacity:.88; }
+.opt.lose .unit { background:#e8dfcc; color:#5e5546; }
+.opt.picked { box-shadow:0 0 0 2px #413a2c,0 0 0 5px #f3e7cd; }
+.verdict { border-radius:2px; padding:24px; }
+.verdict.ok { border:1px solid #9aab88; background:#edf0e3; }
+.verdict.bad { border:1px solid #c9a08a; background:#f2e5d8; }
+.verdict h3 { font-size:22px; letter-spacing:.04em; }
+.origin { border-top:3px double #b8a481; gap:24px; }
+.person-image,.person-fallback { border-radius:1px; border:3px solid #8d7048; box-shadow:0 0 0 1px #cfb579; }
+.origin figcaption { color:#695b45; }
+.origin figcaption strong { font-size:16px; }
+.origin .origin-copy h4 { font-size:19px; }
+.origin .origin-copy p { font-size:17px; line-height:1.95; }
+.btn { border-radius:2px; background:linear-gradient(#7e5a35,#624323); color:#fff6df; border:1px solid #58401f; box-shadow:inset 0 0 0 3px #d9bd7e30; font-weight:600; letter-spacing:.1em; }
+.btn:hover { filter:brightness(1.08); }
+.btn.ghost { background:#f6ebd5; color:#4b3923; border:1px solid #b89e72; }
+button:focus-visible,a:focus-visible { outline-color:#6e4c28; }
+.persona { padding:32px 24px; }
+.persona .kicker { letter-spacing:.12em; color:#756044; }
+.persona .role { color:#6c4926; font-size:32px; letter-spacing:.08em; }
+.persona .desc { font-size:17px; line-height:1.85; }
+.result-art { width:min(100%,320px); border-radius:1px; border:5px solid #806442; box-shadow:0 0 0 1px #e1c789,0 0 0 3px #a58a58,0 9px 22px #3e2f1e28; }
+.stats { gap:12px; }
+.stat { border-radius:2px; background:#f8eed9; border-color:#bda77e; }
+.stat b { font-weight:600; font-size:30px; }
+.stat b.hl { color:#77502a; }
+.rv { border-color:#d5c5a5; }
+.rv .mark { border-radius:1px; }
+.rv .mark.ok { color:#405c42; background:#e5ead9; }
+.rv .mark.bad { color:#864633; background:#efdfcf; }
+.rv .amt.ok { color:#405c42; }
+.rv .amt.bad { color:#864633; }
+.sharecard { border-radius:2px; border:1px solid #b29964; background:linear-gradient(120deg,#3d484b,#29383a); color:#fff2d3; padding:24px; box-shadow:inset 0 0 0 4px #d4b16b20; }
+.sharecard .s4 { color:#edcf8d; }
+.cta { border-radius:2px; background:#3c423a; border:1px solid #a38958; color:#fff3da; box-shadow:inset 0 0 0 5px #d9be8120; padding:24px; }
+.cta .btn { background:#ddc38c; color:#3b2c19; border-color:#ead4a7; }
+.foot { font-size:13px; line-height:1.85; color:#71604a; }
+@media(max-width:560px) {
+ body { padding:18px 16px 40px; }
+ .app { padding:20px 14px 24px; gap:20px; outline-offset:4px; }
+ .hero h1 { font-size:31px; }
+ .hero .kicker { font-size:12px; letter-spacing:.04em; }
+ .hero .lead,.qstory { font-size:16px; }
+ .opts { gap:12px; }
+ .opt { padding:8px; gap:10px; }
+ .opt.win { padding:7px; }
+ .opt .name { font-size:16px; }
+ .opt .spec,.opt .unit { font-size:14px; }
+ .art-wrap { aspect-ratio:3/2; border-width:2px; }
+ .letter-badge { width:22px; height:22px; top:4px; left:4px; font-size:12px; }
+ .spec-pill { font-size:10px; right:3px; bottom:3px; padding:1px 4px; }
+ .tag { padding:8px 7px; }
+ .tag .price { font-size:27px; }
+ .tag .promo { font-size:10px; }
+ .qname { font-size:26px; }
+ .qask { font-size:17px; }
+ .verdict { padding:18px; }
+ .origin { gap:18px; }
+ .origin .origin-copy p { font-size:16px; }
+ .case { grid-template-columns:30px minmax(0,1fr); gap:9px; }
+ .case .lv { grid-column:2; justify-self:start; font-size:11px; }
+ .case .icon-badge { grid-row:1 / 3; width:30px; height:30px; }
+ .cases { padding-inline:13px; }
+ .persona { padding:24px 16px; }
+ .persona .role { font-size:28px; }
+ .stat { padding:16px 4px; }
+ .stat b { font-size:25px; }
+ .stat span { font-size:12px; }
+ .rv { padding:15px 13px; grid-template-columns:24px minmax(0,1fr) auto; gap:8px; }
+ .rv b { font-size:15px; }
+ .rv span { font-size:12px; }
+ .review h2,.card h2 { font-size:19px; padding:18px 16px 4px; }
+ .sharecard { padding:18px; }
+ .sharecard .s2 { font-size:23px; }
+ .cta { padding:20px; }
+}
+@media(max-width:359px) { .opts { grid-template-columns:1fr; } }
+
+/* 品牌優先：古典字體與紙感，搭配原有 invos 藍／黃與狀態色。 */
+:root {
+ --brand:var(--invos-brand-primary,#0066FF);
+ --brand-soft:var(--invos-brand-subtle,#EBF3FF);
+ --brand-ink:var(--invos-brand-strong,#0047B3);
+ --tag:#FFD84D; --tag-border:#E5BC26; --tag-ink:#2B2100; --promo-red:#E02424;
+ --ok:var(--invos-status-success,#0E9F6E); --ok-soft:#DEF7EC;
+ --bad:var(--invos-status-danger,#E02424); --bad-soft:#FDE8E8;
+}
+body { background-color:#e9e8df; background-image:radial-gradient(ellipse at 10% 0%,#ebf3ff99,transparent 60%),repeating-linear-gradient(0deg,#65502d05 0,#65502d05 1px,transparent 1px,transparent 4px); }
+.app { background:linear-gradient(100deg,#fffaf0ee,#f7f1e4ee); border-color:#a8b8cf; outline-color:#0066ff30; box-shadow:0 16px 50px #0047b312; }
+.topbar { border-bottom-color:var(--brand); }
+.topbar b,.hero h1,.qname { color:var(--brand-ink); }
+.pill { background:#f7f9fc; color:var(--brand-ink); border-color:#b4c9e8; }
+.hero .kicker { color:var(--brand); border-bottom-color:var(--brand); }
+.case .icon-badge { color:var(--brand-ink); border-color:#83a9df; background:#ebf3ff80; }
+.case .lv,.qlevel { background:var(--brand-soft); color:var(--brand-ink); }
+.qask { border-left-color:var(--brand); }
+.dots i.done { background:var(--brand); }
+.dots i.now { background:var(--brand-ink); }
+.opt:hover:not([disabled]) { border-color:var(--brand); box-shadow:0 8px 20px #0066ff22,inset 0 0 0 3px #fff8e8; }
+.art-wrap { border-color:#294d7e; }
+.letter-badge { background:#0047b3ed; color:#fff; }
+.tag { background:var(--tag); border-color:var(--tag-border); color:var(--tag-ink); }
+.tag .promo { background:var(--promo-red); color:#fff; }
+.opt.win { border-color:var(--ok); background:linear-gradient(#fbf3e1 70%,var(--ok-soft)); }
+.opt.win .unit { background:var(--ok); color:#fff; }
+.opt.picked { box-shadow:0 0 0 2px var(--brand),0 0 0 5px #ebf3ff; }
+.verdict.ok { border-color:#0e9f6e70; background:var(--ok-soft); }
+.verdict.bad { border-color:#e0242450; background:var(--bad-soft); }
+.btn { background:var(--brand); color:#fff; border-color:var(--brand-ink); box-shadow:inset 0 0 0 3px #ffffff24; }
+.btn.ghost { background:#f8f7f0; color:var(--brand-ink); border-color:#8aaedc; }
+button:focus-visible,a:focus-visible { outline-color:var(--brand); }
+.persona .role,.stat b.hl { color:var(--brand); }
+.persona .kicker { color:var(--brand-ink); }
+.rv .mark.ok { color:var(--ok); background:var(--ok-soft); }
+.rv .mark.bad { color:var(--bad); background:var(--bad-soft); }
+.rv .amt.ok { color:var(--ok); }
+.rv .amt.bad { color:var(--bad); }
+.sharecard { background:linear-gradient(120deg,var(--brand),var(--brand-ink)); color:#fff; border-color:var(--brand-ink); }
+.sharecard .s4 { color:var(--tag); }
+.cta { background:#12356d; color:#fff; border-color:#6e92c2; }
+.cta .btn { background:var(--brand); color:#fff; border-color:#a0c5ff; }
+
+
+
+/* 結果頁以 App 價值與六人比價場景收尾。 */
+.app-outro { gap:20px; padding:28px; }
+.app-outro .outro-kicker { font-size:13px; letter-spacing:.12em; color:#bcd7ff; opacity:1; }
+.app-outro .outro-desc { font-size:18px; line-height:1.95; color:#fff; opacity:1; max-width:40em; }
+.app-outro h2 { color:#fff; font-size:clamp(24px,3.8vw,32px); line-height:1.65; letter-spacing:.03em; }
+.outro-punch { display:inline-block; white-space:nowrap; color:var(--tag); }
+.outro-scene { display:block; width:100%; height:auto; aspect-ratio:3/2; object-fit:contain; border:1px solid #b4a176; margin:0; }
+.outro-scene[hidden] { display:none; }
+@media(max-width:560px) { .app-outro { padding:20px; gap:18px; } .app-outro .outro-desc { font-size:17px; } .app-outro h2 { font-size:24px; } }
+
+</style>
+</head>
+<body>
+
+<main class="app" id="app" aria-live="polite"></main>
+
+<!-- support.js 未附上；核心答題與 dataLayer 追蹤皆已內建 -->
+<script>
+// 最終定案 6 大名人關卡
+const QUESTIONS = [
+  {
+    id: 'q1', name: '蒙提霍爾的衛生紙', icon: '🧻', level: '暖身關', trap: '三門抉擇 × 抽數盲區', unit: '每 100 抽',
+    story: '貨架上有三款衛生紙，你已經把 12 包入的 A 放進推車。店員突然神祕地靠過來：「C 剛剛賣光了，但聽我的，要不要把 A 換成 10 包入的 B？」',
+    ask: '面對店員的提議，你要留著 A，還是換成 B？',
+    a: { name: '留著 A｜12 包串裝', spec: '100 抽 × 12 包（共 1,200 抽）', badge: '100抽×12', promo: '量販價', price: 299, up: '$24.9', img: 'img/price/p01.webp' },
+    b: { name: '換成 B｜10 包厚裝', spec: '120 抽 × 10 包（共 1,200 抽）', badge: '120抽×10', promo: '量販價', price: 279, up: '$23.3', img: 'img/price/p02.webp' },
+    art: 'tissue', ans: 'b', save: 20, lesson: '一樣 1,200 抽，換了立省 $20',
+    origin: '蒙提霍爾問題（三門問題）來自美國益智節目：當主持人幫你排除一個選項並問你「要不要換」時，數學證明換門的勝率更高。在賣場裡別只數幾包，換成單包 120 抽的 B 真的比較省！',
+    why: '兩串總抽數都是 1,200 抽，B 雖然少兩包但每包更厚，直接少付 $20！'
+  },
+  {
+    id: 'q2', name: '歌利亞的家庭號鮮乳', icon: '🥛', level: '第 2 關', trap: '巨無霸迷思 × 量販悖論', unit: '每 100ml',
+    story: '大家都迷信「越大桶越便宜」，但冷藏櫃裡 2,000ml 的巨人歌利亞，正受到兩瓶 946ml 大衛的聯手挑戰。',
+    ask: '哪一組鮮乳每 100ml 其實更划算？',
+    a: { name: '大衛組｜紙盒 2 瓶', spec: '946ml × 2 瓶（共 1,892ml）', badge: '946ml×2', promo: '合購價', price: 185, up: '$9.78', img: 'img/price/p03.webp' },
+    b: { name: '歌利亞｜家庭號巨桶', spec: '2,000ml × 1 大桶', badge: '2000ml', promo: '家庭號', price: 209, up: '$10.45', img: 'img/price/p04.webp' },
+    art: 'milk', ans: 'a', save: 13, lesson: '家庭號大桶不一定贏過雙瓶促銷',
+    origin: '聖經中巨人歌利亞看似無敵，卻敗給靈活的大衛。賣場知道消費者有「大包裝一定比較省」的盲目直覺，反而常在標準紙盒推出合購促銷，單價悄悄擊敗家庭號。',
+    why: '超大桶只多了 108ml（不到半杯），卻貴了 $24！這次是 2 瓶組獲勝。'
+  },
+  {
+    id: 'q3', name: '托里切利的真空洋芋片', icon: '🥔', level: '第 3 關', trap: '氣壓膨脹 × 視覺偏誤', unit: '每 10g',
+    story: '派對大袋裝鼓得像顆氣球一樣超澎湃，但身為懂科學的消費者，你知道裡面充滿了保護氣體。',
+    ask: '不看袋子大小看淨重，哪一袋比較划算？',
+    a: { name: '派對分享大袋', spec: '淨重 70g（包裝超鼓脹）', badge: '淨重 70g', promo: '派對包', price: 59, up: '$8.43', img: 'img/price/p05.webp' },
+    b: { name: '經典一般小袋', spec: '淨重 60g（標準包裝）', badge: '淨重 60g', promo: '標準包', price: 42, up: '$7.00', img: 'img/price/p06.webp' },
+    art: 'chips', ans: 'b', save: 10, lesson: '袋子越大，買到的氮氣越多',
+    origin: '物理學家托里切利證明了大氣壓力與真空的存在；而現代洋芋片則是故意不抽真空、反而灌滿「氮氣」來抵抗外界大氣壓力，保護洋芋片不碎裂。別讓鼓脹的袋子騙了你的眼睛！',
+    why: '大袋只比小袋多 10g（約 5 片洋芋片），卻貴了 $17，多付的錢都拿去買氮氣了！'
+  },
+  {
+    id: 'q4', name: '薛丁格的買一送一', icon: '🧴', level: '第 4 關', trap: '量子疊加 × 免費幻覺', unit: '每 100ml',
+    story: '在還沒換算每 ml 單價之前，「買一送一」同時處於「賺到」與「虧到」的疊加態。打開計算機才會坍縮出真相！',
+    ask: '要帶走兩瓶洗髮精，選哪一邊才不會被當盤子？',
+    a: { name: '大瓶｜第 2 件 6 折', spec: '750ml × 2 瓶（共 1,500ml）', badge: '共1500ml', promo: '2件$398', price: 398, up: '$26.5', img: 'img/price/p07.webp' },
+    b: { name: '小瓶｜買一送一', spec: '400ml × 2 瓶（共 800ml）', badge: '共800ml', promo: '買1送1', price: 299, up: '$37.4', img: 'img/price/p08.webp' },
+    art: 'shampoo', ans: 'a', save: 162, lesson: '買一送一常伴隨容量偷縮水',
+    origin: '薛丁格的貓在打開盒子前同時是活的也是死的；賣場的「買一送一」在看清容量前，也同時是划算與昂貴的。廠商常把小瓶裝拉高定價再買一送一，算下來每 ml 貴了 40%！',
+    why: 'A 方案付 $398 拿到 1,500ml；B 方案付 $299 卻只有 800ml，換算同容量差了 $162！'
+  },
+  {
+    id: 'q5', name: '特洛伊的箱購尿布', icon: '📦', level: '第 5 關', trap: '木馬偽裝 × 單包縮水', unit: '每片',
+    story: '走道盡頭堆著像禮物一樣的尿布紙箱，大大印著「箱購特惠」，爸媽們看都不看就往推車裡搬。',
+    ask: '零買單包 vs. 整箱搬走，哪個每片更便宜？',
+    a: { name: '貨架單包拿', spec: '62 片 × 1 包', badge: '62片×1包', promo: '單包價', price: 359, up: '$5.79', img: 'img/price/p09.webp' },
+    b: { name: '整箱特惠組', spec: '56 片 × 4 包（共 224 片）', badge: '56片×4包', promo: '箱購優惠', price: 1399, up: '$6.25', img: 'img/price/p10.webp' },
+    art: 'diaper', ans: 'a', save: 103, lesson: '箱購可能是暗藏縮水的木馬',
+    origin: '古希臘人送給特洛伊城的巨大木馬看似划算大禮，肚子裡卻藏著伏兵。「箱購優惠」也常玩這招：外箱氣派，拆開才發現裡面每包只有 56 片，比散裝單包偷偷少了 6 片！',
+    why: '箱購每包縮水成 56 片，平均一片 $6.25；直接拿貨架上的 62 片單包，一片只要 $5.79！'
+  },
+  {
+    id: 'q6', name: '康納曼的折上折洗衣精', icon: '🧺', level: '魔王關', trap: '快思慢想 × 雙重折扣盲區', unit: '每 100g',
+    story: '你的大腦「系統一（直覺）」說環保補充包一定最省；但「系統二（慢想）」發現旁邊的大瓶裝貼了會員再 9 折！',
+    ask: '身為賣場會員的你，算完折上折後選哪一個？',
+    a: { name: '環保補充包', spec: '2,000g，無額外會員折扣', badge: '2000g', promo: '補充包', price: 289, up: '$14.45', img: 'img/price/p11.webp' },
+    b: { name: '重量大瓶裝', spec: '3,000g，結帳享會員 9 折', badge: '3000g・9折', promo: '會員9折', price: 449, up: '$13.47', img: 'img/price/p12.webp' },
+    art: 'detergent', ans: 'b', save: 29, lesson: '戰勝心算惰性，打折大瓶逆轉勝',
+    origin: '諾貝爾經濟學獎得主康納曼在《快思慢想》指出：當遇到「不同克數＋打折乘法」時，負責邏輯的「系統二」會因為偷懶而罷工，讓直覺直接抓起補充包。動腦算一下，標價最貴的其實最便宜！',
+    why: '大瓶裝 $449 打完 9 折是 $404，拿到 3,000g（每 100g 只要 $13.47），逆轉擊敗補充包！'
+  }
+];
+
+const PEOPLE = [{"key": "monty-hall", "name": "蒙提霍爾", "en": "Monty Hall", "file": "img/price/p13.webp", "kind": "AI 生成插畫"}, {"key": "goliath", "name": "歌利亞", "en": "Goliath", "file": "img/price/p14.webp", "kind": "AI 生成插畫"}, {"key": "torricelli", "name": "托里切利", "en": "Evangelista Torricelli", "file": "img/price/p15.webp", "kind": "AI 生成插畫"}, {"key": "schrodinger", "name": "薛丁格", "en": "Erwin Schrödinger", "file": "img/price/p16.webp", "kind": "AI 生成插畫"}, {"key": "troy", "name": "特洛伊木馬", "en": "Trojan Horse", "file": "img/price/p17.webp", "kind": "AI 生成插畫"}, {"key": "kahneman", "name": "康納曼", "en": "Daniel Kahneman", "file": "img/price/p18.webp", "kind": "AI 生成插畫"}];
+QUESTIONS.forEach((q, i) => { q.person = PEOPLE[i]; });
+
+function originHTML(q) {
+  const p = q.person;
+  return `<section class="origin" aria-label="名詞解說">
+    <figure>
+      <img class="person-image" src="${p.file}" alt="${p.name}：${p.kind}" width="160" height="200" onerror="this.hidden=true;this.nextElementSibling.hidden=false;this.nextElementSibling.style.display='flex'">
+      <span class="person-fallback" hidden>${p.name}<br>圖像暫時無法顯示</span>
+      <figcaption><strong>${p.name}</strong>${p.en}<br>${p.kind}</figcaption>
+    </figure>
+    <div class="origin-copy"><h4>為什麼叫「${q.name}」？</h4><p>${q.origin}</p>
+    </div>
+  </section>`;
+}
+
+const MAX_SAVE = QUESTIONS.reduce((s, q) => s + q.save, 0);
+const FAST_SECONDS = 90;
+const STORE = {
+  android: 'https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&referrer=utm_source%3Dh5%26utm_campaign%3Dprice_challenge',
+  ios: 'https://apps.apple.com/tw/app/id1276986959?ct=h5_price_challenge'
+};
+
+const ROLES = {
+  "fastSharp": {
+    "icon": "⚡",
+    "role": "比價閃電俠",
+    "desc": "標價一出現，你已經算完了。賣場最怕的就是你。",
+    "img": "img/price/p19.webp"
+  },
+  "slowSharp": {
+    "icon": "🧠",
+    "role": "精算軍師",
+    "desc": "你不急，但每一步都算得準。慢慢來，比較划算。",
+    "img": "img/price/p20.webp"
+  },
+  "fastMid": {
+    "icon": "🚀",
+    "role": "直覺快手",
+    "desc": "出手很快，大多數陷阱都躲過了。再多算一步，就是閃電俠。",
+    "img": "img/price/p21.webp"
+  },
+  "slowMid": {
+    "icon": "🛒",
+    "role": "推車沉思者",
+    "desc": "推著購物車在貨架前想了很久，看穿了一半的陷阱。再多換算一步，就能直奔結帳。",
+    "img": "img/price/p22.webp"
+  },
+  "fastLoose": {
+    "icon": "🛍️",
+    "role": "衝動購物俠",
+    "desc": "手比腦快，看到「優惠」兩個字就出手。下次先停一秒。",
+    "img": "img/price/p23.webp"
+  },
+  "slowLoose": {
+    "icon": "🧭",
+    "role": "標價迷路人",
+    "desc": "想了很久，還是被標價帶著走。換算單位價格，路就清楚了。",
+    "img": "img/price/p24.webp"
+  }
+};
+
+const app = document.getElementById('app');
+let state = { i: 0, picks: [], started: 0, clock: null };
+
+function track(event, props) {
+  try { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: event }, props || {})); } catch (e) {}
+}
+const fmt = n => n.toLocaleString('en-US');
+const mmss = s => { s = Math.floor(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const elapsed = () => (Date.now() - state.started) / 1000;
+const check = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>';
+const cross = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
+
+const topbar = right => `
+  <div class="topbar">
+    <img class="brand-logo" src="assets/invos_logo_horizontal_ch.svg" alt="發票存摺 invos" onerror="this.outerHTML='<b>發票存摺</b>'">
+    ${right}
+  </div>`;
+
+// 內建 3D 棚拍光影質感立體插畫（含高光、陰影濾鏡與木紋層板）
+const svgStage = (label, body) => `
+  <svg class="art" viewBox="0 0 160 120" role="img" aria-label="${label}">
+    <defs>
+      <radialGradient id="studioBg" cx="50%" cy="35%" r="70%">
+        <stop offset="0%" stop-color="#FDFBF7"/>
+        <stop offset="100%" stop-color="#E6DFD3"/>
+      </radialGradient>
+      <linearGradient id="woodShelf" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#DFC39D"/>
+        <stop offset="35%" stop-color="#C8A679"/>
+        <stop offset="100%" stop-color="#9C7A4E"/>
+      </linearGradient>
+      <linearGradient id="gloss" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+        <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.0"/>
+      </linearGradient>
+      <filter id="drop" x="-15%" y="-15%" width="130%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1A2530" flood-opacity="0.22"/>
+      </filter>
+    </defs>
+    <!-- 棚拍背景與木質貨架 -->
+    <rect width="160" height="120" fill="url(#studioBg)"/>
+    <rect y="98" width="160" height="22" fill="url(#woodShelf)"/>
+    <line x1="0" y1="98" x2="160" y2="98" stroke="#F4E3C9" stroke-width="1.5"/>
+    <ellipse cx="80" cy="101" rx="54" ry="5" fill="#000000" opacity="0.14"/>
+    <g filter="url(#drop)">${body}</g>
+  </svg>`;
+
+const ART_3D = {
+  tissue: k => k === 'a'
+    ? svgStage('12包扁平衛生紙',
+        Array.from({length: 12}, (_, i) => {
+          const c = i % 4, r = Math.floor(i / 4), x = 22 + c * 29, y = 38 + r * 19;
+          return `<rect x="${x}" y="${y}" width="27" height="17" rx="4" fill="#63B3ED" stroke="#2B6CB0" stroke-width="1"/>
+                  <rect x="${x+2}" y="${y+2}" width="23" height="6" rx="2" fill="url(#gloss)"/>
+                  <ellipse cx="${x+13.5}" cy="${y+3}" rx="7" ry="2" fill="#FFF"/>`;
+        }).join('') + `<rect x="19" y="34" width="122" height="63" rx="7" fill="url(#gloss)" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7"/>`)
+    : svgStage('10包加厚衛生紙',
+        Array.from({length: 10}, (_, i) => {
+          const c = i % 5, r = Math.floor(i / 5), x = 18 + c * 25, y = 26 + r * 34;
+          return `<rect x="${x}" y="${y}" width="23" height="32" rx="4.5" fill="#38B2AC" stroke="#234E52" stroke-width="1"/>
+                  <rect x="${x+2}" y="${y+2}" width="19" height="12" rx="2" fill="url(#gloss)"/>
+                  <ellipse cx="${x+11.5}" cy="${y+3.5}" rx="6" ry="2" fill="#FFF"/>`;
+        }).join('') + `<rect x="15" y="22" width="130" height="75" rx="7" fill="url(#gloss)" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7"/>`),
+
+  milk: k => k === 'a'
+    ? svgStage('兩瓶屋頂盒鮮乳', [34, 86].map(x => `
+        <g>
+          <polygon points="${x},36 ${x+20},20 ${x+40},36" fill="#3182CE" stroke="#1A365D" stroke-width="1.2"/>
+          <rect x="${x+13}" y="15" width="14" height="6" rx="2" fill="#E53E3E"/>
+          <rect x="${x}" y="36" width="40" height="62" rx="3" fill="#FFFFFF" stroke="#CBD5E0" stroke-width="1.2"/>
+          <rect x="${x+3}" y="50" width="34" height="24" rx="2" fill="#63B3ED"/>
+          <rect x="${x}" y="36" width="16" height="62" fill="url(#gloss)"/>
+        </g>`).join('') + `<rect x="30" y="72" width="100" height="8" rx="2" fill="#E53E3E"/>`)
+    : svgStage('家庭號大桶鮮乳', `
+        <rect x="64" y="12" width="24" height="8" rx="3" fill="#2B6CB0"/>
+        <path d="M46 26 C46 18, 106 18, 106 26 L114 40 L114 98 L40 98 L40 40 Z" fill="#FFFFFF" stroke="#CBD5E0" stroke-width="1.5"/>
+        <path d="M114 38 h10 a8 8 0 0 1 8 8 v22 a8 8 0 0 1 -8 8 h-10" fill="none" stroke="#FFFFFF" stroke-width="7"/>
+        <rect x="48" y="52" width="58" height="28" rx="4" fill="#2B6CB0"/>
+        <path d="M46 26 L75 26 L75 98 L40 98 L40 40 Z" fill="url(#gloss)"/>`),
+
+  chips: k => k === 'a'
+    ? svgStage('超鼓脹派對大袋洋芋片', `
+        <path d="M30 14 Q80 20 130 14 L122 97 Q80 93 38 97 Z" fill="#F6AD55" stroke="#C05621" stroke-width="1.5"/>
+        <rect x="28" y="10" width="104" height="7" rx="2" fill="#DD6B20"/>
+        <rect x="36" y="93" width="88" height="6" rx="2" fill="#DD6B20"/>
+        <circle cx="80" cy="54" r="22" fill="#FEFCBF" stroke="#D69E2E" stroke-width="1.5"/>
+        <ellipse cx="75" cy="50" rx="10" ry="7" fill="#F6E05E" transform="rotate(-15 75 50)"/>
+        <ellipse cx="86" cy="58" rx="10" ry="7" fill="#ECC94B" transform="rotate(20 86 58)"/>
+        <path d="M34 16 L80 18 L76 95 L40 95 Z" fill="url(#gloss)"/>
+        <g class="reveal-only">
+          <rect x="38" y="20" width="84" height="46" rx="6" fill="#FFFFFF" fill-opacity="0.92" stroke="#E02424" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <text x="80" y="47" text-anchor="middle" font-size="12" font-weight="900" fill="#E02424">💨 60% 氮氣空間</text>
+        </g>`)
+    : svgStage('標準小袋洋芋片', `
+        <path d="M48 34 Q80 38 112 34 L108 97 Q80 94 52 97 Z" fill="#F6E05E" stroke="#B7791F" stroke-width="1.5"/>
+        <rect x="46" y="30" width="68" height="6" rx="2" fill="#D69E2E"/>
+        <rect x="50" y="93" width="60" height="5" rx="2" fill="#D69E2E"/>
+        <circle cx="80" cy="64" r="16" fill="#FFFFFF"/>
+        <ellipse cx="80" cy="64" rx="9" ry="6" fill="#ECC94B"/>
+        <path d="M50 35 L80 36 L78 95 L52 95 Z" fill="url(#gloss)"/>`),
+
+  shampoo: k => k === 'a'
+    ? svgStage('兩大瓶按壓洗髮精', [30, 84].map(x => `
+        <g>
+          <path d="M${x+18} 14 h14 M${x+22} 14 v10" stroke="#4A5568" stroke-width="3" stroke-linecap="round"/>
+          <rect x="${x+15}" y="22" width="14" height="7" rx="2" fill="#553C9A"/>
+          <rect x="${x}" y="28" width="44" height="70" rx="14" fill="#9F7AEA" stroke="#6B46C1" stroke-width="1.2"/>
+          <rect x="${x+6}" y="48" width="32" height="28" rx="4" fill="#FFFFFF" opacity="0.92"/>
+          <rect x="${x+3}" y="30" width="18" height="66" rx="8" fill="url(#gloss)"/>
+        </g>`).join('') + `<circle cx="132" cy="30" r="18" fill="#0E9F6E" stroke="#FFF" stroke-width="2"/><text x="132" y="34" text-anchor="middle" font-size="11" font-weight="900" fill="#FFF">6折</text>`)
+    : svgStage('兩小瓶買一送一洗髮精', [38, 86].map(x => `
+        <g>
+          <rect x="${x+10}" y="40" width="14" height="8" rx="2" fill="#B83280"/>
+          <rect x="${x}" y="47" width="34" height="51" rx="10" fill="#F687B3" stroke="#D53F8C" stroke-width="1.2"/>
+          <rect x="${x+5}" y="62" width="24" height="20" rx="3" fill="#FFFFFF" opacity="0.92"/>
+          <rect x="${x+2}" y="49" width="14" height="47" rx="6" fill="url(#gloss)"/>
+        </g>`).join('') + `<circle cx="130" cy="36" r="19" fill="#E02424" stroke="#FFF" stroke-width="2"/><text x="130" y="40" text-anchor="middle" font-size="10.5" font-weight="900" fill="#FFD84D">買1送1</text>`),
+
+  diaper: k => k === 'a'
+    ? svgStage('單包手提袋裝尿布', `
+        <path d="M60 24 Q80 10 100 24" fill="none" stroke="#D53F8C" stroke-width="3.5" stroke-linecap="round"/>
+        <rect x="40" y="22" width="80" height="76" rx="14" fill="#FBB6CE" stroke="#D53F8C" stroke-width="1.4"/>
+        <rect x="50" y="40" width="60" height="36" rx="8" fill="#FFFFFF"/>
+        <circle cx="80" cy="58" r="12" fill="#FED7E2"/>
+        <rect x="42" y="24" width="36" height="72" rx="12" fill="url(#gloss)"/>`)
+    : svgStage('整箱四包入箱購尿布', `
+        ${[0, 1, 2, 3].map(i => `<rect x="${20 + i * 30}" y="20" width="28" height="36" rx="6" fill="#FBB6CE" stroke="#D53F8C" stroke-width="1.2"/>`).join('')}
+        <rect x="14" y="46" width="132" height="52" rx="4" fill="#D69E2E" stroke="#975A16" stroke-width="1.5"/>
+        <polygon points="14,46 6,34 46,34 50,46" fill="#ECC94B" stroke="#975A16" stroke-width="1"/>
+        <polygon points="146,46 154,34 114,34 110,46" fill="#ECC94B" stroke="#975A16" stroke-width="1"/>
+        <rect x="36" y="60" width="88" height="24" rx="4" fill="#FEFCBF"/>
+        <text x="80" y="76" text-anchor="middle" font-size="12" font-weight="900" fill="#975A16">WHOLESALE × 4</text>`),
+
+  detergent: k => k === 'a'
+    ? svgStage('環保補充包洗衣精', `
+        <g transform="translate(96, 14) rotate(28)"><rect width="10" height="16" rx="2" fill="#2C7A7B"/></g>
+        <path d="M46 24 L98 24 L110 40 L104 97 L40 97 Z" fill="#4FD1C5" stroke="#285E61" stroke-width="1.4" stroke-linejoin="round"/>
+        <rect x="52" y="48" width="44" height="30" rx="6" fill="#FFFFFF"/>
+        <path d="M46 24 L74 24 L72 97 L40 97 Z" fill="url(#gloss)"/>`)
+    : svgStage('重量大瓶裝洗衣精', `
+        <rect x="60" y="10" width="26" height="11" rx="3" fill="#2B6CB0"/>
+        <path d="M40 26 L104 26 L112 42 L112 97 L36 97 L36 42 Z" fill="#4299E1" stroke="#2B6CB0" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M112 38 h9 a8 8 0 0 1 8 8 v22 a8 8 0 0 1 -8 8 h-9" fill="none" stroke="#4299E1" stroke-width="7"/>
+        <rect x="48" y="48" width="52" height="32" rx="6" fill="#FFFFFF"/>
+        <path d="M40 26 L74 26 L74 97 L36 97 Z" fill="url(#gloss)"/>
+        <circle cx="34" cy="32" r="19" fill="#FFD84D" stroke="#2B2100" stroke-width="1.8"/>
+        <text x="34" y="36" text-anchor="middle" font-size="11" font-weight="900" fill="#2B2100">會員9折</text>`)
+};
+
+function renderIntro() {
+  clearInterval(state.clock);
+  const list = QUESTIONS.map((q, i) => `
+    <div class="case">
+      <span class="icon-badge" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
+      <div class="info">
+        <b>0${i + 1}｜${q.name}</b>
+        <small>${q.trap}</small>
+      </div>
+      <span class="lv">${q.level}</span>
+    </div>`).join('');
+  app.innerHTML = `
+    ${topbar('<span class="pill">比價直覺挑戰</span>')}
+    <section class="hero">
+      <span class="kicker">6 道經典思維實驗・賣場比價心理戰</span>
+      <h1>你的比價直覺，<br>騙得過賣場嗎？</h1>
+      <p class="lead">從蒙提霍爾到康納曼《快思慢想》，賣場貨架處處是直覺陷阱。每題二選一，測測看你是哪一型購物角色！</p>
+    </section>
+    <div class="cases">${list}</div>
+    <button class="btn block" id="start" type="button">開始挑戰 →</button>
+    <p class="foot">免下載直接玩・題目價格為賣場情境示意</p>`;
+  document.getElementById('start').addEventListener('click', () => {
+    state = { i: 0, picks: [], started: Date.now(), clock: null };
+    state.clock = setInterval(() => { const c = document.getElementById('clock'); if (c) c.textContent = mmss(elapsed()); }, 500);
+    track('challenge_start');
+    renderQuestion();
+  });
+}
+
+function optHTML(key, o, q) {
+  return `<button class="opt" type="button" data-k="${key}">
+      <div class="art-wrap">
+        <img class="photo" src="${o.img}" alt="${o.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+        <div class="fallback-svg" style="display:none;width:100%;height:100%">${ART_3D[q.art](key)}</div>
+        <span class="letter-badge">${key.toUpperCase()}</span>
+        <span class="spec-pill">${o.badge}</span>
+      </div>
+      <span class="name">${o.name}</span>
+      <span class="spec">${o.spec}</span>
+      <span class="unit">${q.unit} ${o.up}</span>
+      <div class="tag">
+        <div class="tag-top">
+          <span class="promo">${o.promo}</span>
+          
+        </div>
+        <span class="price"><small>$</small>${fmt(o.price)}</span>
+      </div>
+    </button>`;
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.i];
+  const dots = QUESTIONS.map((_, i) => `<i class="${i < state.i ? 'done' : i === state.i ? 'now' : ''}"></i>`).join('');
+  app.innerHTML = `
+    ${topbar(`<span class="pills"><span class="pill">${state.i + 1} /${QUESTIONS.length}</span><span class="pill" id="clock" aria-label="總時間">${mmss(elapsed())}</span></span>`)}
+    <div class="dots" aria-hidden="true">${dots}</div>
+    <div class="qhead">
+      <div class="qmeta">
+        <span class="qlevel">卷 ${['I', 'II', 'III', 'IV', 'V', 'VI'][state.i]} · ${q.level}</span>
+        <span class="qtrap">${q.trap}</span>
+      </div>
+      <h2 class="qname" tabindex="-1">${q.name}</h2>
+      <p class="qstory">${q.story}</p>
+      <p class="qask">${q.ask}</p>
+    </div>
+    <div class="opts">${optHTML('a', q.a, q)}${optHTML('b', q.b, q)}</div>
+    <div id="after"></div>`;
+  app.querySelectorAll('.opt').forEach(btn => btn.addEventListener('click', () => answer(btn.dataset.k)));
+  window.scrollTo(0, 0);
+  document.querySelector('.qname').focus({ preventScroll: true });
+}
+
+function answer(k) {
+  if (state.picks.length > state.i) return;
+  const q = QUESTIONS[state.i];
+  state.picks.push(k);
+  const right = k === q.ans;
+  track('answer', { q: state.i + 1, pick: k, correct: right });
+  app.querySelectorAll('.opt').forEach(btn => {
+    btn.disabled = true;
+    btn.classList.add('revealed', btn.dataset.k === q.ans ? 'win' : 'lose');
+    if (btn.dataset.k === k) btn.classList.add('picked');
+  });
+  const last = state.i === QUESTIONS.length - 1;
+  document.getElementById('after').innerHTML = `
+    <div tabindex="-1" class="verdict ${right ? 'ok' : 'bad'}">
+      <h3>${right ? check + '漂亮，你看穿了！' : cross + '中計了！'}</h3>
+      <p>${q.why}</p>
+      <p class="save">${right ? `這題幫荷包省下 $${q.save}` : `如果選 ${q.ans.toUpperCase()} 可以多省 $${q.save}`}</p>
+      ${originHTML(q)}
+    </div>
+    <button class="btn block" id="next" type="button" style="margin-top: 14px">${last ? '看我的購物角色 →' : '下一關 →'}</button>`;
+  const next = document.getElementById('next');
+  document.querySelector('.verdict').focus({ preventScroll: true });
+  document.getElementById('after').scrollIntoView({ block: 'start', behavior: 'instant' });
+  next.addEventListener('click', () => { state.i += 1; last ? renderResult() : renderQuestion(); });
+}
+
+function renderResult() {
+  clearInterval(state.clock);
+  window.scrollTo(0, 0);
+  const total = elapsed();
+  const correct = state.picks.filter((p, i) => p === QUESTIONS[i].ans).length;
+  const saved = QUESTIONS.reduce((s, q, i) => s + (state.picks[i] === q.ans ? q.save : 0), 0);
+  const missed = MAX_SAVE - saved;
+  const fast = total <= FAST_SECONDS;
+  const tier = correct >= 5 ? 'Sharp' : correct >= 3 ? 'Mid' : 'Loose';
+  const r = ROLES[(fast ? 'fast' : 'slow') + tier];
+  track('challenge_complete', { correct: correct, saved: saved, seconds: Math.round(total), role: r.role });
+  const rows = QUESTIONS.map((q, i) => {
+    const ok = state.picks[i] === q.ans;
+    return `<div class="rv"><span class="mark ${ok ? 'ok' : 'bad'}" aria-label="${ok ? '答對' : '答錯'}">${ok ? check : cross}</span>
+      <div><b>${q.name}</b><span>${q.lesson}</span></div>
+      <span class="amt ${ok ? 'ok' : 'bad'}">${ok ? '+' : '−'}$${q.save}</span></div>`;
+  }).join('');
+  app.innerHTML = `
+    ${topbar('<span class="pill">挑戰結果</span>')}
+    <section class="persona">
+      <span class="kicker">你的賣場購物角色是</span>
+      <img class="result-art" src="${r.img}" alt="${r.role}的 AI 生成角色插畫" width="320" height="400" onerror="this.hidden=true;this.nextElementSibling.style.display='flex'">
+      <span class="emblem" aria-hidden="true" style="display:none">${r.icon}</span>
+      <span class="role">${r.role}</span>
+      <p class="desc">${r.desc}</p>
+    </section>
+    <div class="stats">
+      <div class="stat"><b class="hl">$${saved}</b><span>這局省下</span></div>
+      <div class="stat"><b>${correct}/6</b><span>看穿陷阱</span></div>
+      <div class="stat"><b>${mmss(total)}</b><span>總時間</span></div>
+    </div>
+    <section class="review"><h2>${missed > 0 ? `還有 $${missed} 被賣場賺走了` : '滿分過關！一塊錢都沒被賣場多賺'}</h2>${rows}</section>
+    <section class="cta app-outro" aria-labelledby="app-outro-title">
+      <p class="outro-kicker">你的下一次比價，交給發票存摺</p>
+      <p class="outro-desc">發票存摺用你已歸戶的電子發票，自動記下每次實際付了多少，下次買之前一查就知道。</p>
+      <h2 id="app-outro-title">不論你是哪個角色，<br>以後比價都能<span class="outro-punch">快、狠、準。</span></h2>
+      <img class="outro-scene" src="img/price/p25.webp" alt="六個購物角色一起在賣場拿著手機使用發票存摺比價，手機背面朝向觀眾" width="1536" height="1024" onerror="this.hidden=true">
+      <div class="row2">
+        <a class="btn" id="dl-android" href="${STORE.android}" target="_blank" rel="noopener">Android 下載</a>
+        <a class="btn" id="dl-ios" href="${STORE.ios}" target="_blank" rel="noopener">iPhone 下載</a>
+      </div>
+    </section>
+    <button class="btn ghost block" id="again" type="button">再玩一次</button>
+    <p class="foot">題目價格為示意，省下金額以遊戲情境計算。發票同步最多需要 48 小時，歷史價格會隨你的發票逐步累積。</p>`;
+  document.getElementById('dl-android').addEventListener('click', () => track('install_click', { store: 'android', role: r.role }));
+  document.getElementById('dl-ios').addEventListener('click', () => track('install_click', { store: 'ios', role: r.role }));
+  document.getElementById('again').addEventListener('click', renderIntro);
+}
+
+renderIntro();
+</script>
+
+<script>
+// 圖片拆成獨立檔：閒置時預先載入其餘關卡的圖，換題不卡
+(function(){var go=function(){try{var seen={};JSON.stringify(QUESTIONS,function(k,v){if(typeof v==='string'&&/\.webp$/.test(v)&&!seen[v]){seen[v]=1;new Image().src=v;}return v;});}catch(e){}};
+if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:2000});else setTimeout(go,800);})();
+</script>
+</body>
+</html>

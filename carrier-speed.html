@@ -1,0 +1,1484 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>刷載具快手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@700;800&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #E6EEFF;
+  --counter: #FFFFFF;
+  --ink: #121722;
+  --muted: #5A6476;
+  --line: #CBD6EC;
+  --blue: #2956E8;
+  --blue-dark: #193BB5;
+  --blue-soft: #DCE6FF;
+  --green: #0A9F6E;
+  --green-soft: #DDF5EC;
+  --red: #D93A3F;
+  --red-soft: #FCE4E4;
+  --amber: #F59E0B;
+  --bubble: #FFF7CC;
+  --f-display: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  --f-num: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; }
+[hidden]:not([hidden=until-found i]) { display: none !important; }
+html, body { height: 100%; margin: 0; padding: 0; }
+body {
+  background: radial-gradient(circle at 50% 0%, #F4F8FF 0%, var(--bg) 75%);
+  color: var(--ink);
+  font-family: var(--f-display);
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.app {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100%;
+  padding: 14px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+h1, h2, p { margin: 0; text-wrap: balance; }
+button { font-family: inherit; cursor: pointer; user-select: none; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+/* 台灣超商風頂部條紋 */
+.store-awning {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #FF6B00 0 33.3%, #009944 33.3% 66.6%, #E60012 66.6% 100%);
+  box-shadow: 0 2px 6px rgba(18, 23, 34, 0.12);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--blue);
+  letter-spacing: .08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+.icon-btn {
+  background: var(--counter);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 立體按鈕 */
+.btn {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 15px 22px;
+  font-size: 18px;
+  font-weight: 900;
+  background: var(--blue);
+  color: #fff;
+  width: 100%;
+  box-shadow: 0 5px 0 var(--ink);
+  transition: transform .08s, box-shadow .08s;
+}
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+.btn.ghost {
+  background: var(--counter);
+  color: var(--ink);
+}
+.small { font-size: 12px; color: var(--muted); }
+
+/* 首頁 */
+.hero {
+  background: var(--counter);
+  border-radius: 26px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 2px solid var(--ink);
+  box-shadow: 0 6px 0 rgba(18, 23, 34, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+.hero h1 { font-size: 42px; font-weight: 900; line-height: 1.08; letter-spacing: -0.02em; }
+.hero h1 em { font-style: normal; color: var(--blue); }
+.hero p { font-size: 16px; line-height: 1.55; color: var(--muted); font-weight: 500; }
+.scene-mini {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #F4F7FF;
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  padding: 10px 14px;
+}
+.say {
+  background: var(--bubble);
+  border: 2.5px solid var(--ink);
+  border-radius: 18px;
+  padding: 8px 16px;
+  font-size: 26px;
+  font-weight: 900;
+  position: relative;
+  box-shadow: 0 4px 0 rgba(18, 23, 34, 0.1);
+}
+.say::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  bottom: 14px;
+  width: 14px;
+  height: 14px;
+  background: var(--bubble);
+  border-left: 2.5px solid var(--ink);
+  border-bottom: 2.5px solid var(--ink);
+  transform: rotate(45deg);
+}
+.devices-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--blue-soft);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 遊戲頂部 HUD */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.round-badge {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.round-badge.practice {
+  background: var(--amber);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+}
+.skip-btn {
+  background: var(--counter);
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--ink);
+}
+.dots { display: flex; gap: 4px; }
+.dots i {
+  width: 14px;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--line);
+  transition: all .2s;
+}
+.dots i.done { background: var(--blue); }
+.dots i.now { background: var(--ink); width: 22px; }
+
+/* 店員櫃檯區 */
+.counter {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F8FF 100%);
+  border-radius: 24px;
+  border: 2.5px solid var(--ink);
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 138px;
+  position: relative;
+  box-shadow: 0 5px 0 rgba(18, 23, 34, 0.08);
+}
+.bubble {
+  background: var(--bubble);
+  border: 2.5px solid var(--ink);
+  border-radius: 20px;
+  padding: 12px 15px;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.2;
+  position: relative;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  transition: transform .15s cubic-bezier(.2,1.4,.4,1), background-color .15s;
+  box-shadow: 0 4px 0 rgba(18, 23, 34, 0.08);
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 24px;
+  width: 14px;
+  height: 14px;
+  background: var(--bubble);
+  border-left: 2.5px solid var(--ink);
+  border-bottom: 2.5px solid var(--ink);
+  transform: rotate(45deg);
+}
+.bubble.wait { color: var(--muted); font-size: 19px; font-weight: 700; background: #F8FAFF; }
+.bubble.wait::after { background: #F8FAFF; }
+.bubble.go {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--ink);
+  transform: scale(1.04);
+}
+.bubble.go::after { background: var(--blue); border-color: var(--ink); }
+.bubble.ok {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  font-size: 22px;
+}
+.bubble.ok::after { background: var(--green-soft); border-color: var(--green); }
+.bubble.bad {
+  background: var(--red-soft);
+  border-color: var(--red);
+  color: var(--red);
+  font-size: 20px;
+}
+.bubble.bad::after { background: var(--red-soft); border-color: var(--red); }
+
+/* 互動示範教學橫幅 */
+.coach-bar {
+  background: #121722;
+  color: #fff;
+  border-radius: 16px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(18, 23, 34, 0.16);
+  animation: popIn .2s ease-out;
+}
+.coach-bar b { color: #FFD43B; font-weight: 900; }
+@keyframes popIn {
+  from { transform: translateY(-4px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* 計時器與提示列 */
+.status-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+.timer {
+  font-family: var(--f-num);
+  font-weight: 800;
+  font-size: 38px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.timer small { font-size: 16px; margin-left: 3px; font-weight: 700; }
+.toast {
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--red);
+  text-align: right;
+  min-height: 20px;
+}
+
+/* 第一人稱玩家裝備區 */
+.me {
+  background: var(--counter);
+  border-radius: 22px;
+  border: 2.5px solid var(--ink);
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 5px 0 rgba(18, 23, 34, 0.08);
+}
+.me-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.me .label {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: .06em;
+}
+.equip-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.eq-pill {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue-dark);
+  border: 1.5px solid var(--blue);
+}
+.eq-pill.warn {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: var(--red);
+}
+.state {
+  display: block;
+  max-width: 350px;
+  margin: 0 auto;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+}
+.state svg { display: block; }
+
+/* 底部三個載具按鈕 */
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  position: relative;
+}
+.dev {
+  position: relative;
+  border: 2.5px solid var(--ink);
+  background: var(--counter);
+  border-radius: 20px;
+  padding: 12px 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--ink);
+  box-shadow: 0 5px 0 var(--ink);
+  transition: transform .08s, box-shadow .08s, background-color .15s;
+}
+.dev:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+.dev svg { width: 44px; height: 44px; }
+.dev[aria-disabled="true"] {
+  opacity: .42;
+  border-style: dashed;
+  box-shadow: none;
+  transform: none;
+}
+.dev.coach-target {
+  background: #FFF9DB;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(41, 86, 232, 0.25), 0 5px 0 var(--blue);
+  animation: pulseBtn .9s infinite alternate;
+}
+@keyframes pulseBtn {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+.finger-guide {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #FFD43B;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  animation: bounceFinger .7s infinite alternate;
+  z-index: 3;
+}
+.finger-guide::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: var(--ink);
+}
+@keyframes bounceFinger {
+  from { transform: translate(-50%, 0); }
+  to { transform: translate(-50%, -6px); }
+}
+
+/* 彈出層 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 23, 34, .65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 20;
+}
+.lock {
+  width: min(300px, 100%);
+  aspect-ratio: 9/16;
+  max-height: 78vh;
+  background: linear-gradient(165deg, #1E293B 0%, #0F172A 100%);
+  border-radius: 38px;
+  border: 8px solid #090D16;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36px 18px 24px;
+  touch-action: none;
+  user-select: none;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+}
+.lock::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  width: 76px;
+  height: 18px;
+  background: #090D16;
+  border-radius: 999px;
+}
+.lock .clock { font-family: var(--f-num); font-size: 50px; font-weight: 800; margin-top: 8px; }
+.lock .hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+  font-size: 17px;
+}
+.lock .arrow {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 2.5px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  animation: up .9s infinite;
+}
+@keyframes up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.lock .kb {
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,.5);
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.code {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.code::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 20%;
+  height: 3px;
+  background: #FF2E2E;
+  box-shadow: 0 0 10px #FF2E2E;
+  animation: laserScan .6s ease-in-out infinite alternate;
+}
+@keyframes laserScan {
+  from { top: 18%; }
+  to { top: 75%; }
+}
+.code .bars { display: flex; height: 68px; align-items: stretch; }
+.code .bars i { display: block; background: var(--ink); }
+.code .id { font-family: var(--f-num); font-weight: 800; font-size: 19px; letter-spacing: .08em; }
+.watchface {
+  width: 230px;
+  height: 230px;
+  background: #0D1018;
+  border: 10px solid #2A3142;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+}
+.watchface.round { border-radius: 50%; }
+.watchface.square { border-radius: 52px; }
+.watchface .code { padding: 10px; border-radius: 14px; }
+.watchface .code .bars { height: 50px; }
+.watchface .code .id { font-size: 14px; }
+
+.modal-card {
+  background: var(--counter);
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  padding: 22px 20px;
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+/* 結算頁 */
+.result {
+  background: var(--counter);
+  border-radius: 26px;
+  border: 2.5px solid var(--ink);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 6px 0 rgba(18, 23, 34, 0.08);
+}
+.result .big { font-family: var(--f-num); font-size: 60px; font-weight: 800; line-height: 1; }
+.result .big small { font-size: 22px; margin-left: 6px; }
+.title-badge {
+  align-self: flex-start;
+  background: var(--ink);
+  color: #FFD43B;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-weight: 900;
+  font-size: 17px;
+}
+.vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.vs div {
+  border-radius: 18px;
+  padding: 13px;
+  background: var(--blue-soft);
+  border: 1.5px solid var(--line);
+}
+.vs div:first-child { background: #F1F4F9; }
+.vs b { display: block; font-family: var(--f-num); font-size: 26px; margin-top: 2px; }
+.vs span { font-size: 13px; color: var(--muted); font-weight: 700; }
+.punch { font-size: 18px; font-weight: 900; line-height: 1.45; }
+.punch em { font-style: normal; color: var(--blue); }
+.dl { display: flex; flex-direction: column; gap: 8px; }
+.dl a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--counter);
+  border: 2.5px solid var(--ink);
+  border-radius: 18px;
+  padding: 14px 16px;
+  font-weight: 900;
+  font-size: 15px;
+  box-shadow: 0 4px 0 var(--ink);
+}
+.dl a span { font-size: 13px; color: var(--muted); font-weight: 700; }
+.dl a.primary { background: var(--blue); color: #fff; }
+.dl a.primary span { color: #DCE5FF; }
+
+/* 分享卡區塊 */
+.share {
+  background: var(--counter);
+  border-radius: 24px;
+  border: 2.5px solid var(--ink);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.share img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1080 / 1350;
+  object-fit: contain;
+  border-radius: 16px;
+  border: 1.5px solid var(--line);
+}
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.copied { color: var(--green); font-weight: 900; font-size: 14px; text-align: center; min-height: 20px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="store-awning"></div>
+  <div class="topbar">
+    <div class="brand">發票存摺 × 結帳反應挑戰</div>
+    <button class="icon-btn" id="b-sound" type="button" aria-label="切換音效">🔊 音效開</button>
+  </div>
+
+  <!-- START -->
+  <section id="s-start" style="display:flex;flex-direction:column;gap:14px">
+    <div class="hero">
+      <div class="scene-mini">
+        <svg width="76" height="86" viewBox="0 0 78 90" aria-hidden="true">
+          <rect x="12" y="52" width="54" height="38" rx="14" fill="#2563EB"/>
+          <rect x="24" y="56" width="30" height="34" rx="6" fill="#FFFFFF"/>
+          <path d="M24 62 H54" stroke="#FF6B00" stroke-width="4"/>
+          <circle cx="39" cy="32" r="20" fill="#F5D3B3"/>
+          <path d="M17 26c2-12 11-18 22-18s20 6 22 18z" fill="#1E293B"/>
+          <rect x="15" y="23" width="48" height="6" rx="3" fill="#2563EB"/>
+          <circle cx="32" cy="35" r="2.6" fill="#121722"/>
+          <circle cx="46" cy="35" r="2.6" fill="#121722"/>
+          <path d="M33 43q6 5 12 0" stroke="#121722" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <div class="say">載具？</div>
+          <div class="small" style="margin-top:6px;font-weight:700">後面還有 10 人在排隊…</div>
+        </div>
+      </div>
+      <h1>刷載具<em>快手</em></h1>
+      <p>店員一問「載具？」，你多快拿出來？不用看冗長規則，先跟著店員試刷 2 次就上手！</p>
+      <div class="devices-row">
+        <span class="chip">⚡ 互動示範秒懂</span>
+        <span class="chip">🛒 10 位排隊客人</span>
+        <span class="chip">⌚ 手機 vs 手錶對決</span>
+      </div>
+    </div>
+    <button class="btn" id="b-start">開始結帳（含 15 秒實戰教學）</button>
+    <p class="small" style="text-align:center">秒數以遊戲情境計算</p>
+  </section>
+
+  <!-- GAME -->
+  <section id="s-game" hidden style="display:flex;flex-direction:column;gap:10px">
+    <div class="hud">
+      <div class="hud-left">
+        <span class="round-badge" id="g-round">第 1 位客人</span>
+        <button class="skip-btn" id="b-skip-tut" hidden>跳過教學 →</button>
+      </div>
+      <span class="dots" id="g-dots"></span>
+    </div>
+
+    <div class="coach-bar" id="g-coach" hidden>
+      <span id="g-coach-text">跟著店員試一次！</span>
+    </div>
+
+    <div class="counter">
+      <svg width="96" height="112" viewBox="0 0 88 96" aria-hidden="true">
+        <rect x="64" y="54" width="20" height="32" rx="4" fill="#334155" stroke="#121722" stroke-width="2"/>
+        <rect x="67" y="58" width="14" height="10" rx="2" fill="#38BDF8"/>
+        <rect x="10" y="54" width="52" height="36" rx="14" fill="#2563EB" stroke="#121722" stroke-width="2"/>
+        <rect x="22" y="56" width="28" height="34" rx="5" fill="#FFFFFF"/>
+        <path d="M22 63 H50" stroke="#FF6B00" stroke-width="3.5"/>
+        <path d="M22 68 H50" stroke="#009944" stroke-width="3.5"/>
+        <circle cx="36" cy="34" r="20" fill="#F5D3B3" stroke="#121722" stroke-width="2"/>
+        <path d="M14 28c2-12 11-18 22-18s20 6 22 18z" fill="#1E293B" stroke="#121722" stroke-width="2"/>
+        <rect x="12" y="25" width="48" height="6" rx="3" fill="#2563EB" stroke="#121722" stroke-width="2"/>
+        <circle cx="29" cy="36" r="2.6" fill="#121722"/>
+        <circle cx="43" cy="36" r="2.6" fill="#121722"/>
+        <path id="g-mouth" d="M30 44q6 5 12 0" stroke="#121722" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="bubble wait" id="g-bubble" aria-live="assertive">嗶…嗶…刷商品中</div>
+    </div>
+
+    <div class="status-row">
+      <div class="timer" id="g-timer">0.00<small>秒</small></div>
+      <div class="toast" id="g-toast" aria-live="polite"></div>
+    </div>
+
+    <div class="me">
+      <div class="me-header">
+        <div class="label">👇 低頭看你的雙手與兩側口袋</div>
+        <div class="equip-badges" id="g-badges"></div>
+      </div>
+      <div class="state" id="g-state"></div>
+    </div>
+
+    <div class="pad">
+      <button class="dev" id="d-phone" data-dev="phone">
+        <div class="finger-guide" id="fg-phone" hidden>👆 點手機</div>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="13" y="4" width="22" height="40" rx="5" fill="#EEF4FF" stroke="#121722" stroke-width="3"/>
+          <rect x="20" y="8" width="8" height="2.5" rx="1.2" fill="#121722"/>
+          <rect x="17" y="16" width="14" height="10" rx="2" fill="#2956E8"/>
+        </svg>
+        手機
+      </button>
+      <button class="dev" id="d-android" data-dev="android">
+        <div class="finger-guide" id="fg-android" hidden>👆 點這支錶</div>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="17" y="2" width="14" height="44" rx="5" fill="#64748B"/>
+          <circle cx="24" cy="24" r="14" fill="#EEF4FF" stroke="#121722" stroke-width="3"/>
+          <circle cx="24" cy="24" r="5" fill="#2956E8"/>
+        </svg>
+        Android 手錶
+      </button>
+      <button class="dev" id="d-apple" data-dev="apple">
+        <div class="finger-guide" id="fg-apple" hidden>👆 點這支錶</div>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="17" y="2" width="14" height="44" rx="5" fill="#64748B"/>
+          <rect x="11" y="10" width="26" height="28" rx="8" fill="#EEF4FF" stroke="#121722" stroke-width="3"/>
+          <rect x="38" y="19" width="3" height="7" rx="1.5" fill="#121722"/>
+          <rect x="16" y="18" width="16" height="4" rx="2" fill="#2956E8"/>
+          <rect x="16" y="25" width="11" height="4" rx="2" fill="#0A9F6E"/>
+        </svg>
+        Apple Watch
+      </button>
+    </div>
+    <p class="small" style="text-align:center">鍵盤快捷鍵：1 手機・2 Android 手錶・3 Apple Watch・↑ 解鎖</p>
+  </section>
+
+  <!-- RESULT -->
+  <section id="s-result" hidden style="display:flex;flex-direction:column;gap:14px">
+    <div class="result">
+      <div class="brand">你的刷載具速度</div>
+      <div class="big" id="r-avg">0.00<small>秒</small></div>
+      <div class="title-badge" id="r-title">櫃檯閃電</div>
+      <div class="vs">
+        <div><span>📱 用手機平均</span><b id="r-phone">–</b></div>
+        <div><span>⌚ 用手錶平均</span><b id="r-watch">–</b></div>
+      </div>
+      <div class="punch" id="r-punch"></div>
+      <p class="small">秒數以遊戲情境計算，手機包含解鎖、打開 App 的時間。</p>
+    </div>
+    <div class="dl">
+      <a class="primary" id="a-android" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dwatch_android" target="_blank" rel="noopener">我有 Android 手錶<span>Google Play 下載 →</span></a>
+      <a class="primary" id="a-apple" href="https://apps.apple.com/tw/app/id1276986959" target="_blank" rel="noopener">我有 Apple Watch<span>App Store 下載 →</span></a>
+      <a id="a-phone" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dphone" target="_blank" rel="noopener">還沒有手錶<span>先用手機刷載具 →</span></a>
+    </div>
+    <div class="share">
+      <b style="font-size:17px">挑戰朋友</b>
+      <img id="r-card" alt="分享卡：你的刷載具速度與稱號">
+      <p class="small">長按圖片儲存，或複製挑戰文字貼給朋友。</p>
+      <div class="row2">
+        <button class="btn" id="b-copy">複製挑戰文字</button>
+        <button class="btn ghost" id="b-again">再玩一次</button>
+      </div>
+      <div class="copied" id="r-copied" aria-live="polite"></div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="ov" hidden></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const track = (ev, p={}) => { try { (window.dataLayer = window.dataLayer || []).push({event:'carrier_game_'+ev, ...p}); } catch(e){} };
+
+// 簡易合成音效
+let soundOn = true;
+let audioCtx = null;
+function beep(freq = 1850, dur = 0.08, type = 'sine') {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+$('b-sound').onclick = () => {
+  soundOn = !soundOn;
+  $('b-sound').textContent = soundOn ? '🔊 音效開' : '🔇 靜音';
+};
+
+// 2 關互動示範關卡
+const PRACTICE_ROUNDS = [
+  {
+    wrist: null,
+    hands: false,
+    distract: ['要袋子嗎？'],
+    target: 'phone',
+    waitCoach: '👀 店員還在刷商品，<b>先別按！</b>',
+    distractCoach: '✋ 店員問「要袋子嗎？」<b>不是問載具，忍住別按！</b>',
+    goCoach: '⚡ 聽到「載具？」了！你沒戴錶，快點下方<b>【手機】</b>'
+  },
+  {
+    wrist: 'apple',
+    hands: true,
+    distract: [],
+    target: 'apple',
+    waitCoach: '☕ 雙手拿著熱咖啡與購物袋（沒手掏右口袋手機），注意<b>左手腕戴了 Apple Watch</b>',
+    goCoach: '⌚ 問「載具？」了！直接點下方<b>【Apple Watch】</b>免解鎖秒刷！'
+  }
+];
+
+// 正式 10 位客人
+const ROUNDS = [
+  {wrist:null,      hands:false, distract:[]},
+  {wrist:null,      hands:false, distract:[]},
+  {wrist:null,      hands:false, distract:[]},
+  {wrist:'android', hands:false, distract:[]},
+  {wrist:'apple',   hands:false, distract:[]},
+  {wrist:'android', hands:false, distract:['要袋子嗎？']},
+  {wrist:'apple',   hands:false, distract:['有會員嗎？']},
+  {wrist:null,      hands:false, distract:['打統編嗎？','要袋子嗎？']},
+  {wrist:'android', hands:true,  distract:['要不要加購？']},
+  {wrist:'apple',   hands:true,  distract:['有會員嗎？','要袋子嗎？']},
+];
+
+const WRONG_LINE = {'要袋子嗎？':'我是問袋子耶','有會員嗎？':'我是問會員耶','打統編嗎？':'我是問統編耶','要不要加購？':'我是問加購耶'};
+const OK_LINES = ['嗶！好了，謝謝～','刷好了，謝謝光臨','收到～超快！','好快！謝謝'];
+const LIMIT = 5000, PENALTY = 1000;
+
+let isPractice = true;
+let i = 0, phase = 'idle', t0 = 0, penalty = 0, raf = 0, timers = [], records = [], practiceTimes = [], curLine = '';
+
+function show(id) {
+  ['s-start', 's-game', 's-result'].forEach(s => $(s).hidden = s !== id);
+  window.scrollTo(0, 0);
+}
+function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
+function clearTimers() { timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf); }
+function bubble(text, cls) {
+  const b = $('g-bubble');
+  b.className = 'bubble ' + (cls || '');
+  b.textContent = text;
+  const mouth = $('g-mouth');
+  if (mouth) {
+    if (cls === 'go') mouth.setAttribute('d', 'M31 42 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0');
+    else if (cls === 'bad') mouth.setAttribute('d', 'M30 46 q6 -5 12 0');
+    else mouth.setAttribute('d', 'M30 44 q6 5 12 0');
+  }
+}
+function toast(t) {
+  $('g-toast').textContent = t;
+  later(() => { if ($('g-toast').textContent === t) $('g-toast').textContent = ''; }, 1300);
+}
+function fmt(ms) { return (ms / 1000).toFixed(2); }
+function setTimer(ms) { $('g-timer').innerHTML = fmt(ms) + '<small>秒</small>'; }
+
+function setCoach(html, targetDev = null) {
+  const bar = $('g-coach');
+  if (!isPractice || !html) {
+    bar.hidden = true;
+  } else {
+    bar.hidden = false;
+    $('g-coach-text').innerHTML = html;
+  }
+  ['phone', 'android', 'apple'].forEach(d => {
+    const btn = $('d-' + d);
+    const fg = $('fg-' + d);
+    const active = isPractice && targetDev === d;
+    btn.classList.toggle('coach-target', active);
+    fg.hidden = !active;
+  });
+}
+
+function dots() {
+  const list = isPractice ? PRACTICE_ROUNDS : ROUNDS;
+  $('g-dots').innerHTML = list.map((_, k) => `<i class="${k < i ? 'done' : k === i ? 'now' : ''}"></i>`).join('');
+}
+
+function figureSVG(r) {
+  const SK = '#F4C7A5', SK2 = '#DA9F76', SL = '#334155', SL2 = '#1E293B';
+
+  const watchOnWrist = (cx, cy, rot) => {
+    if (!r.wrist) return '';
+    const face = r.wrist === 'android'
+      ? `<rect x="-24" y="-11" width="48" height="22" rx="6" fill="#1E293B" stroke="#0F172A" stroke-width="1.5"/>
+         <circle cx="0" cy="0" r="20" fill="url(#bezel)" stroke="#121722" stroke-width="2"/>
+         <circle cx="0" cy="0" r="15.5" fill="#0F172A"/>
+         <circle cx="0" cy="0" r="11.5" fill="none" stroke="#38BDF8" stroke-width="3" stroke-dasharray="42 25" stroke-linecap="round" transform="rotate(-90)"/>
+         <text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" font-weight="800" fill="#fff">9:41</text>`
+      : `<rect x="-24" y="-11" width="48" height="22" rx="6" fill="#1E293B" stroke="#0F172A" stroke-width="1.5"/>
+         <rect x="-18" y="-21" width="36" height="42" rx="11" fill="url(#bezel)" stroke="#121722" stroke-width="2"/>
+         <rect x="-14" y="-17" width="28" height="34" rx="8" fill="#0F172A"/>
+         <rect x="18" y="-9" width="3.5" height="9" rx="1.5" fill="#94A3B8" stroke="#121722" stroke-width="1"/>
+         <rect x="-9" y="-10" width="18" height="4" rx="2" fill="#3B82F6"/>
+         <rect x="-9" y="-3" width="13" height="4" rx="2" fill="#10B981"/>
+         <rect x="-9" y="4" width="15" height="4" rx="2" fill="#F59E0B"/>`;
+    return `<g transform="translate(${cx} ${cy}) rotate(${rot})">
+      <circle cx="0" cy="0" r="29" fill="none" stroke="#2956E8" stroke-width="2.5" stroke-dasharray="6 5"/>
+      ${face}
+    </g>`;
+  };
+
+  const emptyHands = `
+    <g transform="translate(96 126) rotate(14)">
+      <path d="M-20 0 L-26 95 L26 95 L20 0 Z" fill="url(#arm)" stroke="${SK2}" stroke-width="1.5"/>
+      <rect x="12" y="-28" width="12" height="30" rx="6" fill="${SK}" stroke="${SK2}" stroke-width="1.5" transform="rotate(28 18 -12)"/>
+      <rect x="-19" y="-64" width="9" height="34" rx="4.5" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="-9" y="-70" width="9" height="40" rx="4.5" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="1" y="-68" width="9" height="38" rx="4.5" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="11" y="-58" width="8.5" height="30" rx="4.2" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="-20" y="-42" width="40" height="46" rx="15" fill="${SK}" stroke="${SK2}" stroke-width="1.5"/>
+      <path d="M-26 38 L26 38 L30 95 L-30 95 Z" fill="${SL}" stroke="#121722" stroke-width="1.8"/>
+      <rect x="-27" y="34" width="54" height="11" rx="5" fill="${SL2}"/>
+    </g>
+    ${watchOnWrist(92, 140, 14)}
+
+    <g transform="translate(264 126) rotate(-14)">
+      <path d="M-20 0 L-26 95 L26 95 L20 0 Z" fill="url(#arm)" stroke="${SK2}" stroke-width="1.5"/>
+      <rect x="-24" y="-28" width="12" height="30" rx="6" fill="${SK}" stroke="${SK2}" stroke-width="1.5" transform="rotate(-28 -18 -12)"/>
+      <rect x="-19" y="-58" width="8.5" height="30" rx="4.2" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="-9" y="-68" width="9" height="38" rx="4.5" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="1" y="-70" width="9" height="40" rx="4.5" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="11" y="-64" width="9" height="34" rx="4.5" fill="${SK}" stroke="${SK2}" stroke-width="1.4"/>
+      <rect x="-20" y="-42" width="40" height="46" rx="15" fill="${SK}" stroke="${SK2}" stroke-width="1.5"/>
+      <path d="M-26 38 L26 38 L30 95 L-30 95 Z" fill="${SL}" stroke="#121722" stroke-width="1.8"/>
+      <rect x="-27" y="34" width="54" height="11" rx="5" fill="${SL2}"/>
+    </g>
+  `;
+
+  const holdingHands = `
+    <g transform="translate(88 104)">
+      <path d="M-22 22 L-38 115 L14 115 L22 28 Z" fill="url(#arm)" stroke="${SK2}" stroke-width="1.5"/>
+      <path d="M-32 62 L18 66 L14 115 L-38 115 Z" fill="${SL}" stroke="#121722" stroke-width="1.8"/>
+      <rect x="-33" y="58" width="52" height="11" rx="5" fill="${SL2}" transform="rotate(5 -7 63)"/>
+
+      <g transform="translate(4 -22)">
+        <path d="M-8 -56 Q-12 -64 -6 -70 M4 -58 Q0 -66 6 -72" stroke="#94A3B8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M-24 -38 L24 -38 L18 32 L-18 32 Z" fill="#FFFFFF" stroke="#121722" stroke-width="2"/>
+        <path d="M-22 -14 L22 -14 L19 14 L-19 14 Z" fill="#C88A56" stroke="#121722" stroke-width="1.8"/>
+        <circle cx="0" cy="0" r="6" fill="#0A9F6E"/>
+        <rect x="-27" y="-47" width="54" height="10" rx="4" fill="#1E293B" stroke="#121722" stroke-width="2"/>
+        <rect x="-18" y="-52" width="14" height="6" rx="2" fill="#1E293B" stroke="#121722" stroke-width="1.8"/>
+      </g>
+
+      <path d="M-24 -10 Q-32 5 -18 28 L12 28 Q20 12 14 -6 Z" fill="${SK}" stroke="${SK2}" stroke-width="1.5"/>
+      <rect x="14" y="-26" width="16" height="11" rx="5.5" fill="${SK}" stroke="#121722" stroke-width="1.6" transform="rotate(-12 22 -20)"/>
+      <rect x="-26" y="-32" width="22" height="9.5" rx="4.7" fill="${SK}" stroke="#121722" stroke-width="1.6"/>
+      <rect x="-27" y="-21" width="24" height="9.5" rx="4.7" fill="${SK}" stroke="#121722" stroke-width="1.6"/>
+      <rect x="-26" y="-10" width="23" height="9.5" rx="4.7" fill="${SK}" stroke="#121722" stroke-width="1.6"/>
+      <rect x="-24" y="1" width="20" height="9" rx="4.5" fill="${SK}" stroke="#121722" stroke-width="1.6"/>
+      <rect x="-28" y="-84" width="64" height="18" rx="9" fill="#121722"/>
+      <text x="4" y="-72" text-anchor="middle" font-size="10" font-weight="900" fill="#FFD43B">☕ 拿熱咖啡</text>
+    </g>
+    ${watchOnWrist(82, 146, 12)}
+
+    <g transform="translate(248 96)">
+      <g transform="translate(2 12)">
+        <path d="M-16 -24 Q-18 -52 0 -52 Q18 -52 16 -24" fill="none" stroke="#92400E" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="-14" cy="-6" rx="14" ry="10" fill="#F59E0B" stroke="#121722" stroke-width="1.8"/>
+        <rect x="2" y="-18" width="20" height="22" rx="3" fill="#10B981" stroke="#121722" stroke-width="1.8" transform="rotate(8 12 -7)"/>
+        <path d="M-38 -4 L38 -4 L44 68 L-44 68 Z" fill="url(#paper)" stroke="#121722" stroke-width="2"/>
+        <path d="M-38 -4 L38 -4 L38 6 L-38 6 Z" fill="#D9BE8C" stroke="#121722" stroke-width="1.5"/>
+        <rect x="-22" y="18" width="44" height="18" rx="4" fill="#FFFFFF" opacity=".85"/>
+        <text x="0" y="31" text-anchor="middle" font-size="10" font-weight="900" fill="#92400E">滿載而歸</text>
+      </g>
+
+      <path d="M8 -22 L42 120 L82 120 L42 -26 Z" fill="url(#arm)" stroke="${SK2}" stroke-width="1.5"/>
+      <path d="M22 36 L64 28 L84 120 L38 120 Z" fill="${SL}" stroke="#121722" stroke-width="1.8"/>
+      <rect x="20" y="28" width="48" height="11" rx="5" fill="${SL2}" transform="rotate(-10 44 33)"/>
+
+      <rect x="-18" y="-36" width="40" height="26" rx="11" fill="${SK}" stroke="#121722" stroke-width="1.8"/>
+      <rect x="-15" y="-40" width="9" height="16" rx="4.5" fill="${SK}" stroke="#121722" stroke-width="1.5"/>
+      <rect x="-5" y="-42" width="9" height="17" rx="4.5" fill="${SK}" stroke="#121722" stroke-width="1.5"/>
+      <rect x="5" y="-41" width="9" height="16" rx="4.5" fill="${SK}" stroke="#121722" stroke-width="1.5"/>
+      <rect x="15" y="-39" width="8.5" height="15" rx="4.2" fill="${SK}" stroke="#121722" stroke-width="1.5"/>
+      <rect x="-16" y="-25" width="22" height="10" rx="5" fill="${SK}" stroke="#121722" stroke-width="1.5"/>
+
+      <rect x="-30" y="-76" width="64" height="18" rx="9" fill="#121722"/>
+      <text x="2" y="-64" text-anchor="middle" font-size="10" font-weight="900" fill="#FFD43B">🛍️ 提購物袋</text>
+    </g>
+  `;
+
+  const pantsAndSidePockets = `
+    <rect x="0" y="156" width="360" height="64" fill="url(#denim)"/>
+    <rect x="0" y="152" width="360" height="12" fill="#1E3A5F" stroke="#121722" stroke-width="1.5"/>
+    <rect x="118" y="150" width="8" height="16" rx="2" fill="#2D4673" stroke="#121722" stroke-width="1.5"/>
+    <rect x="234" y="150" width="8" height="16" rx="2" fill="#2D4673" stroke="#121722" stroke-width="1.5"/>
+    <circle cx="180" cy="158" r="4" fill="#F59E0B" stroke="#121722" stroke-width="1.5"/>
+    <path d="M180 164 L180 220" stroke="#162B47" stroke-width="2"/>
+    <path d="M180 164 L188 164 L188 206 Q188 214 180 216" fill="none" stroke="#E6B85C" stroke-width="1.5" stroke-dasharray="4 3" opacity=".75"/>
+
+    <path d="M12 164 Q56 184 96 164 L96 220 L12 220 Z" fill="#243B61"/>
+    <path d="M12 164 Q56 184 96 164" fill="none" stroke="#121722" stroke-width="2"/>
+    <path d="M12 168 Q56 188 96 168" fill="none" stroke="#E6B85C" stroke-width="1.8" stroke-dasharray="5 4"/>
+    <text x="52" y="208" text-anchor="middle" font-size="10" font-weight="700" fill="#94A3B8">左口袋</text>
+
+    <g transform="translate(302 168) rotate(10)">
+      <rect x="-22" y="-34" width="44" height="68" rx="8" fill="#0F172A" stroke="#121722" stroke-width="2"/>
+      <rect x="-18" y="-29" width="36" height="48" rx="5" fill="url(#glow)"/>
+      <rect x="-7" y="-25" width="14" height="3.5" rx="1.7" fill="#0F172A"/>
+      <text x="0" y="-10" text-anchor="middle" font-size="8.5" font-weight="900" fill="#FFFFFF">手機</text>
+    </g>
+    <path d="M256 164 Q302 186 350 162 L356 220 L252 220 Z" fill="url(#denim)"/>
+    <path d="M256 164 Q302 186 350 162" fill="none" stroke="#121722" stroke-width="2.2"/>
+    <path d="M256 169 Q302 191 350 167" fill="none" stroke="#E6B85C" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="304" y="208" text-anchor="middle" font-size="10" font-weight="900" fill="#DCE6FF">右口袋（手機）</text>
+
+    ${r.hands ? `
+      <g transform="translate(304 150)">
+        <circle r="15" fill="#D93A3F" stroke="#FFFFFF" stroke-width="2.5"/>
+        <path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    ` : ''}
+  `;
+
+  return `<svg viewBox="0 0 360 220" width="100%" role="img">
+    <defs>
+      <linearGradient id="arm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${SK2}"/><stop offset=".4" stop-color="${SK}"/><stop offset="1" stop-color="${SK2}"/></linearGradient>
+      <linearGradient id="bezel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1F5F9"/><stop offset="1" stop-color="#94A3B8"/></linearGradient>
+      <linearGradient id="denim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B5B92"/><stop offset="1" stop-color="#263E68"/></linearGradient>
+      <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+      <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6E6C6"/><stop offset="1" stop-color="#E2C491"/></linearGradient>
+      <linearGradient id="top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF8"/></linearGradient>
+    </defs>
+
+    <rect x="0" y="0" width="360" height="146" fill="url(#top)"/>
+    <rect x="0" y="144" width="360" height="10" fill="#CBD5E1" stroke="#121722" stroke-width="1.5"/>
+
+    <g opacity=".92" transform="translate(148 12)">
+      <rect x="0" y="6" width="22" height="44" rx="5" fill="#6EE7B7" stroke="#121722" stroke-width="1.8"/>
+      <rect x="4" y="0" width="14" height="7" rx="2" fill="#059669" stroke="#121722" stroke-width="1.5"/>
+      <rect x="3" y="20" width="16" height="12" rx="2" fill="#FFFFFF"/>
+      <rect x="30" y="16" width="34" height="34" rx="6" fill="#FBBF24" stroke="#121722" stroke-width="1.8"/>
+      <rect x="35" y="24" width="24" height="6" rx="3" fill="#FFFFFF"/>
+    </g>
+
+    ${pantsAndSidePockets}
+    ${r.hands ? holdingHands : emptyHands}
+  </svg>`;
+}
+
+function renderState(r) {
+  $('g-state').innerHTML = figureSVG(r);$('d-phone').setAttribute('aria-disabled', r.hands ? 'true' : 'false');
+  const badges = [];
+  if (r.wrist === 'android') badges.push(`<span class="eq-pill">⌚ 左手：Android 手錶</span>`);
+  else if (r.wrist === 'apple') badges.push(`<span class="eq-pill">⌚ 左手：Apple Watch</span>`);
+  else badges.push(`<span class="eq-pill">📱 沒戴錶（手機在右口袋）</span>`);
+  if (r.hands) badges.push(`<span class="eq-pill warn">☕🛍️ 雙手拿滿（沒手掏手機）</span>`);
+  $('g-badges').innerHTML = badges.join('');
+}
+
+function startRound() {
+  clearTimers();
+  penalty = 0;
+  phase = 'wait';
+  curLine = '';
+  const list = isPractice ? PRACTICE_ROUNDS : ROUNDS;
+  const r = list[i];
+
+  const rb = $('g-round');
+  rb.className = 'round-badge' + (isPractice ? ' practice' : '');
+  rb.textContent = isPractice ? `⚡ 熱身示範 ${i + 1} / 2` : `第 ${i + 1} / 10 位客人`;
+  $('b-skip-tut').hidden = !isPractice;
+
+  dots();
+  renderState(r);
+  setTimer(0);
+  $('g-toast').textContent = '';
+  bubble('嗶…嗶…刷商品中', 'wait');
+  beep(1500, 0.05);
+
+  if (isPractice) setCoach(r.waitCoach, null);
+  else setCoach(null, null);
+
+  let t = isPractice ? 950 : (650 + Math.random() * 850);
+  r.distract.forEach(line => {
+    later(() => {
+      phase = 'distract';
+      curLine = line;
+      bubble(line);
+      if (isPractice && r.distractCoach) setCoach(r.distractCoach, null);
+    }, t);
+    t += isPractice ? 1300 : (950 + Math.random() * 300);
+    later(() => {
+      phase = 'wait';
+      curLine = '';
+      bubble('嗶…嗶…', 'wait');
+      beep(1500, 0.05);
+    }, t);
+    t += 400;
+  });
+  later(go, t);
+}
+
+function go() {
+  const list = isPractice ? PRACTICE_ROUNDS : ROUNDS;
+  const r = list[i];
+  phase = 'go';
+  curLine = '載具？';
+  bubble('載具？', 'go');
+  beep(1100, 0.09, 'triangle');
+  if (isPractice) setCoach(r.goCoach, r.target);
+
+  t0 = performance.now();
+  const tick = () => {
+    const ms = performance.now() - t0 + penalty;
+    setTimer(ms);
+    if (!isPractice && performance.now() - t0 >= LIMIT) {
+      finish(LIMIT + penalty, 'late');
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+function press(dev) {
+  const list = isPractice ? PRACTICE_ROUNDS : ROUNDS;
+  const r = list[i];
+  if (['done', 'idle', 'unlock', 'opening'].includes(phase)) return;
+
+  if (phase === 'wait') {
+    beep(240, 0.14, 'sawtooth');
+    if (isPractice) {
+      toast('店員還沒問「載具？」喔，再等一下！');
+    } else {
+      penalty += PENALTY;
+      toast('店員：我還沒問耶（+1 秒）');
+    }
+    return;
+  }
+  if (phase === 'distract') {
+    beep(240, 0.14, 'sawtooth');
+    if (isPractice) {
+      toast(`店員問的是「${curLine}」，別被騙囉！`);
+    } else {
+      penalty += PENALTY;
+      toast(`店員：${WRONG_LINE[curLine] || '不是問這個'}（+1 秒）`);
+    }
+    return;
+  }
+
+  if (dev === 'phone') {
+    if (r.hands) {
+      beep(240, 0.14, 'sawtooth');
+      if (isPractice) {
+        toast('雙手拿著咖啡跟購物袋掏不出手機！快點左手戴的手錶');
+      } else {
+        penalty += PENALTY;
+        toast('手上拿滿東西，拿不出手機（+1 秒）');
+      }
+      return;
+    }
+    openPhone();
+    return;
+  }
+  if (dev !== r.wrist) {
+    beep(240, 0.14, 'sawtooth');
+    if (isPractice) {
+      toast(r.wrist ? '看左手指引，點選正確的手錶！' : '這關沒戴手錶，請點左邊的【手機】！');
+    } else {
+      penalty += PENALTY;
+      toast(r.wrist ? '你手上戴的不是這支（+1 秒）' : '你今天沒戴錶喔（+1 秒）');
+    }
+    return;
+  }
+  showWatch(dev);
+  finish(performance.now() - t0 + penalty, 'watch');
+}
+
+function barcodeHTML() {
+  let bars = '';
+  for (let k = 0; k < 44; k++) {
+    const w = [2, 2, 3, 4][Math.floor(Math.random() * 4)];
+    bars += `<i style="width:${w}px;margin-right:${[1, 2, 2, 3][Math.floor(Math.random() * 4)]}px"></i>`;
+  }
+  return `<div class="code"><div class="bars">${bars}</div><div class="id">/X7K2Q9P</div></div>`;
+}
+
+function showWatch(dev) {
+  const ov = $('ov');
+  ov.innerHTML = `<div class="watchface ${dev === 'android' ? 'round' : 'square'}">${barcodeHTML()}</div>`;
+  ov.hidden = false;
+}
+
+function openPhone() {
+  phase = 'unlock';
+  setCoach(null, null);
+  const ov = $('ov');
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0'), mm = String(now.getMinutes()).padStart(2, '0');
+  ov.innerHTML = `
+    <div class="lock" id="lock">
+      <div class="clock">${hh}:${mm}</div>
+      <div class="hint">
+        <div class="arrow">↑</div>
+        <span>手指往上滑解鎖手機</span>
+        <button class="kb" id="kb-up">或直接點這裡解鎖</button>
+      </div>
+    </div>`;
+  ov.hidden = false;
+  const lock = $('lock');
+  let y0 = null;
+  lock.addEventListener('pointerdown', e => { y0 = e.clientY; lock.setPointerCapture(e.pointerId); });
+  lock.addEventListener('pointermove', e => { if (y0 !== null && y0 - e.clientY > 48) { y0 = null; unlock(); } });
+  lock.addEventListener('pointerup', () => { y0 = null; });
+  $('kb-up').addEventListener('click', e => { e.stopPropagation(); unlock(); });
+}
+
+function unlock() {
+  if (phase !== 'unlock') return;
+  phase = 'opening';
+  beep(880, 0.06);
+  const lock = $('lock');
+  lock.innerHTML = '<div style="margin:auto;font-weight:900;font-size:18px">打開發票存摺 App…</div>';
+  later(() => {
+    lock.innerHTML = `<div style="font-weight:900;font-size:18px">手機條碼</div>${barcodeHTML()}<div></div>`;
+    finish(performance.now() - t0 + penalty, 'phone');
+  }, 360);
+}
+
+function finish(ms, kind) {
+  if (phase === 'done') return;
+  phase = 'done';
+  cancelAnimationFrame(raf);
+  setCoach(null, null);
+  setTimer(ms);
+  beep(2050, 0.11);
+
+  if (isPractice) {
+    practiceTimes.push(ms);
+    bubble(`嗶！試刷成功 ${fmt(ms)} 秒`, 'ok');
+    later(() => {
+      $('ov').hidden = true;
+      $('ov').innerHTML = '';
+      i++;
+      if (i < PRACTICE_ROUNDS.length) {
+        startRound();
+      } else {
+        showPracticeSummary();
+      }
+    }, 1050);
+    return;
+  }
+
+  const late = kind === 'late' || ms > 2600;
+  records.push({ ms, kind: kind === 'late' ? 'late' : kind });
+  bubble(late ? '後面在排隊喔～' : `${OK_LINES[Math.floor(Math.random() * OK_LINES.length)]} ${fmt(ms)} 秒`, late ? 'bad' : 'ok');
+  track('round', { round: i + 1, ms: Math.round(ms), device: kind });
+  later(() => {
+    $('ov').hidden = true;
+    $('ov').innerHTML = '';
+    i++;
+    if (i < ROUNDS.length) startRound();
+    else showResult();
+  }, kind === 'late' ? 1250 : 1000);
+}
+
+function showPracticeSummary() {
+  const pPhone = practiceTimes[0] ? fmt(practiceTimes[0]) : '1.45';
+  const pWatch = practiceTimes[1] ? fmt(practiceTimes[1]) : '0.62';
+  const ov = $('ov');
+  ov.innerHTML = `
+    <div class="modal-card">
+      <div style="font-size:36px">🎉</div>
+      <h2 style="font-size:24px;font-weight:900">熱身完成！你已經抓到訣竅了</h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.5">
+        剛剛從右口袋掏手機解鎖花了 <b>${pPhone} 秒</b>，手錶一按只要 <b>${pWatch} 秒</b>！<br>
+        接下來正式挑戰 <b>10 位排隊客人</b>，看你能多快！
+      </p>
+      <button class="btn" id="b-real-go">正式開始 10 人挑戰 →</button>
+    </div>`;
+  ov.hidden = false;
+  $('b-real-go').onclick = () => {
+    ov.hidden = true;
+    ov.innerHTML = '';
+    startRealGame();
+  };
+}
+
+function startPractice() {
+  isPractice = true;
+  i = 0;
+  practiceTimes = [];
+  show('s-game');
+  track('start_practice');
+  startRound();
+}
+
+function startRealGame() {
+  clearTimers();
+  $('ov').hidden = true;
+  $('ov').innerHTML = '';
+  isPractice = false;
+  i = 0;
+  records = [];
+  show('s-game');
+  track('start');
+  startRound();
+}
+
+const TITLES = [[800, '刷載具快手'], [1300, '櫃檯閃電'], [2000, '還在翻口袋'], [Infinity, '店員已經在等了']];
+let last = {};
+function avg(a) { return a.length ? a.reduce((s, x) => s + x, 0) / a.length : null; }
+
+function showResult() {
+  const all = records.map(r => r.ms), ph = records.filter(r => r.kind === 'phone').map(r => r.ms), wa = records.filter(r => r.kind === 'watch').map(r => r.ms);
+  const A = avg(all), P = avg(ph), W = avg(wa);
+  const title = TITLES.find(t => A < t[0])[1];
+  last = { A, P, W, title };
+  $('r-avg').innerHTML = fmt(A) + '<small>秒</small>';
+  $('r-title').textContent = title;
+  $('r-phone').textContent = P ? fmt(P) + ' 秒' : '–';
+  $('r-watch').textContent = W ? fmt(W) + ' 秒' : '–';
+  $('r-punch').innerHTML = (P && W && P > W)
+    ? `用手錶刷載具，比掏手機快 <em>${(P / W).toFixed(1)} 倍</em>。發票存摺的 Android 手錶和 Apple Watch 版，手腕一抬就出示載具。`
+    : `發票存摺的 Android 手錶和 Apple Watch 版，手腕一抬就出示載具，不用掏手機。`;
+  show('s-result');
+  drawCard();
+  track('complete', { avg: Math.round(A), phone: P && Math.round(P), watch: W && Math.round(W), title });
+}
+
+async function drawCard() {
+  try { await document.fonts.ready; } catch (e) {}
+  const c = document.createElement('canvas');
+  c.width = 1080;
+  c.height = 1350;
+  const g = c.getContext('2d');
+  const F = '"Noto Sans TC","PingFang TC",sans-serif', N = '"JetBrains Mono",monospace';
+  g.fillStyle = '#2956E8';
+  g.fillRect(0, 0, 1080, 1350);
+  g.fillStyle = '#FFFFFF';
+  g.globalAlpha = .08;
+  g.beginPath();
+  g.arc(900, 1180, 520, 0, Math.PI * 2);
+  g.fill();
+  g.globalAlpha = 1;
+  g.fillStyle = '#DCE5FF';
+  g.font = `700 40px ${F}`;
+  g.fillText('發票存摺 × 刷載具快手', 90, 150);
+  g.fillStyle = '#FFF6C9';
+  roundRect(g, 90, 210, 360, 130, 40);
+  g.fill();
+  g.lineWidth = 6;
+  g.strokeStyle = '#121722';
+  g.stroke();
+  g.fillStyle = '#121722';
+  g.font = `900 72px ${F}`;
+  g.fillText('載具？', 130, 300);
+  g.fillStyle = '#FFFFFF';
+  g.font = `700 44px ${F}`;
+  g.fillText('我刷載具只要', 90, 470);
+  g.font = `800 220px ${N}`;
+  g.fillText(fmt(last.A), 80, 700);
+  g.font = `900 70px ${F}`;
+  g.fillText('秒', 80 + g.measureText(fmt(last.A)).width + 30, 700);
+  g.fillStyle = '#121722';
+  roundRect(g, 90, 760, Math.max(360, 70 * last.title.length + 90), 110, 55);
+  g.fill();
+  g.fillStyle = '#FFD43B';
+  g.font = `900 60px ${F}`;
+  g.fillText(last.title, 135, 837);
+  if (last.P && last.W) {
+    g.font = `700 44px ${F}`;
+    g.fillStyle = '#DCE5FF';
+    g.fillText(`手機 ${fmt(last.P)} 秒 ／ 手錶 ${fmt(last.W)} 秒`, 90, 980);
+  }
+  g.fillStyle = '#FFFFFF';
+  g.font = `900 64px ${F}`;
+  g.fillText('你能更快嗎？', 90, 1110);
+  g.fillStyle = '#DCE5FF';
+  g.font = `500 32px ${F}`;
+  g.fillText('手機・Android 手錶・Apple Watch 都能出示載具', 90, 1250);
+  g.font = `500 26px ${F}`;
+  g.fillText('秒數以遊戲情境計算', 90, 1300);
+  $('r-card').src = c.toDataURL('image/png');
+}
+
+function roundRect(g, x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+
+$('b-start').onclick = startPractice;
+$('b-skip-tut').onclick = startRealGame;
+$('b-again').onclick = () => { track('replay'); startRealGame(); };
+document.querySelectorAll('.dev').forEach(b => b.addEventListener('click', () => press(b.dataset.dev)));
+['a-android', 'a-apple', 'a-phone'].forEach(id => $(id).addEventListener('click', () => track('store_click', { target: id.slice(2) })));$('b-copy').onclick = async () => {
+  const t = `店員問「載具？」我只要 ${fmt(last.A)} 秒（${last.title}）。你能更快嗎？ #刷載具快手 #發票存摺`;
+  track('share_copy');
+  try {
+    await navigator.clipboard.writeText(t);
+    $('r-copied').textContent = '已複製，貼給朋友挑戰吧！';
+  } catch (e) {
+    $('r-copied').textContent = t;
+  }
+};
+document.addEventListener('keydown', e => {
+  if ($('s-game').hidden) return;
+  if (e.key === '1') press('phone');
+  else if (e.key === '2') press('android');
+  else if (e.key === '3') press('apple');
+  else if (e.key === 'ArrowUp') { e.preventDefault(); unlock(); }
+});
+})();
+</script>
+</body>
+</html>

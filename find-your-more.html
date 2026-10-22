@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FIND YOUR MORE｜發票存摺</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;900&family=Noto+Sans+TC:wght@400;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#ffffff; --ink:#000000; --ink-2:#5f5f5c; --line:#dcdcd8; --panel:#f3f3f0; --panel-2:#e9e9e5;
+  --m:#2F5BFF; --o:#C8863B; --r:#FF5A1F; --e:#1F6B4F;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --bg:#000000; --ink:#ffffff; --ink-2:#a8a8a4; --line:#2b2b2b; --panel:#141414; --panel-2:#1f1f1f; }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --bg:#000000; --ink:#ffffff; --ink-2:#a8a8a4; --line:#2b2b2b; --panel:#141414; --panel-2:#1f1f1f; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Archivo","Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+img,video,canvas{ max-width:100%; display:block; }
+[hidden]{ display:none !important; }
+button{ font:inherit; color:inherit; }
+.wrap{ max-width:640px; margin:0 auto; padding:0 20px 80px; }
+
+/* ---------- header ---------- */
+.hero{ padding:40px 0 28px; }
+.hero .brand{ font-size:14px; font-weight:600; color:var(--ink-2); margin:0 0 18px; }
+.hero h1{
+  font-family:"Archivo",sans-serif; font-weight:900; letter-spacing:-0.045em; line-height:0.9;
+  font-size:clamp(64px,19vw,124px); margin:0;
+}
+.hero h1 .mo{ display:block; }
+.hero p{ font-size:17px; margin:22px 0 0; max-width:34em; }
+.hero p small{ display:block; color:var(--ink-2); font-size:14px; margin-top:8px; }
+
+/* ---------- steps ---------- */
+.step{ padding:28px 0 8px; border-top:1px solid var(--line); }
+.step[hidden]{ display:none; }
+.step h2{ font-size:22px; font-weight:700; margin:0 0 4px; letter-spacing:-0.01em; }
+.step .lead{ margin:0 0 18px; color:var(--ink-2); font-size:15px; }
+
+/* persona grid */
+.personas{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.persona{
+  position:relative; text-align:left; border:0; border-radius:4px; padding:14px 14px 16px;
+  background:var(--panel); cursor:pointer; min-height:188px; overflow:hidden;
+  outline:2px solid transparent; outline-offset:2px; transition:outline-color .15s;
+}
+.persona:focus-visible{ outline-color:var(--ink); }
+.persona .big{
+  position:absolute; right:-6px; top:-22px; font-weight:900; font-size:132px; line-height:1;
+  letter-spacing:-0.05em; color:var(--ac); opacity:.18; pointer-events:none;
+}
+.persona .role{ font-weight:900; font-size:18px; letter-spacing:-0.01em; color:var(--ac); }
+.persona .fn{ font-weight:700; font-size:15px; margin-top:2px; }
+.persona .who{ font-size:13px; color:var(--ink-2); margin-top:10px; }
+.persona .say{ font-size:14px; margin-top:12px; line-height:1.45; }
+.persona[aria-pressed="true"]{ outline-color:var(--ac); background:var(--panel-2); }
+.persona[aria-pressed="true"] .big{ opacity:.95; }
+
+.quiz-toggle{ margin-top:14px; background:none; border:0; padding:8px 0; text-decoration:underline; text-underline-offset:4px; cursor:pointer; font-size:15px; }
+.quiz{ margin-top:10px; padding:16px; background:var(--panel); border-radius:4px; }
+.quiz[hidden]{ display:none; }
+.q{ margin:0 0 14px; }
+.q p{ margin:0 0 8px; font-weight:700; font-size:15px; }
+.q label{ display:flex; gap:10px; align-items:flex-start; padding:7px 0; font-size:15px; cursor:pointer; }
+.q input{ margin-top:5px; flex:none; }
+.quiz .btn{ margin-top:4px; }
+
+/* buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 20px; border-radius:4px; border:1px solid var(--ink); background:var(--ink); color:var(--bg);
+  font-weight:700; font-size:16px; cursor:pointer; min-height:48px; text-decoration:none;
+}
+.btn.ghost{ background:transparent; color:var(--ink); }
+.btn:disabled{ opacity:.4; cursor:default; }
+.btn:focus-visible,.seg button:focus-visible,.slogans label:focus-within{ outline:2px solid var(--ink); outline-offset:3px; }
+.row{ display:flex; gap:10px; flex-wrap:wrap; }
+.row .btn{ flex:1 1 auto; }
+
+/* photo */
+.photo-stage{ position:relative; aspect-ratio:1; background:#111; border-radius:4px; overflow:hidden; margin-bottom:12px; }
+.photo-stage[hidden]{ display:none; }
+.photo-stage video{ width:100%; height:100%; object-fit:cover; }
+.photo-stage video.mirror{ transform:scaleX(-1); }
+.photo-stage .tint,.photo-stage canvas{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.photo-stage .tint{ mix-blend-mode:overlay; }
+.note{ font-size:14px; color:var(--ink-2); margin:10px 0 0; }
+.note.err{ color:var(--ink); }
+
+/* editor */
+.editor{ display:grid; gap:18px; }
+.preview{ position:relative; aspect-ratio:1; background:#000; border-radius:4px; overflow:hidden; touch-action:none; }
+.preview canvas{ width:100%; height:100%; cursor:grab; }
+.preview canvas:active{ cursor:grabbing; }
+.ctl{ display:grid; gap:6px; }
+.ctl > span{ display:flex; justify-content:space-between; font-size:14px; font-weight:700; }
+.ctl > span em{ font-style:normal; color:var(--ink-2); font-weight:400; }
+input[type=range]{ width:100%; accent-color:var(--ink); }
+.seg{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.seg button{ border:1px solid var(--line); background:var(--panel); border-radius:4px; padding:8px 0; cursor:pointer; }
+.seg button[aria-pressed="true"]{ border-color:var(--ink); background:var(--panel-2); }
+.seg svg{ width:40px; height:40px; display:block; margin:0 auto; }
+.seg rect.a{ fill:var(--ink); }
+.seg rect.b{ fill:var(--ink-2); }
+.slogans{ display:grid; gap:8px; }
+.slogans label{ display:flex; gap:10px; align-items:center; padding:12px 14px; border:1px solid var(--line); border-radius:4px; cursor:pointer; font-size:15px; }
+.slogans label:has(input:checked){ border-color:var(--ink); background:var(--panel-2); }
+.slogans input{ flex:none; }
+
+/* result */
+.result-img{ aspect-ratio:1; border-radius:4px; background:var(--panel); margin-bottom:12px; }
+.result-img[hidden]{ display:none; }
+.feature{ margin-top:22px; padding:18px; border-radius:4px; background:var(--panel); border-left:6px solid var(--ac,var(--ink)); }
+.feature h3{ margin:0 0 6px; font-size:18px; }
+.feature p{ margin:0 0 14px; font-size:15px; }
+.privacy{ margin-top:28px; font-size:13px; color:var(--ink-2); }
+
+@media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+@media (max-width:380px){ .persona .big{ font-size:110px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <p class="brand">發票存摺　MORE THAN BARCODES.</p>
+  <h1><span class="mo">FIND</span><span class="mo">YOUR</span><span class="mo">MORE.</span></h1>
+  <p>你的生活，是哪一種 MORE？選一種個性，拍一張照，做一張你自己的 MORE 海報。<small>照片全程在你的手機上處理，不會上傳到任何地方。</small></p>
+</header>
+
+<!-- STEP 1 -->
+<section class="step" id="s1">
+  <h2>選你的 MORE</h2>
+  <p class="lead">四種消費個性，四種濾鏡。點一個，或先回答四題讓我們猜。</p>
+  <div class="personas" id="personas"></div>
+  <button class="quiz-toggle" id="quizToggle" aria-expanded="false" aria-controls="quiz">不確定？回答四題</button>
+  <form class="quiz" id="quiz" hidden></form>
+</section>
+
+<!-- STEP 2 -->
+<section class="step" id="s2" hidden>
+  <h2>你的照片</h2>
+  <p class="lead">自拍或從相簿選一張。正方形構圖最好看，之後還可以拖曳跟縮放。</p>
+  <div class="photo-stage" id="camStage" hidden>
+    <video id="cam" playsinline muted autoplay></video>
+    <div class="tint" id="tint"></div>
+    <canvas id="live" width="1080" height="1080" aria-hidden="true"></canvas>
+  </div>
+  <div class="row" id="camRow" hidden>
+    <button class="btn" id="shoot">拍照</button>
+    <button class="btn ghost" id="flip">換鏡頭</button>
+    <button class="btn ghost" id="camOff">取消</button>
+  </div>
+  <div class="row" id="pickRow">
+    <button class="btn" id="openCam">開相機</button>
+    <label class="btn ghost" for="file">從相簿選</label>
+    <input id="file" type="file" accept="image/*" hidden>
+  </div>
+  <p class="note" id="camNote" hidden></p>
+</section>
+
+<!-- STEP 3 -->
+<section class="step" id="s3" hidden>
+  <h2>調整</h2>
+  <p class="lead">拖曳照片換位置。字母別壓到臉，換個排版就好。</p>
+  <div class="editor">
+    <div class="preview"><canvas id="preview" width="1080" height="1080" aria-label="預覽"></canvas></div>
+    <label class="ctl"><span>濾鏡強度 <em id="fxVal">100%</em></span><input type="range" id="fx" min="0" max="100" value="100"></label>
+    <label class="ctl"><span>縮放 <em id="zoomVal">1.0×</em></span><input type="range" id="zoom" min="100" max="300" value="100"></label>
+    <div class="ctl"><span>排版</span><div class="seg" id="layouts" role="group" aria-label="排版"></div></div>
+    <div class="ctl"><span>個性宣言</span><div class="slogans" id="slogans" role="radiogroup"></div></div>
+    <div class="row"><button class="btn ghost" id="rephoto">換一張照片</button><button class="btn" id="make">產生我的 MORE</button></div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step" id="s4" hidden>
+  <h2>分享你的 MORE</h2>
+  <p class="lead">1080 × 1080，直接發 IG、Threads 都剛好。</p>
+  <img class="result-img" id="result" alt="你的 MORE 個性照" hidden>
+  <div class="row">
+    <button class="btn" id="save">儲存圖片</button>
+    <button class="btn ghost" id="share" hidden>分享</button>
+  </div>
+  <p class="note" id="saveNote" hidden></p>
+  <div class="feature" id="feature">
+    <h3 id="featTitle"></h3>
+    <p id="featCopy"></p>
+    <a class="btn" id="featCta" href="https://invos.com.tw" target="_blank" rel="noopener">下載發票存摺</a>
+  </div>
+  <p class="privacy">這張圖是在你的裝置上完成的。我們沒有收到你的照片，也不需要。</p>
+</section>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------------- data ---------------- */
+const PERSONAS = {
+  M:{ role:'MANAGE', zh:'訂閱管理', who:'The Curator｜生活策展人', accent:'#2F5BFF', letter:'#EEF2FF', filter:'coolflash',
+      say:['喜歡的留下，扣款要有數。','訂閱很多，但每一筆我都認得。','自動扣款，不代表自動同意。'],
+      tile:'音樂、串流、健身都訂，但誰在扣我的錢，我一清二楚。',
+      feat:'訂閱管理', featCopy:'發票存摺會從你的消費紀錄找出固定扣款的服務，列成一張清單。留下喜歡的，看見不再用的。' },
+  O:{ role:'OVERVIEW', zh:'花費檢視', who:'The Observer｜生活觀察家', accent:'#C8863B', letter:'#FFF3DF', filter:'warmfilm',
+      say:['想買就買，花去哪裡我知道。','小確幸可以有，帳也要算得清。','花多少不是重點，知道去哪了才是。'],
+      tile:'咖啡、旅行、小確幸都要，只是錢去了哪裡，我想知道。',
+      feat:'花費檢視', featCopy:'發票存進來就自動分類。每個月的錢去了哪、哪一類變多了，打開就看得到，不用記帳。' },
+  R:{ role:'RESEARCH', zh:'比價', who:'The Smart Shopper｜精明選物家', accent:'#FF5A1F', letter:'#FFF4EC', filter:'poporange',
+      say:['我不是不買，我只是很會比。','喜歡歸喜歡，價格要合理。','同一件東西，我知道去哪裡買。'],
+      tile:'有品味也有底線，喜歡的東西要買在合理的價格。',
+      feat:'比價', featCopy:'用你買過的商品，對照各通路的近期價格。不保證最低，但下一次買之前，你會比較有把握。' },
+  E:{ role:'EXAMINE', zh:'消費快篩', who:'The Conscious Buyer｜安心選物家', accent:'#1F6B4F', letter:'#EAF5EF', filter:'greenfilm',
+      say:['買過什麼，我都查得出來。','買之前講究，買之後也在意。','吃進去的、用在身上的，我都查過。'],
+      tile:'不只在意買了什麼，也在意買到的東西可不可靠。',
+      feat:'消費快篩', featCopy:'把你的消費紀錄和公開的商品問題、召回資訊比對一次。有買到的，會主動告訴你。' }
+};
+const ORDER = ['M','O','R','E'];
+
+const FILTERS = {
+  coolflash: { c:1.28, s:0.82, lift:0,  gain:1.08, sh:[-12,-4,46],  hi:[-6,0,14],   grain:.12, vig:.34, flash:.22 },
+  warmfilm:  { c:0.90, s:0.92, lift:22, gain:1.00, sh:[26,10,-18],  hi:[14,6,-22],  grain:.18, vig:.18, flash:0 },
+  poporange: { c:1.15, s:1.40, lift:6,  gain:1.05, sh:[18,-4,-30],  hi:[30,8,-40],  grain:.10, vig:.12, flash:0 },
+  greenfilm: { c:1.10, s:0.70, lift:10, gain:0.94, sh:[-20,18,0],   hi:[-8,14,2],   grain:.16, vig:.40, flash:0 }
+};
+/* live camera approximation: CSS filter on the video + a blended tint layer (the real per-pixel filter runs on the captured photo) */
+const LIVE = {
+  coolflash: { filter:'contrast(1.25) saturate(.85) brightness(1.04)', tint:'rgba(40,90,255,.38)' },
+  warmfilm:  { filter:'contrast(.92) saturate(.95) brightness(1.06)',  tint:'rgba(215,150,80,.36)' },
+  poporange: { filter:'contrast(1.15) saturate(1.4)',                  tint:'rgba(255,100,40,.32)' },
+  greenfilm: { filter:'contrast(1.1) saturate(.7) brightness(.95)',    tint:'rgba(30,120,80,.42)' }
+};
+
+/* layouts: where the big letter sits, where the text block sits, where the wordmark sits */
+const LAYOUTS = [
+  { id:'A', letter:'tl', text:'bl', mark:'br', label:'字母左上' },
+  { id:'B', letter:'tr', text:'bl', mark:'br', label:'字母右上' },
+  { id:'C', letter:'br', text:'tl', mark:'tr', label:'字母右下' },
+  { id:'D', letter:'bl', text:'tr', mark:'tl', label:'字母左下' }
+];
+
+const QUIZ = [
+  { q:'月底看到帳單，你第一個反應是？', a:[['先看哪些訂閱還在扣','M'],['看這個月的錢花去哪','O'],['想想哪些東西其實可以買更划算','R'],['回頭確認買的東西有沒有問題','E']] },
+  { q:'看到喜歡的東西，你會？', a:[['先想一下已經有多少類似的服務','M'],['想買就買，反正記得起來','O'],['先查一下別的地方賣多少','R'],['先看成分、品牌、有沒有被召回','E']] },
+  { q:'朋友會怎麼形容你？', a:[['很懂取捨','M'],['很會過生活','O'],['很會挑','R'],['很謹慎','E']] },
+  { q:'手機裡最常打開的是？', a:[['串流、音樂','M'],['咖啡、外送、旅遊','O'],['比價、購物','R'],['新聞、評測','E']] }
+];
+
+/* ---------------- state ---------------- */
+const S = { key:null, strength:1, zoom:1, panX:0, panY:0, layout:0, slogan:0, src:null, filtered:null, srcKey:null, lastBlob:null, facing:'user', stream:null };
+const $ = id => document.getElementById(id);
+const W = 1080;
+
+/* ---------------- step 1: personas ---------------- */
+const personaWrap = $('personas');
+ORDER.forEach(k => {
+  const p = PERSONAS[k];
+  const b = document.createElement('button');
+  b.className = 'persona'; b.type = 'button'; b.dataset.key = k; b.setAttribute('aria-pressed','false');
+  b.style.setProperty('--ac', p.accent);
+  b.innerHTML = `<span class="big" aria-hidden="true">${k}</span>
+    <div class="role">${p.role}</div><div class="fn">${p.zh}</div>
+    <div class="who">${p.who}</div><div class="say">「${p.say[0]}」</div>`;
+  b.addEventListener('click', () => choose(k));
+  personaWrap.appendChild(b);
+});
+
+function choose(k){
+  S.key = k;
+  personaWrap.querySelectorAll('.persona').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.key === k)));
+  const p = PERSONAS[k];
+  document.documentElement.style.setProperty('--ac', p.accent);
+  buildSlogans();
+  $('featTitle').textContent = `${k} — ${p.role}｜${p.feat}`;
+  $('featCopy').textContent = p.featCopy;
+  $('feature').style.setProperty('--ac', p.accent);
+  S.filtered = null; S.srcKey = null;
+  reveal('s2');
+  if (S.src) { refilter(); draw(); }
+  drawLive();
+}
+
+/* quiz */
+const quiz = $('quiz');
+QUIZ.forEach((item, i) => {
+  const d = document.createElement('div'); d.className = 'q';
+  d.innerHTML = `<p>${i+1}. ${item.q}</p>` + item.a.map(([t,k]) =>
+    `<label><input type="radio" name="q${i}" value="${k}" required> ${t}</label>`).join('');
+  quiz.appendChild(d);
+});
+const quizBtn = document.createElement('button'); quizBtn.className = 'btn'; quizBtn.type = 'submit'; quizBtn.textContent = '看結果';
+quiz.appendChild(quizBtn);
+$('quizToggle').addEventListener('click', () => {
+  const open = quiz.hidden; quiz.hidden = !open;
+  $('quizToggle').setAttribute('aria-expanded', String(open));
+});
+quiz.addEventListener('submit', e => {
+  e.preventDefault();
+  const tally = { M:0, O:0, R:0, E:0 };
+  new FormData(quiz).forEach(v => tally[v]++);
+  let best = 'M'; ORDER.forEach(k => { if (tally[k] > tally[best]) best = k; });
+  choose(best);
+  personaWrap.querySelector(`[data-key="${best}"]`).scrollIntoView({ behavior:'smooth', block:'center' });
+});
+
+function reveal(id){
+  const el = $(id);
+  const was = el.hidden; el.hidden = false;
+  if (was) requestAnimationFrame(() => el.scrollIntoView({ behavior:'smooth', block:'start' }));
+}
+
+/* ---------------- step 2: photo ---------------- */
+const cam = $('cam');
+function note(msg, err){ const n = $('camNote'); n.hidden = !msg; n.textContent = msg || ''; n.classList.toggle('err', !!err); }
+
+async function openCam(){
+  stopCam();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    note('這個瀏覽器不支援相機，改用「從相簿選」也可以。', true); return;
+  }
+  try {
+    S.stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:S.facing, width:{ ideal:1440 }, height:{ ideal:1440 } }, audio:false });
+    cam.srcObject = S.stream; cam.classList.toggle('mirror', S.facing === 'user');
+    $('camStage').hidden = false; $('camRow').hidden = false; $('pickRow').hidden = true; note('');
+    drawLive();
+  } catch (e) {
+    note('相機沒有打開。可能是沒有允許權限，或這個頁面被嵌在不允許相機的地方。改用「從相簿選」也可以。', true);
+  }
+}
+function stopCam(){
+  if (S.stream) { S.stream.getTracks().forEach(t => t.stop()); S.stream = null; }
+  cam.srcObject = null; cam.style.filter = '';
+  $('camStage').hidden = true; $('camRow').hidden = true; $('pickRow').hidden = false;
+}
+$('openCam').addEventListener('click', openCam);
+$('camOff').addEventListener('click', stopCam);
+$('flip').addEventListener('click', () => { S.facing = S.facing === 'user' ? 'environment' : 'user'; openCam(); });
+$('shoot').addEventListener('click', () => {
+  const vw = cam.videoWidth, vh = cam.videoHeight;
+  if (!vw) return;
+  const side = Math.min(vw, vh, 2000);
+  const c = document.createElement('canvas'); c.width = side; c.height = side;
+  const x = c.getContext('2d');
+  if (S.facing === 'user') { x.translate(side, 0); x.scale(-1, 1); }
+  x.drawImage(cam, (vw - Math.min(vw,vh))/2, (vh - Math.min(vw,vh))/2, Math.min(vw,vh), Math.min(vw,vh), 0, 0, side, side);
+  stopCam();
+  setSource(c);
+});
+
+$('file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  try {
+    const bmp = await loadImage(f);
+    setSource(bmp);
+  } catch (err) {
+    note('這張圖讀不出來，換一張試試。', true);
+  }
+  e.target.value = '';
+});
+
+async function loadImage(file){
+  if ('createImageBitmap' in window) {
+    try { return await createImageBitmap(file, { imageOrientation:'from-image' }); } catch (_) {}
+  }
+  const url = URL.createObjectURL(file);
+  try {
+    return await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+  } finally { setTimeout(() => URL.revokeObjectURL(url), 5000); }
+}
+
+function setSource(img){
+  const iw = img.width || img.naturalWidth, ih = img.height || img.naturalHeight;
+  const cap = 1600, k = Math.min(1, cap / Math.max(iw, ih));
+  const c = document.createElement('canvas'); c.width = Math.round(iw * k); c.height = Math.round(ih * k);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  S.src = c; S.filtered = null; S.srcKey = null;
+  S.zoom = 1; S.panX = 0; S.panY = 0; $('zoom').value = 100; $('zoomVal').textContent = '1.0×';
+  refilter(); draw();
+  reveal('s3');
+}
+$('rephoto').addEventListener('click', () => { $('s2').scrollIntoView({ behavior:'smooth', block:'start' }); });
+
+/* ---------------- filters ---------------- */
+function refilter(){
+  if (!S.src || !S.key) return;
+  const f = FILTERS[PERSONAS[S.key].filter];
+  const w = S.src.width, h = S.src.height;
+  const out = document.createElement('canvas'); out.width = w; out.height = h;
+  const ctx = out.getContext('2d', { willReadFrequently:true });
+  ctx.drawImage(S.src, 0, 0);
+  const img = ctx.getImageData(0, 0, w, h), d = img.data;
+  const t = S.strength;
+  const lut = new Uint8ClampedArray(256);
+  for (let v = 0; v < 256; v++) {
+    let x = (v * f.gain - 128) * f.c + 128;
+    x = f.lift + x * (255 - f.lift) / 255;
+    lut[v] = x;
+  }
+  const s = f.s, sh = f.sh, hi = f.hi;
+  for (let i = 0; i < d.length; i += 4) {
+    const r0 = d[i], g0 = d[i+1], b0 = d[i+2];
+    let r = lut[r0], g = lut[g0], b = lut[b0];
+    const l = 0.299*r + 0.587*g + 0.114*b;
+    r = l + (r - l) * s; g = l + (g - l) * s; b = l + (b - l) * s;
+    const wgt = l / 255, swt = 1 - wgt;
+    r += swt*sh[0] + wgt*hi[0]; g += swt*sh[1] + wgt*hi[1]; b += swt*sh[2] + wgt*hi[2];
+    d[i]   = r0 + (r - r0) * t;
+    d[i+1] = g0 + (g - g0) * t;
+    d[i+2] = b0 + (b - b0) * t;
+  }
+  ctx.putImageData(img, 0, 0);
+  S.filtered = out; S.srcKey = S.key;
+}
+
+let grainCanvas = null;
+function grain(){
+  if (grainCanvas) return grainCanvas;
+  const n = 256, c = document.createElement('canvas'); c.width = n; c.height = n;
+  const x = c.getContext('2d'), im = x.createImageData(n, n), d = im.data;
+  for (let i = 0; i < d.length; i += 4) { const v = 128 + (Math.random() - 0.5) * 140; d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255; }
+  x.putImageData(im, 0, 0); grainCanvas = c; return c;
+}
+
+/* ---------------- composition ---------------- */
+const preview = $('preview');
+const pctx = preview.getContext('2d');
+let fontsReady = false;
+(async () => {
+  const zh = ORDER.map(k => PERSONAS[k].zh + PERSONAS[k].say.join('')).join('') + '發票存摺';
+  try { await Promise.all([document.fonts.load('900 100px Archivo', 'MORE'), document.fonts.load('600 40px Archivo', 'MORE THAN BARCODES.'), document.fonts.load('700 40px "Noto Sans TC"', zh), document.fonts.load('400 40px "Noto Sans TC"', zh)]); } catch (_) {}
+  fontsReady = true; draw(); drawLive();
+})();
+
+function geometry(){
+  const sw = S.filtered.width, sh = S.filtered.height;
+  const base = Math.max(W / sw, W / sh), sc = base * S.zoom;
+  const dw = sw * sc, dh = sh * sc;
+  const cx = (W - dw)/2, cy = (W - dh)/2;
+  const x = Math.min(0, Math.max(W - dw, cx + S.panX));
+  const y = Math.min(0, Math.max(W - dh, cy + S.panY));
+  S.panX = x - cx; S.panY = y - cy;
+  return { x, y, dw, dh };
+}
+
+function wrap(ctx, text, maxW){
+  const lines = []; let line = '';
+  for (const ch of text) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = ch; } else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function draw(ctx = pctx){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, W);
+  if (!S.filtered || S.srcKey !== S.key) { if (S.src && S.key) refilter(); else return; }
+  const p = PERSONAS[S.key], f = FILTERS[p.filter], L = LAYOUTS[S.layout];
+  const g = geometry();
+  ctx.drawImage(S.filtered, g.x, g.y, g.dw, g.dh);
+  paint(ctx, p, f, L, true);
+}
+
+/* everything that sits on top of the photo: grain, flash, vignette, letter, text, wordmark */
+function paint(ctx, p, f, L, withGrain){
+  const ga = withGrain ? f.grain * S.strength : 0;
+  if (ga > 0) {
+    ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = ga;
+    const pat = ctx.createPattern(grain(), 'repeat'); ctx.fillStyle = pat; ctx.fillRect(0, 0, W, W);
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  }
+  /* flash + vignette */
+  if (f.flash > 0) {
+    const fg = ctx.createRadialGradient(W*.5, W*.42, 60, W*.5, W*.42, W*.8);
+    fg.addColorStop(0, `rgba(255,255,255,${f.flash * S.strength})`); fg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = fg; ctx.fillRect(0, 0, W, W); ctx.globalCompositeOperation = 'source-over';
+  }
+  const vg = ctx.createRadialGradient(W/2, W/2, W*.35, W/2, W/2, W*.85);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, `rgba(0,0,0,${f.vig * S.strength})`);
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, W);
+
+  if (!fontsReady) return;
+  const pad = 56;
+
+  /* big letter */
+  ctx.save();
+  ctx.font = '900 520px Archivo, sans-serif'; ctx.fillStyle = p.letter; ctx.globalAlpha = .96;
+  const m = ctx.measureText(S.key);
+  const asc = m.actualBoundingBoxAscent || 380;
+  let lx = pad, ly = pad + asc;
+  ctx.textAlign = 'left';
+  if (L.letter.endsWith('r')) { ctx.textAlign = 'right'; lx = W - pad; }
+  if (L.letter.startsWith('b')) ly = W - pad - 4;
+  ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 40;
+  ctx.fillText(S.key, lx, ly);
+  ctx.restore();
+
+  /* text block */
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 28;
+  const right = L.text.endsWith('r');
+  ctx.textAlign = right ? 'right' : 'left';
+  const tx = right ? W - pad - 22 : pad + 22;
+  const slogan = p.say[S.slogan];
+  ctx.font = '400 40px "Noto Sans TC", sans-serif';
+  const lines = wrap(ctx, slogan, 760);
+  const hRole = 72, hZh = 50, hLine = 54, gap = 14;
+  const blockH = hRole + gap + hZh + gap + lines.length * hLine;
+  let y = L.text.startsWith('t') ? pad : W - pad - blockH;
+  /* accent bar */
+  ctx.fillStyle = p.accent; ctx.shadowBlur = 0;
+  ctx.fillRect(right ? W - pad - 10 : pad, y + 6, 10, blockH - 8);
+  ctx.shadowBlur = 28;
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 66px Archivo, sans-serif'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText(p.role, tx, y + hRole - 10);
+  y += hRole + gap;
+  ctx.font = '700 42px "Noto Sans TC", sans-serif';
+  ctx.fillText(p.zh, tx, y + hZh - 10);
+  y += hZh + gap;
+  ctx.font = '400 40px "Noto Sans TC", sans-serif';
+  lines.forEach(ln => { ctx.fillText(ln, tx, y + hLine - 14); y += hLine; });
+  ctx.restore();
+
+  /* wordmark */
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 20; ctx.fillStyle = '#fff';
+  const mr = L.mark.endsWith('r'); ctx.textAlign = mr ? 'right' : 'left';
+  const mx = mr ? W - pad : pad; const my = L.mark.startsWith('t') ? pad + 30 : W - pad - 30;
+  ctx.font = '700 32px "Noto Sans TC", sans-serif'; ctx.fillText('發票存摺', mx, my);
+  ctx.font = '600 20px Archivo, sans-serif'; ctx.globalAlpha = .85;
+  ctx.fillText('MORE THAN BARCODES.', mx, my + 30);
+  if (p.filter === 'poporange') {
+    ctx.font = '600 30px Archivo, sans-serif'; ctx.fillStyle = '#FFB38A'; ctx.globalAlpha = .9;
+    const d = new Date(); const stamp = `'${String(d.getFullYear()).slice(2)} ${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getDate()).padStart(2,'0')}`;
+    ctx.fillText(stamp, mx, L.mark.startsWith('t') ? my + 68 : my - 46);
+  }
+  ctx.restore();
+}
+
+/* live overlay on the camera view */
+const live = $('live'), lctx = live.getContext('2d');
+function drawLive(){
+  if (!S.stream || !S.key) return;
+  const p = PERSONAS[S.key], f = FILTERS[p.filter], L = LAYOUTS[S.layout];
+  lctx.setTransform(1,0,0,1,0,0); lctx.globalCompositeOperation = 'source-over'; lctx.globalAlpha = 1; lctx.shadowBlur = 0;
+  lctx.clearRect(0, 0, W, W);
+  paint(lctx, p, f, L, false);
+  const lv = LIVE[p.filter];
+  cam.style.filter = lv.filter; $('tint').style.background = lv.tint;
+}
+
+/* ---------------- controls ---------------- */
+const layoutsEl = $('layouts');
+LAYOUTS.forEach((L, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(i === 0)); b.title = L.label; b.setAttribute('aria-label', L.label);
+  const lx = L.letter.endsWith('r') ? 20 : 4, ly = L.letter.startsWith('b') ? 20 : 4;
+  const tx = L.text.endsWith('r') ? 22 : 4, ty = L.text.startsWith('b') ? 28 : 6;
+  b.innerHTML = `<svg viewBox="0 0 40 40" aria-hidden="true"><rect class="a" x="${lx}" y="${ly}" width="16" height="16" rx="1"/><rect class="b" x="${tx}" y="${ty}" width="14" height="2"/><rect class="b" x="${tx}" y="${ty+4}" width="10" height="2"/></svg>`;
+  b.addEventListener('click', () => { S.layout = i; layoutsEl.querySelectorAll('button').forEach((x, j) => x.setAttribute('aria-pressed', String(j === i))); draw(); drawLive(); });
+  layoutsEl.appendChild(b);
+});
+
+function buildSlogans(){
+  const el = $('slogans'); el.innerHTML = ''; S.slogan = 0;
+  PERSONAS[S.key].say.forEach((s, i) => {
+    const l = document.createElement('label');
+    l.innerHTML = `<input type="radio" name="slogan" value="${i}" ${i === 0 ? 'checked' : ''}> ${s}`;
+    l.querySelector('input').addEventListener('change', () => { S.slogan = i; draw(); drawLive(); });
+    el.appendChild(l);
+  });
+}
+
+let fxPending = false;
+$('fx').addEventListener('input', e => {
+  S.strength = e.target.value / 100; $('fxVal').textContent = e.target.value + '%';
+  if (fxPending) return; fxPending = true;
+  requestAnimationFrame(() => { fxPending = false; S.filtered = null; draw(); });
+});
+$('zoom').addEventListener('input', e => {
+  S.zoom = e.target.value / 100; $('zoomVal').textContent = S.zoom.toFixed(1) + '×'; draw();
+});
+
+/* drag to pan */
+let drag = null;
+preview.addEventListener('pointerdown', e => { drag = { x:e.clientX, y:e.clientY, px:S.panX, py:S.panY }; preview.setPointerCapture(e.pointerId); });
+preview.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const k = W / preview.clientWidth;
+  S.panX = drag.px + (e.clientX - drag.x) * k; S.panY = drag.py + (e.clientY - drag.y) * k; draw();
+});
+const endDrag = () => { drag = null; };
+preview.addEventListener('pointerup', endDrag); preview.addEventListener('pointercancel', endDrag);
+
+/* ---------------- export ---------------- */
+$('make').addEventListener('click', async () => {
+  if (!S.src || !S.key) return;
+  const out = document.createElement('canvas'); out.width = W; out.height = W;
+  draw(out.getContext('2d'));
+  const blob = await new Promise(r => out.toBlob(r, 'image/png'));
+  S.lastBlob = blob;
+  const img = $('result');
+  if (img.dataset.url) URL.revokeObjectURL(img.dataset.url);
+  const url = URL.createObjectURL(blob); img.dataset.url = url; img.src = url; img.hidden = false;
+  $('share').hidden = !(navigator.canShare && navigator.canShare({ files:[new File([blob], 'more.png', { type:'image/png' })] }));
+  $('saveNote').hidden = true;
+  reveal('s4');
+});
+
+function filename(){ return `MORE-${S.key}-${PERSONAS[S.key].role}.png`; }
+
+$('save').addEventListener('click', async () => {
+  if (!S.lastBlob) return;
+  const n = $('saveNote');
+  let dl = null;
+  try { if (window.claude && typeof window.claude.use === 'function') dl = await window.claude.use('downloads'); } catch (_) {}
+  if (dl) {
+    try { await dl.save({ filename:filename(), data:S.lastBlob }); n.hidden = true; return; }
+    catch (err) {
+      if (err && err.code === 'declined') return;
+    }
+  }
+  /* fallback: plain download link, plus long-press hint on touch devices */
+  try {
+    const a = document.createElement('a'); a.href = $('result').src; a.download = filename(); document.body.appendChild(a); a.click(); a.remove();
+  } catch (_) {}
+  n.hidden = false; n.textContent = '如果沒有自動存檔，長按上面的圖片就可以儲存到相簿。';
+});
+
+$('share').addEventListener('click', async () => {
+  if (!S.lastBlob) return;
+  try {
+    await navigator.share({ files:[new File([S.lastBlob], filename(), { type:'image/png' })], title:'我的 MORE', text:`我是 ${S.key} — ${PERSONAS[S.key].role}。你的生活，是哪一種 MORE？` });
+  } catch (err) {
+    if (err && err.name !== 'AbortError') { const n = $('saveNote'); n.hidden = false; n.textContent = '這裡沒辦法直接分享，先儲存圖片再發到社群就可以。'; }
+  }
+});
+
+})();
+</script>
+</body>
+</html>
