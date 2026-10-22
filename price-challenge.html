@@ -3,28 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>比價直覺挑戰｜發票存摺 invos</title>
-<!-- 自足樣式與系統字型：不依賴未附上的 _ds 或外部字型 -->
+<title>超級比一比｜全民比價王挑戰・發票存摺 invos</title>
+<meta name="description" content="6 題賣場二選一，只算總時間。看看你是不是全民比價王，再找朋友來比一比。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="超級比一比｜你是全民比價王嗎？">
+<meta property="og:description" content="6 題賣場二選一，只算總時間。先警告：會算數學。">
+<meta property="og:url" content="https://invosdata-mkt.github.io/h5-games/price-challenge">
+<meta property="og:image" content="https://invosdata-mkt.github.io/h5-games/img/price/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#3560FF">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-82LNTS7C14"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-82LNTS7C14',{page_title:'超級比一比（H5）'});</script>
+<!-- 自足樣式與系統字型：invos 設計系統 token 直接寫在 :root -->
 <style>
 :root {
-  --bg: var(--invos-bg-primary, #F4F6F9);
-  --surface: var(--invos-surface-primary, #FFFFFF);
-  --ink: var(--invos-text-primary, #161E2E);
-  --muted: var(--invos-text-secondary, #5B667A);
-  --line: var(--invos-border-subtle, #E2E8F0);
-  --brand: var(--invos-brand-primary, #0066FF);
-  --brand-soft: var(--invos-brand-subtle, #EBF3FF);
-  --brand-ink: var(--invos-brand-strong, #0047B3);
-  --tag: #FFD84D;
-  --tag-border: #E5BC26;
+  /* invos 設計系統（@invos/ios-ui-kit）：品牌藍 #3560ff、中性灰白底、扁平卡片 */
+  --bg: #F7F8F9;
+  --surface: #FFFFFF;
+  --ink: #101119;
+  --text: #3B3C43;
+  --muted: #737380;
+  --line: #EDEFF3;
+  --brand: #3560FF;
+  --brand-soft: #EBEFFF;
+  --brand-ink: #1F3FD1;
+  --tag: #FFC423;
+  --tag-border: #E5A800;
   --tag-ink: #2B2100;
-  --promo-red: #E02424;
-  --ok: var(--invos-status-success, #0E9F6E);
-  --ok-soft: #DEF7EC;
-  --bad: var(--invos-status-danger, #E02424);
-  --bad-soft: #FDE8E8;
-  --font-ui: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-num: 'IBM Plex Mono', ui-monospace, monospace;
+  --promo-red: #F4252D;
+  --ok: #00BD64;
+  --ok-soft: #E3F8EE;
+  --bad: #F4252D;
+  --bad-soft: #FEE9EA;
+  --font-ui: -apple-system, BlinkMacSystemFont, system-ui, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  --font-num: ui-monospace, 'SF Mono', Menlo, monospace;
 }
 * { box-sizing: border-box; }
 body {
@@ -244,189 +258,138 @@ button:focus-visible, a:focus-visible { outline: 3px solid #0047b3; outline-offs
 
 .result-art { display:block; width:min(100%,320px); height:auto; aspect-ratio:4/5; object-fit:cover; border-radius:18px; margin:10px 0 12px; }
 .result-art[hidden] { display:none; }
-/* 古典畫冊：紙張、墨色、宋體、畫框。 */
-:root {
- --bg:#e6dac2; --surface:#f8f0de; --ink:#342d25; --muted:#665a49; --line:#c5b18a;
- --brand:#714b29; --brand-soft:#eee0c4; --brand-ink:#4b321f;
- --tag:#ead7a7; --tag-border:#ac8850; --tag-ink:#3e2b16; --promo-red:#794030;
- --ok:#45604b; --ok-soft:#e7ebdc; --bad:#8b4636; --bad-soft:#f3e3d3;
- --font-ui:'Songti TC','Noto Serif TC','Source Han Serif TC','PMingLiU','STSong',Georgia,serif;
- --font-num:'Baskerville','Palatino Linotype',Georgia,'Songti TC',serif;
-}
-body {
- background-color:var(--bg);
- background-image:radial-gradient(ellipse at 20% 0%,#faf4e6aa,transparent 55%),repeating-linear-gradient(0deg,#65502d06 0,#65502d06 1px,transparent 1px,transparent 4px);
- padding-block:32px 56px;
-}
-.app { padding:28px 32px 32px; background:linear-gradient(100deg,#fff8e8aa,#f4e9d5dd 65%,#f8efddbb); border:1px solid #bba276; outline:1px solid #bba27680; outline-offset:6px; box-shadow:0 16px 50px #45321918; gap:24px; }
-h1,h2,h3,h4,.role { font-weight:700; }
-.topbar { border-bottom:3px double #b99c6f; padding-bottom:18px; }
-.topbar b { font-size:17px; letter-spacing:.12em; }
-.pill { border-radius:2px; background:#f7edd8; color:#624b32; border-color:#bea67e; letter-spacing:.06em; padding:4px 10px; }
-.hero { padding:18px 0 8px; gap:18px; }
-.hero .kicker { background:transparent; border-radius:0; padding:0 0 8px; border-bottom:1px solid #b79a65; font-size:13px; letter-spacing:.12em; }
-.hero h1 { font-weight:700; letter-spacing:.05em; line-height:1.45; font-size:clamp(31px,5vw,45px); }
-.hero .lead,.qstory { line-height:1.95; }
-.cases,.review,.card,.persona { border:1px solid var(--line); border-radius:3px; box-shadow:inset 0 0 0 4px #fff9ec, inset 0 0 0 5px #c7b48f70; background:#fbf4e5; }
-.case { border-color:#cfbd9b; }
-.case .icon-badge { background:transparent; border:1px solid #b99c6f; border-radius:50%; color:#87683f; font:600 15px var(--font-num); }
-.case .lv,.qlevel { border-radius:1px; background:#e8dab9; color:#604624; padding:4px 9px; font-weight:600; letter-spacing:.04em; }
-.qmeta { gap:12px; }
-.qname { font-weight:700; letter-spacing:.04em; }
-.qask { border-left:3px solid #b49762; padding:4px 0 4px 14px; }
-.dots { gap:8px; }
-.dots i { border-radius:0; height:4px; background:#d3c4a6; }
-.dots i.done { background:#a6874b; }
-.dots i.now { background:#4e493d; }
-.opts { gap:18px; }
-.opt { border-radius:3px; border:1px solid #b89d72; padding:12px; background:#fbf3e1; box-shadow:0 4px 9px #47331a12,inset 0 0 0 3px #fff8e8; gap:12px; }
-.opt:hover:not([disabled]) { border-color:#806035; box-shadow:0 8px 20px #47331a24,inset 0 0 0 3px #fff8e8; }
-.art-wrap { aspect-ratio:3/2; border:3px solid #806442; border-radius:1px; background:#45505a; box-shadow:0 0 0 1px #cfb57e,inset 0 0 0 1px #e0c28c; }
-.art-wrap img.photo { object-fit:contain; }
-.letter-badge { border-radius:1px; width:27px; height:27px; top:7px; left:7px; background:#342f25e8; border:1px solid #d5bc89; color:#fff5d9; backdrop-filter:none; }
-.spec-pill { border-radius:1px; background:#f4e6cceF; border-color:#b69965; color:#44331e; font-weight:600; font-size:12px; }
-.opt .name { font-size:19px; font-weight:700; }
-.opt .spec { font-size:15px; line-height:1.7; }
-.tag { background:linear-gradient(110deg,#eddbb2,#e5cb91); border:1px solid #b18b4b; border-radius:1px; padding:10px 12px; }
-.tag .promo { background:#754733; border-radius:0; font-weight:600; font-size:12px; letter-spacing:.05em; }
-.tag .barcode { display:none; }
-.tag .price { font-size:33px; font-weight:700; }
-.opt .unit { border-radius:1px; font-size:15px; }
-.opt.win { border:2px solid #566748; padding:11px; background:linear-gradient(#fbf3e1 70%,#e5e8d5); }
-.opt.win .unit { background:#4c634b; }
-.opt.lose { opacity:.88; }
-.opt.lose .unit { background:#e8dfcc; color:#5e5546; }
-.opt.picked { box-shadow:0 0 0 2px #413a2c,0 0 0 5px #f3e7cd; }
-.verdict { border-radius:2px; padding:24px; }
-.verdict.ok { border:1px solid #9aab88; background:#edf0e3; }
-.verdict.bad { border:1px solid #c9a08a; background:#f2e5d8; }
-.verdict h3 { font-size:22px; letter-spacing:.04em; }
-.origin { border-top:3px double #b8a481; gap:24px; }
-.person-image,.person-fallback { border-radius:1px; border:3px solid #8d7048; box-shadow:0 0 0 1px #cfb579; }
-.origin figcaption { color:#695b45; }
-.origin figcaption strong { font-size:16px; }
-.origin .origin-copy h4 { font-size:19px; }
-.origin .origin-copy p { font-size:17px; line-height:1.95; }
-.btn { border-radius:2px; background:linear-gradient(#7e5a35,#624323); color:#fff6df; border:1px solid #58401f; box-shadow:inset 0 0 0 3px #d9bd7e30; font-weight:600; letter-spacing:.1em; }
-.btn:hover { filter:brightness(1.08); }
-.btn.ghost { background:#f6ebd5; color:#4b3923; border:1px solid #b89e72; }
-button:focus-visible,a:focus-visible { outline-color:#6e4c28; }
-.persona { padding:32px 24px; }
-.persona .kicker { letter-spacing:.12em; color:#756044; }
-.persona .role { color:#6c4926; font-size:32px; letter-spacing:.08em; }
-.persona .desc { font-size:17px; line-height:1.85; }
-.result-art { width:min(100%,320px); border-radius:1px; border:5px solid #806442; box-shadow:0 0 0 1px #e1c789,0 0 0 3px #a58a58,0 9px 22px #3e2f1e28; }
-.stats { gap:12px; }
-.stat { border-radius:2px; background:#f8eed9; border-color:#bda77e; }
-.stat b { font-weight:600; font-size:30px; }
-.stat b.hl { color:#77502a; }
-.rv { border-color:#d5c5a5; }
-.rv .mark { border-radius:1px; }
-.rv .mark.ok { color:#405c42; background:#e5ead9; }
-.rv .mark.bad { color:#864633; background:#efdfcf; }
-.rv .amt.ok { color:#405c42; }
-.rv .amt.bad { color:#864633; }
-.sharecard { border-radius:2px; border:1px solid #b29964; background:linear-gradient(120deg,#3d484b,#29383a); color:#fff2d3; padding:24px; box-shadow:inset 0 0 0 4px #d4b16b20; }
-.sharecard .s4 { color:#edcf8d; }
-.cta { border-radius:2px; background:#3c423a; border:1px solid #a38958; color:#fff3da; box-shadow:inset 0 0 0 5px #d9be8120; padding:24px; }
-.cta .btn { background:#ddc38c; color:#3b2c19; border-color:#ead4a7; }
-.foot { font-size:13px; line-height:1.85; color:#71604a; }
-@media(max-width:560px) {
- body { padding:18px 16px 40px; }
- .app { padding:20px 14px 24px; gap:20px; outline-offset:4px; }
- .hero h1 { font-size:31px; }
- .hero .kicker { font-size:12px; letter-spacing:.04em; }
- .hero .lead,.qstory { font-size:16px; }
- .opts { gap:12px; }
- .opt { padding:8px; gap:10px; }
- .opt.win { padding:7px; }
- .opt .name { font-size:16px; }
- .opt .spec,.opt .unit { font-size:14px; }
- .art-wrap { aspect-ratio:3/2; border-width:2px; }
- .letter-badge { width:22px; height:22px; top:4px; left:4px; font-size:12px; }
- .spec-pill { font-size:10px; right:3px; bottom:3px; padding:1px 4px; }
- .tag { padding:8px 7px; }
- .tag .price { font-size:27px; }
- .tag .promo { font-size:10px; }
- .qname { font-size:26px; }
- .qask { font-size:17px; }
- .verdict { padding:18px; }
- .origin { gap:18px; }
- .origin .origin-copy p { font-size:16px; }
- .case { grid-template-columns:30px minmax(0,1fr); gap:9px; }
- .case .lv { grid-column:2; justify-self:start; font-size:11px; }
- .case .icon-badge { grid-row:1 / 3; width:30px; height:30px; }
- .cases { padding-inline:13px; }
- .persona { padding:24px 16px; }
- .persona .role { font-size:28px; }
- .stat { padding:16px 4px; }
- .stat b { font-size:25px; }
- .stat span { font-size:12px; }
- .rv { padding:15px 13px; grid-template-columns:24px minmax(0,1fr) auto; gap:8px; }
- .rv b { font-size:15px; }
- .rv span { font-size:12px; }
- .review h2,.card h2 { font-size:19px; padding:18px 16px 4px; }
- .sharecard { padding:18px; }
- .sharecard .s2 { font-size:23px; }
- .cta { padding:20px; }
-}
-@media(max-width:359px) { .opts { grid-template-columns:1fr; } }
+/* 現代版（2026-10-22）：invos 設計系統——扁平白卡、12–16px 圓角、品牌藍唯一強調色、黑＋藍雙行大標。油畫圖保留，只換成圓角白框。 */
+body { background: var(--bg); color: var(--text); }
+.app { max-width: 720px; gap: 20px; }
+.topbar { border-bottom: 0; padding-bottom: 4px; }
+.topbar b { color: var(--ink); }
+.pill { font-family: var(--font-ui); background: var(--surface); border-color: var(--line); color: var(--ink); }
+#clock { font-family: var(--font-num); }
+.dots i { height: 4px; background: var(--line); }
+.dots i.now { background: var(--brand-ink); }
 
-/* 品牌優先：古典字體與紙感，搭配原有 invos 藍／黃與狀態色。 */
-:root {
- --brand:var(--invos-brand-primary,#0066FF);
- --brand-soft:var(--invos-brand-subtle,#EBF3FF);
- --brand-ink:var(--invos-brand-strong,#0047B3);
- --tag:#FFD84D; --tag-border:#E5BC26; --tag-ink:#2B2100; --promo-red:#E02424;
- --ok:var(--invos-status-success,#0E9F6E); --ok-soft:#DEF7EC;
- --bad:var(--invos-status-danger,#E02424); --bad-soft:#FDE8E8;
+.hero { gap: 12px; padding: 4px 0 0; }
+.hero .kicker { font-size: 14px; letter-spacing: .1em; padding: 0; background: none; border-radius: 0; color: var(--brand); }
+.hero h1 { font-size: clamp(40px, 9vw, 56px); line-height: 1.15; letter-spacing: 0; color: var(--ink); font-weight: 900; }
+.hero h1 em { font-style: normal; color: var(--brand); display: block; }
+.hero .lead { font-size: 17px; line-height: 1.75; color: var(--text); }
+
+.storm { display: flex; gap: 12px; align-items: center; background: var(--brand); color: #fff; border-radius: 16px; padding: 14px 16px; }
+.storm svg { flex: none; }
+.storm b { display: block; font-size: 16px; line-height: 1.4; }
+.storm span { font-size: 14px; opacity: .9; }
+
+.mathwarn { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 12px; align-items: start; background: #FFF6DA; border: 1.5px dashed var(--tag-border); border-radius: 16px; padding: 14px 16px; }
+.mathwarn .sign { width: 40px; height: 40px; border-radius: 12px; background: var(--tag); color: var(--tag-ink); display: flex; align-items: center; justify-content: center; font: 900 22px var(--font-num); transform: rotate(-6deg); }
+.mathwarn b { display: block; color: var(--ink); font-size: 16px; }
+.mathwarn p { font-size: 14.5px; line-height: 1.7; color: var(--text); }
+.mathwarn .eq { font-family: var(--font-num); font-size: 13px; color: var(--muted); }
+
+.vs-card { background: var(--surface); border: 2px solid var(--brand); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.vs-card .k { font-size: 13px; font-weight: 700; color: var(--brand); letter-spacing: .06em; }
+.vs-card b { font-size: 19px; color: var(--ink); line-height: 1.5; }
+.vs-card .num { font-family: var(--font-num); color: var(--brand); }
+
+.cases { background: var(--surface); border: 0; border-radius: 16px; box-shadow: none; padding: 4px 16px; }
+.case { border-color: var(--line); padding-block: 13px; }
+.case .icon-badge { background: var(--brand-soft); color: var(--brand); border: 0; border-radius: 10px; font: 700 14px var(--font-num); }
+.case b { color: var(--ink); font-size: 16px; }
+.case .lv, .qlevel { background: var(--brand-soft); color: var(--brand); border-radius: 6px; font-weight: 700; }
+
+.qname { color: var(--ink); font-weight: 900; font-size: clamp(26px, 5vw, 34px); line-height: 1.3; }
+.qstory { color: var(--text); font-size: 16px; line-height: 1.75; }
+.qask { color: var(--ink); font-size: 17px; border-left: 4px solid var(--brand); padding: 2px 0 2px 12px; }
+
+.opt { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; box-shadow: none; padding: 12px; gap: 9px; }
+.opt:hover:not([disabled]) { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(53,96,255,.12); }
+.art-wrap { aspect-ratio: 4 / 3; border: 0; border-radius: 12px; background: #EEF0F4; box-shadow: none; }
+.art-wrap img.photo { object-fit: cover; }
+.letter-badge { border-radius: 8px; background: var(--brand); color: #fff; border: 0; font-family: var(--font-ui); }
+.spec-pill { border-radius: 6px; border: 0; background: rgba(255,255,255,.95); color: var(--ink); font-weight: 700; }
+.opt .name { color: var(--ink); font-weight: 800; font-size: 17px; line-height: 1.4; }
+.opt .spec { color: var(--muted); font-size: 14px; }
+.tag { background: var(--tag); border: 0; border-radius: 10px; padding: 8px 12px 10px; }
+.tag .promo { background: var(--promo-red); border-radius: 6px; }
+.tag .barcode { display: none; }
+.tag .price { font-family: var(--font-num); font-weight: 800; font-size: 30px; }
+.opt .unit { border-radius: 8px; font-family: var(--font-ui); }
+.opt.win { border-color: var(--ok); background: var(--surface); }
+.opt.win .unit { background: var(--ok); color: #fff; }
+.opt.lose { opacity: .7; }
+.opt.lose .unit { background: var(--bg); color: var(--muted); }
+.opt.picked { box-shadow: 0 0 0 3px var(--brand-soft); border-color: var(--brand); }
+.opt.picked.win { border-color: var(--ok); }
+
+.verdict { border-radius: 16px; padding: 18px; border: 0; }
+.verdict.ok { background: var(--ok-soft); }
+.verdict.bad { background: var(--bad-soft); }
+.verdict h3 { font-size: 20px; }
+.verdict p { font-size: 16px; line-height: 1.75; color: var(--text); }
+.verdict .save { color: var(--ink); }
+.origin { border-top: 1px solid rgba(16,17,25,.1); grid-template-columns: 112px minmax(0,1fr); gap: 16px; padding-top: 16px; }
+.person-image, .person-fallback { border-radius: 12px; border: 0; box-shadow: none; }
+.origin figcaption { color: var(--muted); }
+.origin .origin-copy h4 { font-size: 17px; color: var(--ink); }
+.origin .origin-copy p { font-size: 15.5px; line-height: 1.75; }
+
+.btn { border-radius: 12px; border: 0; background: var(--brand); color: #fff; font-weight: 700; letter-spacing: 0; box-shadow: none; min-height: 52px; }
+@media (hover: hover) { .btn:hover { background: var(--brand-ink); } .btn.ghost:hover { background: var(--brand-soft); } }
+.btn.ghost { background: var(--surface); color: var(--brand); border: 1.5px solid var(--brand); }
+.btn svg { flex: none; }
+button:focus-visible, a:focus-visible { outline-color: var(--brand); }
+
+.persona { background: var(--surface); border: 0; border-radius: 16px; box-shadow: none; padding: 24px 18px; }
+.persona .kicker { color: var(--muted); letter-spacing: .06em; }
+.persona .role { color: var(--brand); font-size: 32px; font-weight: 900; letter-spacing: 0; }
+.persona .desc { color: var(--text); font-size: 16px; line-height: 1.75; }
+.result-art { width: min(100%, 280px); border-radius: 16px; border: 0; box-shadow: none; }
+.stats { gap: 10px; }
+.stat { background: var(--surface); border: 0; border-radius: 16px; padding: 16px 6px; }
+.stat b { font-family: var(--font-num); color: var(--ink); font-weight: 800; font-size: 26px; }
+.stat b.hl { color: var(--brand); }
+.stat span { color: var(--muted); font-size: 13px; }
+.stat small { display: block; font-size: 11px; color: var(--muted); }
+.review { background: var(--surface); border: 0; border-radius: 16px; }
+.review h2 { color: var(--ink); font-size: 18px; }
+.rv { border-color: var(--line); }
+
+.vs-result { border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 6px; background: var(--brand-soft); }
+.vs-result h2 { font-size: 22px; color: var(--ink); }
+.vs-result p { font-size: 15px; color: var(--text); }
+.vs-result .num { font-family: var(--font-num); font-weight: 700; color: var(--brand); }
+
+.share { background: var(--surface); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.share h2 { font-size: 20px; color: var(--ink); line-height: 1.4; }
+.share p { font-size: 14.5px; color: var(--muted); }
+.share-preview { display: block; width: min(100%, 300px); margin: 0 auto; border-radius: 12px; border: 1px solid var(--line); }
+.copied { font-size: 14px; color: var(--ok); min-height: 20px; text-align: center; }
+
+.app-outro { background: var(--surface); color: var(--text); border: 0; border-radius: 16px; padding: 22px 18px; gap: 14px; box-shadow: none; }
+.app-outro .outro-kicker { font-size: 14px; font-weight: 700; letter-spacing: .1em; color: var(--brand); }
+.app-outro h2 { color: var(--ink); font-size: clamp(26px, 6vw, 34px); font-weight: 900; line-height: 1.3; }
+.app-outro h2 em { font-style: normal; color: var(--brand); display: block; }
+.app-outro .outro-desc { font-size: 16px; line-height: 1.75; color: var(--text); opacity: 1; }
+.outro-shot { display: block; width: min(100%, 320px); height: auto; margin: 4px auto 0; border-radius: 16px; background: #F3F5FA; }
+.outro-shot[hidden] { display: none; }
+.app-outro .btn { background: var(--brand); color: #fff; }
+.foot { color: var(--muted); font-size: 13px; line-height: 1.75; }
+
+@media (max-width: 560px) {
+  .app { gap: 16px; }
+  .hero h1 { font-size: 42px; }
+  .opt { padding: 8px; gap: 7px; border-radius: 14px; }
+  .opt .name { font-size: 15px; }
+  .opt .spec, .opt .unit { font-size: 13px; }
+  .tag { padding: 6px 8px 8px; }
+  .tag .price { font-size: 25px; }
+  .tag .promo { font-size: 10.5px; }
+  .letter-badge { width: 22px; height: 22px; top: 5px; left: 5px; font-size: 12px; }
+  .spec-pill { font-size: 10px; right: 4px; bottom: 4px; padding: 1px 5px; }
+  .origin { grid-template-columns: 1fr; }
+  .origin figure { grid-template-columns: 80px minmax(0,1fr); }
+  .stat b { font-size: 22px; }
+  .persona .role { font-size: 28px; }
 }
-body { background-color:#e9e8df; background-image:radial-gradient(ellipse at 10% 0%,#ebf3ff99,transparent 60%),repeating-linear-gradient(0deg,#65502d05 0,#65502d05 1px,transparent 1px,transparent 4px); }
-.app { background:linear-gradient(100deg,#fffaf0ee,#f7f1e4ee); border-color:#a8b8cf; outline-color:#0066ff30; box-shadow:0 16px 50px #0047b312; }
-.topbar { border-bottom-color:var(--brand); }
-.topbar b,.hero h1,.qname { color:var(--brand-ink); }
-.pill { background:#f7f9fc; color:var(--brand-ink); border-color:#b4c9e8; }
-.hero .kicker { color:var(--brand); border-bottom-color:var(--brand); }
-.case .icon-badge { color:var(--brand-ink); border-color:#83a9df; background:#ebf3ff80; }
-.case .lv,.qlevel { background:var(--brand-soft); color:var(--brand-ink); }
-.qask { border-left-color:var(--brand); }
-.dots i.done { background:var(--brand); }
-.dots i.now { background:var(--brand-ink); }
-.opt:hover:not([disabled]) { border-color:var(--brand); box-shadow:0 8px 20px #0066ff22,inset 0 0 0 3px #fff8e8; }
-.art-wrap { border-color:#294d7e; }
-.letter-badge { background:#0047b3ed; color:#fff; }
-.tag { background:var(--tag); border-color:var(--tag-border); color:var(--tag-ink); }
-.tag .promo { background:var(--promo-red); color:#fff; }
-.opt.win { border-color:var(--ok); background:linear-gradient(#fbf3e1 70%,var(--ok-soft)); }
-.opt.win .unit { background:var(--ok); color:#fff; }
-.opt.picked { box-shadow:0 0 0 2px var(--brand),0 0 0 5px #ebf3ff; }
-.verdict.ok { border-color:#0e9f6e70; background:var(--ok-soft); }
-.verdict.bad { border-color:#e0242450; background:var(--bad-soft); }
-.btn { background:var(--brand); color:#fff; border-color:var(--brand-ink); box-shadow:inset 0 0 0 3px #ffffff24; }
-.btn.ghost { background:#f8f7f0; color:var(--brand-ink); border-color:#8aaedc; }
-button:focus-visible,a:focus-visible { outline-color:var(--brand); }
-.persona .role,.stat b.hl { color:var(--brand); }
-.persona .kicker { color:var(--brand-ink); }
-.rv .mark.ok { color:var(--ok); background:var(--ok-soft); }
-.rv .mark.bad { color:var(--bad); background:var(--bad-soft); }
-.rv .amt.ok { color:var(--ok); }
-.rv .amt.bad { color:var(--bad); }
-.sharecard { background:linear-gradient(120deg,var(--brand),var(--brand-ink)); color:#fff; border-color:var(--brand-ink); }
-.sharecard .s4 { color:var(--tag); }
-.cta { background:#12356d; color:#fff; border-color:#6e92c2; }
-.cta .btn { background:var(--brand); color:#fff; border-color:#a0c5ff; }
-
-
-
-/* 結果頁以 App 價值與六人比價場景收尾。 */
-.app-outro { gap:20px; padding:28px; }
-.app-outro .outro-kicker { font-size:13px; letter-spacing:.12em; color:#bcd7ff; opacity:1; }
-.app-outro .outro-desc { font-size:18px; line-height:1.95; color:#fff; opacity:1; max-width:40em; }
-.app-outro h2 { color:#fff; font-size:clamp(24px,3.8vw,32px); line-height:1.65; letter-spacing:.03em; }
-.outro-punch { display:inline-block; white-space:nowrap; color:var(--tag); }
-.outro-scene { display:block; width:100%; height:auto; aspect-ratio:3/2; object-fit:contain; border:1px solid #b4a176; margin:0; }
-.outro-scene[hidden] { display:none; }
-@media(max-width:560px) { .app-outro { padding:20px; gap:18px; } .app-outro .outro-desc { font-size:17px; } .app-outro h2 { font-size:24px; } }
 
 </style>
 </head>
@@ -565,8 +528,9 @@ const ROLES = {
 const app = document.getElementById('app');
 let state = { i: 0, picks: [], started: 0, clock: null };
 
+// GA4：invos.com.tw 資源（G-82LNTS7C14），事件都帶 game＝price_challenge
 function track(event, props) {
-  try { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: event }, props || {})); } catch (e) {}
+  try { gtag('event', event, Object.assign({ game: 'price_challenge' }, props || {})); } catch (e) {}
 }
 const fmt = n => n.toLocaleString('en-US');
 const mmss = s => { s = Math.floor(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -711,31 +675,69 @@ const ART_3D = {
         <text x="34" y="36" text-anchor="middle" font-size="11" font-weight="900" fill="#2B2100">會員9折</text>`)
 };
 
+// 颱風橫幅：TYPHOON_UNTIL 當天（台灣時間）結束後自動不顯示；要提早關就改成過去的日期
+const TYPHOON_UNTIL = '2026-10-24';
+const showStorm = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10) <= TYPHOON_UNTIL;
+const PAGE_URL = 'https://invosdata-mkt.github.io/h5-games/price-challenge';
+
+// 挑戰連結：?r=角色&n=答對題數&t=總秒數
+const VS = (() => {
+  try {
+    const u = new URLSearchParams(location.search);
+    const r = u.get('r'), n = parseInt(u.get('n'), 10), t = parseInt(u.get('t'), 10);
+    if (ROLES[r] && n >= 0 && n <= 6 && t >= 5 && t <= 3600) return { r: r, n: n, t: t };
+  } catch (e) {}
+  return null;
+})();
+if (VS) track('challenge_link_open', { friend_role: ROLES[VS.r].role, friend_correct: VS.n, friend_seconds: VS.t });
+
+const stormIcon = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 4.5c-3-2-8-2.4-11.5-.6C5.8 5.8 4 9.6 4.7 13.3"/><path d="M3 19.5c3 2 8 2.4 11.5.6 3.7-1.9 5.5-5.7 4.8-9.4"/><circle cx="12" cy="12" r="3"/></svg>';
+const shareIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+const linkIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+
 function renderIntro() {
   clearInterval(state.clock);
+  window.scrollTo(0, 0);
   const list = QUESTIONS.map((q, i) => `
     <div class="case">
       <span class="icon-badge" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
       <div class="info">
-        <b>0${i + 1}｜${q.name}</b>
+        <b>${q.name}</b>
         <small>${q.trap}</small>
       </div>
       <span class="lv">${q.level}</span>
     </div>`).join('');
+  const vs = VS ? `
+    <section class="vs-card" aria-label="朋友的挑戰">
+      <span class="k">你收到一封挑戰書</span>
+      <b>朋友答對 <span class="num">${VS.n}/6</span>、只花 <span class="num">${mmss(VS.t)}</span>，是「${ROLES[VS.r].role}」。你敢比嗎？</b>
+    </section>` : '';
+  const storm = showStorm() ? `
+    <section class="storm">${stormIcon}<div><b>颱風天在家沒事？</b><span>來場超級比一比，看看你是不是全民比價王。</span></div></section>` : '';
   app.innerHTML = `
-    ${topbar('<span class="pill">比價直覺挑戰</span>')}
+    ${topbar('<span class="pill">超級比一比</span>')}
+    ${storm}
+    ${vs}
     <section class="hero">
-      <span class="kicker">6 道經典思維實驗・賣場比價心理戰</span>
-      <h1>你的比價直覺，<br>騙得過賣場嗎？</h1>
-      <p class="lead">從蒙提霍爾到康納曼《快思慢想》，賣場貨架處處是直覺陷阱。每題二選一，測測看你是哪一型購物角色！</p>
+      <span class="kicker">全民比價王挑戰</span>
+      <h1>超級比一比<em>你是比價王嗎？</em></h1>
+      <p class="lead">賣場貨架上，每個標價都在考你。6 題二選一、由易到難，只算總時間——答得越準越快，越接近比價王。</p>
+    </section>
+    <section class="mathwarn" aria-label="數學警告">
+      <span class="sign" aria-hidden="true">÷</span>
+      <div>
+        <b>先說好：這遊戲會算數學。</b>
+        <p>別緊張，只有除法，不考微積分。不想算也行，憑直覺選——只是賣場最愛直覺派。</p>
+        <span class="eq">例：$299 ÷ 1,200 抽 = 每抽多少？</span>
+      </div>
     </section>
     <div class="cases">${list}</div>
-    <button class="btn block" id="start" type="button">開始挑戰 →</button>
-    <p class="foot">免下載直接玩・題目價格為賣場情境示意</p>`;
+    <button class="btn block" id="start" type="button">${VS ? '接受挑戰 →' : '開始比一比 →'}</button>
+    <p class="foot">免下載直接玩・約 1–2 分鐘・題目價格為情境示意</p>`;
   document.getElementById('start').addEventListener('click', () => {
     state = { i: 0, picks: [], started: Date.now(), clock: null };
     state.clock = setInterval(() => { const c = document.getElementById('clock'); if (c) c.textContent = mmss(elapsed()); }, 500);
-    track('challenge_start');
+    track('challenge_start', { from_challenge: !!VS });
     renderQuestion();
   });
 }
@@ -769,7 +771,7 @@ function renderQuestion() {
     <div class="dots" aria-hidden="true">${dots}</div>
     <div class="qhead">
       <div class="qmeta">
-        <span class="qlevel">卷 ${['I', 'II', 'III', 'IV', 'V', 'VI'][state.i]} · ${q.level}</span>
+        <span class="qlevel">第 ${state.i + 1} 題・${q.level}</span>
         <span class="qtrap">${q.trap}</span>
       </div>
       <h2 class="qname" tabindex="-1">${q.name}</h2>
@@ -802,7 +804,7 @@ function answer(k) {
       <p class="save">${right ? `這題幫荷包省下 $${q.save}` : `如果選 ${q.ans.toUpperCase()} 可以多省 $${q.save}`}</p>
       ${originHTML(q)}
     </div>
-    <button class="btn block" id="next" type="button" style="margin-top: 14px">${last ? '看我的購物角色 →' : '下一關 →'}</button>`;
+    <button class="btn block" id="next" type="button" style="margin-top: 14px">${last ? '看我的比一比結果 →' : '下一關 →'}</button>`;
   const next = document.getElementById('next');
   document.querySelector('.verdict').focus({ preventScroll: true });
   document.getElementById('after').scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -813,21 +815,34 @@ function renderResult() {
   clearInterval(state.clock);
   window.scrollTo(0, 0);
   const total = elapsed();
+  const secs = Math.max(1, Math.round(total));
   const correct = state.picks.filter((p, i) => p === QUESTIONS[i].ans).length;
   const saved = QUESTIONS.reduce((s, q, i) => s + (state.picks[i] === q.ans ? q.save : 0), 0);
   const missed = MAX_SAVE - saved;
   const fast = total <= FAST_SECONDS;
   const tier = correct >= 5 ? 'Sharp' : correct >= 3 ? 'Mid' : 'Loose';
-  const r = ROLES[(fast ? 'fast' : 'slow') + tier];
-  track('challenge_complete', { correct: correct, saved: saved, seconds: Math.round(total), role: r.role });
+  const key = (fast ? 'fast' : 'slow') + tier;
+  const r = ROLES[key];
+  track('challenge_complete', { correct: correct, saved: saved, seconds: secs, role: r.role, from_challenge: !!VS });
   const rows = QUESTIONS.map((q, i) => {
     const ok = state.picks[i] === q.ans;
     return `<div class="rv"><span class="mark ${ok ? 'ok' : 'bad'}" aria-label="${ok ? '答對' : '答錯'}">${ok ? check : cross}</span>
       <div><b>${q.name}</b><span>${q.lesson}</span></div>
       <span class="amt ${ok ? 'ok' : 'bad'}">${ok ? '+' : '−'}$${q.save}</span></div>`;
   }).join('');
+  let vs = '';
+  if (VS) {
+    const win = correct > VS.n || (correct === VS.n && secs < VS.t);
+    const tie = correct === VS.n && secs === VS.t;
+    track('challenge_result', { outcome: tie ? 'tie' : win ? 'win' : 'lose' });
+    vs = `<section class="vs-result"><h2>${tie ? '平手！再來一局分高下' : win ? '你贏了這場挑戰！' : '這局朋友贏了'}</h2>
+      <p>你 <span class="num">${correct}/6・${mmss(secs)}</span>　vs　朋友 <span class="num">${VS.n}/6・${mmss(VS.t)}</span></p>
+      <p>${win ? '把結果傳回去，換朋友不服氣。' : '再玩一次扳回來，或把題目丟給別人。'}</p></section>`;
+  }
+  const link = `${PAGE_URL}?r=${key}&n=${correct}&t=${secs}`;
+  const shareText = `我在「超級比一比」答對 ${correct}/6、花 ${mmss(secs)}，是「${r.role}」。你敢挑戰我嗎？`;
   app.innerHTML = `
-    ${topbar('<span class="pill">挑戰結果</span>')}
+    ${topbar('<span class="pill">比一比結果</span>')}
     <section class="persona">
       <span class="kicker">你的賣場購物角色是</span>
       <img class="result-art" src="${r.img}" alt="${r.role}的 AI 生成角色插畫" width="320" height="400" onerror="this.hidden=true;this.nextElementSibling.style.display='flex'">
@@ -836,27 +851,115 @@ function renderResult() {
       <p class="desc">${r.desc}</p>
     </section>
     <div class="stats">
-      <div class="stat"><b class="hl">$${saved}</b><span>這局省下</span></div>
       <div class="stat"><b>${correct}/6</b><span>看穿陷阱</span></div>
-      <div class="stat"><b>${mmss(total)}</b><span>總時間</span></div>
+      <div class="stat"><b>${mmss(secs)}</b><span>總時間</span></div>
+      <div class="stat"><b class="hl">$${saved}</b><span>這局省下<small>以遊戲情境計算</small></span></div>
     </div>
+    ${vs}
+    <section class="share" aria-labelledby="share-title">
+      <h2 id="share-title">找個朋友來比一比</h2>
+      <p>傳圖卡或挑戰連結，朋友打開就看得到你的成績，玩完直接比輸贏。</p>
+      <img class="share-preview" id="share-preview" alt="分享圖卡預覽" hidden>
+      <div class="row2">
+        <button class="btn" id="share-card" type="button">${shareIcon}分享圖卡</button>
+        <button class="btn ghost" id="share-link" type="button">${linkIcon}傳挑戰連結</button>
+      </div>
+      <p class="copied" id="copied" role="status"></p>
+    </section>
     <section class="review"><h2>${missed > 0 ? `還有 $${missed} 被賣場賺走了` : '滿分過關！一塊錢都沒被賣場多賺'}</h2>${rows}</section>
     <section class="cta app-outro" aria-labelledby="app-outro-title">
-      <p class="outro-kicker">你的下一次比價，交給發票存摺</p>
-      <p class="outro-desc">發票存摺用你已歸戶的電子發票，自動記下每次實際付了多少，下次買之前一查就知道。</p>
-      <h2 id="app-outro-title">不論你是哪個角色，<br>以後比價都能<span class="outro-punch">快、狠、準。</span></h2>
-      <img class="outro-scene" src="img/price/p25.webp" alt="六個購物角色一起在賣場拿著手機使用發票存摺比價，手機背面朝向觀眾" width="1536" height="1024" onerror="this.hidden=true">
+      <p class="outro-kicker">遊戲結束，真的比價才開始</p>
+      <h2 id="app-outro-title">遊戲裡要自己算，<em>App 幫你記著價格。</em></h2>
+      <p class="outro-desc">發票存摺用你已歸戶的電子發票，記下每樣東西「你通常買多少」「你買過最低」，也看得到其他會員的成交價。下次站在貨架前，不用再心算。</p>
+      <img class="outro-shot" src="img/price/survey.webp" alt="發票存摺「價格調查」畫面：你通常買 $83.50、你買過最低 $77" width="720" height="1280" loading="lazy" onerror="this.hidden=true">
       <div class="row2">
         <a class="btn" id="dl-android" href="${STORE.android}" target="_blank" rel="noopener">Android 下載</a>
         <a class="btn" id="dl-ios" href="${STORE.ios}" target="_blank" rel="noopener">iPhone 下載</a>
       </div>
     </section>
     <button class="btn ghost block" id="again" type="button">再玩一次</button>
-    <p class="foot">題目價格為示意，省下金額以遊戲情境計算。發票同步最多需要 48 小時，歷史價格會隨你的發票逐步累積。</p>`;
+    <p class="foot">題目價格為情境示意，省下金額以遊戲情境計算。發票同步最多需要 48 小時，價格紀錄會隨你的發票逐步累積。</p>`;
   document.getElementById('dl-android').addEventListener('click', () => track('install_click', { store: 'android', role: r.role }));
   document.getElementById('dl-ios').addEventListener('click', () => track('install_click', { store: 'ios', role: r.role }));
-  document.getElementById('again').addEventListener('click', renderIntro);
+  document.getElementById('again').addEventListener('click', () => { track('play_again'); renderIntro(); });
+
+  const msg = t => { document.getElementById('copied').textContent = t; };
+  let cardBlob = null;
+  drawShareCard(r, correct, secs).then(blob => {
+    cardBlob = blob;
+    const img = document.getElementById('share-preview');
+    if (img && blob) { img.src = URL.createObjectURL(blob); img.hidden = false; }
+  }).catch(() => {});
+  document.getElementById('share-card').addEventListener('click', async () => {
+    if (!cardBlob) cardBlob = await drawShareCard(r, correct, secs).catch(() => null);
+    if (!cardBlob) { msg('圖卡產生失敗，改傳挑戰連結吧'); return; }
+    const file = new File([cardBlob], 'super-compare.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], text: shareText + ' ' + link });
+        track('share', { method: 'card', role: r.role });
+      } catch (e) {}
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(cardBlob); a.download = 'super-compare.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      track('share', { method: 'card_download', role: r.role });
+      msg('圖卡已下載，貼到社群或傳給朋友吧');
+    }
+  });
+  document.getElementById('share-link').addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: '超級比一比', text: shareText, url: link });
+        track('share', { method: 'link', role: r.role });
+        return;
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(shareText + ' ' + link);
+      track('share', { method: 'link_copy', role: r.role });
+      msg('挑戰連結已複製，貼給朋友吧');
+    } catch (e) { msg(link); }
+  });
 }
+
+// 分享圖卡 1080×1350（IG／LINE 直式），不寫省下金額
+function drawShareCard(r, correct, secs) {
+  return new Promise((resolve, reject) => {
+    const W = 1080, H = 1350, c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const F = '-apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+    const rr = (x, y, w, h, rad) => { g.beginPath(); g.moveTo(x + rad, y); g.arcTo(x + w, y, x + w, y + h, rad); g.arcTo(x + w, y + h, x, y + h, rad); g.arcTo(x, y + h, x, y, rad); g.arcTo(x, y, x + w, y, rad); g.closePath(); };
+    const draw = img => {
+      g.fillStyle = '#3560FF'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      g.font = `900 84px ${F}`; g.fillText('超級比一比', W / 2, 150);
+      g.font = `500 36px ${F}`; g.globalAlpha = .88; g.fillText('全民比價王挑戰', W / 2, 205); g.globalAlpha = 1;
+      rr(60, 250, W - 120, 930, 40); g.fill();
+      if (img) {
+        const iw = 340, ih = 425, ix = (W - iw) / 2, iy = 300;
+        g.save(); rr(ix, iy, iw, ih, 28); g.clip(); g.drawImage(img, ix, iy, iw, ih); g.restore();
+      }
+      g.fillStyle = '#737380'; g.font = `500 34px ${F}`; g.fillText('我的賣場購物角色是', W / 2, 800);
+      g.fillStyle = '#3560FF'; g.font = `900 80px ${F}`; g.fillText(r.role, W / 2, 895);
+      g.fillStyle = '#EBEFFF'; rr(130, 935, 380, 120, 24); g.fill(); rr(570, 935, 380, 120, 24); g.fill();
+      g.fillStyle = '#101119'; g.font = `800 52px ui-monospace, Menlo, monospace`;
+      g.fillText(`${correct}/6`, 320, 1000); g.fillText(mmss(secs), 760, 1000);
+      g.fillStyle = '#737380'; g.font = `500 28px ${F}`;
+      g.fillText('看穿陷阱', 320, 1040); g.fillText('總時間', 760, 1040);
+      g.fillStyle = '#101119'; g.font = `800 46px ${F}`; g.fillText('你敢跟我比一比嗎？', W / 2, 1130);
+      g.fillStyle = '#FFFFFF'; g.font = `700 34px ${F}`; g.fillText('發票存摺 invos', W / 2, 1250);
+      g.font = `400 26px ${F}`; g.globalAlpha = .85; g.fillText('invosdata-mkt.github.io/h5-games/price-challenge', W / 2, 1300); g.globalAlpha = 1;
+      c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob')), 'image/png');
+    };
+    const img = new Image();
+    img.onload = () => draw(img);
+    img.onerror = () => draw(null);
+    img.src = r.img;
+  });
+}
+
 
 renderIntro();
 </script>
