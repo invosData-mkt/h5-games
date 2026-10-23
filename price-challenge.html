@@ -423,7 +423,7 @@ const QUESTIONS = [
     a: { name: '派對分享大袋', spec: '淨重 70g', badge: '淨重 70g', promo: '派對包', price: 59, up: '$8.43', img: 'img/price/p05.webp' },
     b: { name: '經典一般小袋', spec: '淨重 60g', badge: '淨重 60g', promo: '標準包', price: 42, up: '$7.00', img: 'img/price/p06.webp' },
     art: 'chips', ans: 'b', save: 10, lesson: '袋子越大，買到的氮氣越多',
-    origin: '1643 年，托里切利用一管水銀做出人類第一個人造真空。將近 400 年後，洋芋片袋還是沒辦法像他一樣抽成真空——一抽，洋芋片就碎了。所以廠商改灌氮氣，把氧氣趕走、讓洋芋片不變質，也把袋子撐得鼓鼓的。向托里切利致敬的方式：先看淨重，別讓鼓脹的袋子騙了你的眼睛！',
+    origin: '1643 年，托里切利用一管水銀做出人類第一個人造真空。洋芋片也想跟他一樣抽成真空，恐怕還很有難度——袋子一抽真空，洋芋片就被壓碎了。所以廠商改灌氮氣，把氧氣趕走、讓洋芋片不變質，也把袋子撐得鼓鼓的。向托里切利致敬的方式：先看淨重，別讓鼓脹的袋子騙了你的眼睛！',
     why: '大袋只比小袋多 10g（約 5 片洋芋片），卻貴了 $17，多付的錢都拿去買氮氣了！'
   },
   {
@@ -849,7 +849,6 @@ function renderResult() {
     <section class="review"><h2>${missed > 0 ? `還有 $${missed} 被賣場賺走了` : '滿分過關！一塊錢都沒被賣場多賺'}</h2>${rows}</section>
     <section class="cta app-outro" aria-labelledby="app-outro-title">
       <img class="outro-scene" src="img/price/p25.webp" alt="六個購物角色一起在賣場拿著手機用發票存摺比價" width="1536" height="1024" loading="lazy" onerror="this.hidden=true">
-      <p class="outro-kicker">遊戲結束，說句真心話</p>
       <h2 id="app-outro-title">想省錢，<br>不用人人都當比價王，<em>讓發票存摺<br>幫你一鍵算清楚。</em></h2>
       <p class="outro-desc">站在貨架前心算，連比價王都會累。發票存摺用你已歸戶的電子發票，幫你記下每樣東西「你通常買多少」「你買過最低」，也看得到其他會員在哪買、付多少。下次買之前查一下，就知道這次划不划算。</p>
       <img class="outro-shot" src="img/price/survey.webp" alt="發票存摺「價格調查」畫面：你通常買 $83.50、你買過最低 $77" width="720" height="1280" loading="lazy" onerror="this.hidden=true">
