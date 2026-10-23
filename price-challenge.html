@@ -276,7 +276,7 @@ body { background: var(--bg); color: var(--text); }
 
 
 
-.mathwarn { color: var(--bad); font-size: 20px; font-weight: 900; letter-spacing: .04em; }
+.mathwarn { align-self: flex-start; color: var(--bad); background: var(--bad-soft); border: 2px solid var(--bad); border-radius: 12px; padding: 8px 16px; font-size: 20px; font-weight: 900; letter-spacing: .04em; }
 .vs-card { background: var(--surface); border: 2px solid var(--brand); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
 .vs-card .k { font-size: 13px; font-weight: 700; color: var(--brand); letter-spacing: .06em; }
 .vs-card b { font-size: 19px; color: var(--ink); line-height: 1.5; }
@@ -303,7 +303,7 @@ body { background: var(--bg); color: var(--text); }
 .tag { background: var(--tag); border: 0; border-radius: 10px; padding: 8px 12px 10px; }
 .tag .promo { background: var(--promo-red); border-radius: 6px; }
 .tag .barcode { display: none; }
-.tag .was { font-family: var(--font-num); font-size: 15px; font-weight: 700; color: var(--tag-ink); opacity: .65; line-height: 1.1; }
+.tag .price.strike { text-decoration: line-through; text-decoration-color: var(--promo-red); text-decoration-thickness: 3px; }
 .tag .price { font-family: var(--font-num); font-weight: 800; font-size: 30px; }
 .opt .unit { border-radius: 8px; font-family: var(--font-ui); }
 .opt.win { border-color: var(--ok); background: var(--surface); }
@@ -423,7 +423,7 @@ const QUESTIONS = [
     a: { name: '派對分享大袋', spec: '淨重 70g', badge: '淨重 70g', promo: '派對包', price: 59, up: '$8.43', img: 'img/price/p05.webp' },
     b: { name: '經典一般小袋', spec: '淨重 60g', badge: '淨重 60g', promo: '標準包', price: 42, up: '$7.00', img: 'img/price/p06.webp' },
     art: 'chips', ans: 'b', save: 10, lesson: '袋子越大，買到的氮氣越多',
-    origin: '物理學家托里切利證明了大氣壓力與真空的存在；洋芋片袋子卻不抽真空，而是灌進氮氣把氧氣趕出去，避免油脂氧化變質，順便當緩衝。氮氣是用來保鮮的，不是多給你的，別讓鼓脹的袋子騙了你的眼睛！',
+    origin: '1643 年，托里切利用一管水銀做出人類第一個人造真空。將近 400 年後，洋芋片袋還是沒辦法像他一樣抽成真空——一抽，洋芋片就碎了。所以廠商改灌氮氣，把氧氣趕走、讓洋芋片不變質，也把袋子撐得鼓鼓的。向托里切利致敬的方式：先看淨重，別讓鼓脹的袋子騙了你的眼睛！',
     why: '大袋只比小袋多 10g（約 5 片洋芋片），卻貴了 $17，多付的錢都拿去買氮氣了！'
   },
   {
@@ -451,7 +451,7 @@ const QUESTIONS = [
     story: '你的大腦「系統一」說環保補充包直覺比較省；但「系統二（慢想）」發現旁邊的大瓶裝貼了會員再 9 折！',
     ask: '身為賣場會員的你，算完折上折後選哪一個？',
     a: { name: '環保補充包', spec: '2,000g，無額外會員折扣', badge: '2000g', promo: '補充包', price: 289, up: '$14.45', img: 'img/price/p11.webp' },
-    b: { name: '重量大瓶裝', spec: '3,000g，標價已含會員 9 折', badge: '3000g・9折', promo: '會員9折', was: 449, price: 404, up: '$13.47', img: 'img/price/p12.webp' },
+    b: { name: '重量大瓶裝', spec: '3,000g，標價未含會員 9 折', badge: '3000g・9折', promo: '會員9折', strike: true, price: 449, up: '$13.47', img: 'img/price/p12.webp' },
     art: 'detergent', ans: 'b', save: 29, lesson: '戰勝心算惰性，打折大瓶逆轉勝',
     origin: '諾貝爾經濟學獎得主康納曼在《快思慢想》裡，把大腦分成反應快、憑直覺的「系統一」，和費力計算的「系統二」，並形容系統二很懶，能不動就不動。不同克數再加上打折，正好讓人懶得算、直接抓起補充包。動腦算一下，標價最貴的其實最便宜！',
     why: '大瓶裝 $449 打完 9 折是 $404，拿到 3,000g（每 100g 只要 $13.47），逆轉擊敗補充包！'
@@ -738,7 +738,7 @@ function optHTML(key, o, q) {
           <span class="promo">${o.promo}</span>
           
         </div>
-        ${o.was ? `<s class="was">$${fmt(o.was)}</s>` : ''}<span class="price"><small>$</small>${fmt(o.price)}</span>
+        <span class="price${o.strike ? ' strike' : ''}"><small>$</small>${fmt(o.price)}</span>
       </div>
     </button>`;
 }
