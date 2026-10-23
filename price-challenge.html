@@ -274,17 +274,9 @@ body { background: var(--bg); color: var(--text); }
 .hero h1 em { font-style: normal; color: var(--brand); display: block; }
 .hero .lead { font-size: 17px; line-height: 1.75; color: var(--text); }
 
-.storm { display: flex; gap: 12px; align-items: center; background: var(--brand); color: #fff; border-radius: 16px; padding: 14px 16px; }
-.storm svg { flex: none; }
-.storm b { display: block; font-size: 16px; line-height: 1.4; }
-.storm span { font-size: 14px; opacity: .9; }
 
-.mathwarn { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 12px; align-items: start; background: #FFF6DA; border: 1.5px dashed var(--tag-border); border-radius: 16px; padding: 14px 16px; }
-.mathwarn .sign { width: 40px; height: 40px; border-radius: 12px; background: var(--tag); color: var(--tag-ink); display: flex; align-items: center; justify-content: center; font: 900 22px var(--font-num); transform: rotate(-6deg); }
-.mathwarn b { display: block; color: var(--ink); font-size: 16px; }
-.mathwarn p { font-size: 14.5px; line-height: 1.7; color: var(--text); }
-.mathwarn .eq { font-family: var(--font-num); font-size: 13px; color: var(--muted); }
 
+.mathwarn { color: var(--bad); font-size: 20px; font-weight: 900; letter-spacing: .04em; }
 .vs-card { background: var(--surface); border: 2px solid var(--brand); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
 .vs-card .k { font-size: 13px; font-weight: 700; color: var(--brand); letter-spacing: .06em; }
 .vs-card b { font-size: 19px; color: var(--ink); line-height: 1.5; }
@@ -311,6 +303,7 @@ body { background: var(--bg); color: var(--text); }
 .tag { background: var(--tag); border: 0; border-radius: 10px; padding: 8px 12px 10px; }
 .tag .promo { background: var(--promo-red); border-radius: 6px; }
 .tag .barcode { display: none; }
+.tag .was { font-family: var(--font-num); font-size: 15px; font-weight: 700; color: var(--tag-ink); opacity: .65; line-height: 1.1; }
 .tag .price { font-family: var(--font-num); font-weight: 800; font-size: 30px; }
 .opt .unit { border-radius: 8px; font-family: var(--font-ui); }
 .opt.win { border-color: var(--ok); background: var(--surface); }
@@ -405,7 +398,7 @@ button:focus-visible, a:focus-visible { outline-color: var(--brand); }
 const QUESTIONS = [
   {
     id: 'q1', name: '蒙提霍爾的衛生紙', icon: '🧻', level: '暖身關', trap: '三門抉擇 × 抽數盲區', unit: '每 100 抽',
-    story: '貨架上有三款衛生紙，你已經把 12 包入的 A 放進推車。店員突然神祕地靠過來：「C 剛剛賣光了，但聽我的，要不要把 A 換成 10 包入的 B？」',
+    story: '貨架上有三款衛生紙，你已經把 12 包入的 A 放進推車。店員突然神祕地靠過來：「現在 B 有做折扣，要不要把 A 換成 10 包入的 B？」',
     ask: '面對店員的提議，你要留著 A，還是換成 B？',
     a: { name: '留著 A｜12 包串裝', spec: '100 抽 × 12 包（共 1,200 抽）', badge: '100抽×12', promo: '量販價', price: 299, up: '$24.9', img: 'img/price/p01.webp' },
     b: { name: '換成 B｜10 包厚裝', spec: '120 抽 × 10 包（共 1,200 抽）', badge: '120抽×10', promo: '量販價', price: 279, up: '$23.3', img: 'img/price/p02.webp' },
@@ -416,7 +409,7 @@ const QUESTIONS = [
   {
     id: 'q2', name: '歌利亞的家庭號鮮乳', icon: '🥛', level: '第 2 關', trap: '巨無霸迷思 × 量販悖論', unit: '每 100ml',
     story: '大家都迷信「越大桶越便宜」，但冷藏櫃裡 2,000ml 的巨人歌利亞，正受到兩瓶 946ml 大衛的聯手挑戰。',
-    ask: '哪一組鮮乳每 100ml 其實更划算？',
+    ask: '哪一組鮮乳其實更划算？',
     a: { name: '大衛組｜紙盒 2 瓶', spec: '946ml × 2 瓶（共 1,892ml）', badge: '946ml×2', promo: '合購價', price: 185, up: '$9.78', img: 'img/price/p03.webp' },
     b: { name: '歌利亞｜家庭號巨桶', spec: '2,000ml × 1 大桶', badge: '2000ml', promo: '家庭號', price: 209, up: '$10.45', img: 'img/price/p04.webp' },
     art: 'milk', ans: 'a', save: 13, lesson: '家庭號大桶不一定贏過雙瓶促銷',
@@ -425,12 +418,12 @@ const QUESTIONS = [
   },
   {
     id: 'q3', name: '托里切利的真空洋芋片', icon: '🥔', level: '第 3 關', trap: '氣壓膨脹 × 視覺偏誤', unit: '每 10g',
-    story: '派對大袋裝鼓得像顆氣球一樣超澎湃，但身為懂科學的消費者，你知道裡面充滿了保護氣體。',
-    ask: '不看袋子大小看淨重，哪一袋比較划算？',
-    a: { name: '派對分享大袋', spec: '淨重 70g（包裝超鼓脹）', badge: '淨重 70g', promo: '派對包', price: 59, up: '$8.43', img: 'img/price/p05.webp' },
-    b: { name: '經典一般小袋', spec: '淨重 60g（標準包裝）', badge: '淨重 60g', promo: '標準包', price: 42, up: '$7.00', img: 'img/price/p06.webp' },
+    story: '派對大袋裝鼓得像顆氣球一樣超澎湃，但身為懂科學的消費者，你知道裡面就是包氮氣。',
+    ask: '大小兩袋洋芋片，哪一袋比較划算？',
+    a: { name: '派對分享大袋', spec: '淨重 70g', badge: '淨重 70g', promo: '派對包', price: 59, up: '$8.43', img: 'img/price/p05.webp' },
+    b: { name: '經典一般小袋', spec: '淨重 60g', badge: '淨重 60g', promo: '標準包', price: 42, up: '$7.00', img: 'img/price/p06.webp' },
     art: 'chips', ans: 'b', save: 10, lesson: '袋子越大，買到的氮氣越多',
-    origin: '物理學家托里切利證明了大氣壓力與真空的存在；而現代洋芋片則是故意不抽真空、反而灌滿「氮氣」來抵抗外界大氣壓力，保護洋芋片不碎裂。別讓鼓脹的袋子騙了你的眼睛！',
+    origin: '物理學家托里切利證明了大氣壓力與真空的存在；洋芋片袋子卻不抽真空，而是灌進氮氣把氧氣趕出去，避免油脂氧化變質，順便當緩衝。氮氣是用來保鮮的，不是多給你的，別讓鼓脹的袋子騙了你的眼睛！',
     why: '大袋只比小袋多 10g（約 5 片洋芋片），卻貴了 $17，多付的錢都拿去買氮氣了！'
   },
   {
@@ -440,12 +433,12 @@ const QUESTIONS = [
     a: { name: '大瓶｜第 2 件 6 折', spec: '750ml × 2 瓶（共 1,500ml）', badge: '共1500ml', promo: '2件$398', price: 398, up: '$26.5', img: 'img/price/p07.webp' },
     b: { name: '小瓶｜買一送一', spec: '400ml × 2 瓶（共 800ml）', badge: '共800ml', promo: '買1送1', price: 299, up: '$37.4', img: 'img/price/p08.webp' },
     art: 'shampoo', ans: 'a', save: 162, lesson: '買一送一常伴隨容量偷縮水',
-    origin: '薛丁格的貓在打開盒子前同時是活的也是死的；賣場的「買一送一」在看清容量前，也同時是划算與昂貴的。廠商常把小瓶裝拉高定價再買一送一，算下來每 ml 貴了 40%！',
+    origin: '薛丁格的貓在打開盒子前同時是活的也是死的；賣場的「買一送一」在看清容量前，是划算還是昂貴也說不準。廠商常把小瓶裝拉高定價再買一送一，算下來每 ml 貴了 40%！',
     why: 'A 方案付 $398 拿到 1,500ml；B 方案付 $299 卻只有 800ml，換算同容量差了 $162！'
   },
   {
     id: 'q5', name: '特洛伊的箱購尿布', icon: '📦', level: '第 5 關', trap: '木馬偽裝 × 單包縮水', unit: '每片',
-    story: '走道盡頭堆著像禮物一樣的尿布紙箱，大大印著「箱購特惠」，爸媽們看都不看就往推車裡搬。',
+    story: '走道盡頭堆滿尿布紙箱，外箱大大印著「箱購特惠」，不少爸媽沒細看就整箱搬上推車。',
     ask: '零買單包 vs. 整箱搬走，哪個每片更便宜？',
     a: { name: '貨架單包拿', spec: '62 片 × 1 包', badge: '62片×1包', promo: '單包價', price: 359, up: '$5.79', img: 'img/price/p09.webp' },
     b: { name: '整箱特惠組', spec: '56 片 × 4 包（共 224 片）', badge: '56片×4包', promo: '箱購優惠', price: 1399, up: '$6.25', img: 'img/price/p10.webp' },
@@ -455,26 +448,26 @@ const QUESTIONS = [
   },
   {
     id: 'q6', name: '康納曼的折上折洗衣精', icon: '🧺', level: '魔王關', trap: '快思慢想 × 雙重折扣盲區', unit: '每 100g',
-    story: '你的大腦「系統一（直覺）」說環保補充包一定最省；但「系統二（慢想）」發現旁邊的大瓶裝貼了會員再 9 折！',
+    story: '你的大腦「系統一」說環保補充包直覺比較省；但「系統二（慢想）」發現旁邊的大瓶裝貼了會員再 9 折！',
     ask: '身為賣場會員的你，算完折上折後選哪一個？',
     a: { name: '環保補充包', spec: '2,000g，無額外會員折扣', badge: '2000g', promo: '補充包', price: 289, up: '$14.45', img: 'img/price/p11.webp' },
-    b: { name: '重量大瓶裝', spec: '3,000g，結帳享會員 9 折', badge: '3000g・9折', promo: '會員9折', price: 449, up: '$13.47', img: 'img/price/p12.webp' },
+    b: { name: '重量大瓶裝', spec: '3,000g，標價已含會員 9 折', badge: '3000g・9折', promo: '會員9折', was: 449, price: 404, up: '$13.47', img: 'img/price/p12.webp' },
     art: 'detergent', ans: 'b', save: 29, lesson: '戰勝心算惰性，打折大瓶逆轉勝',
-    origin: '諾貝爾經濟學獎得主康納曼在《快思慢想》指出：當遇到「不同克數＋打折乘法」時，負責邏輯的「系統二」會因為偷懶而罷工，讓直覺直接抓起補充包。動腦算一下，標價最貴的其實最便宜！',
+    origin: '諾貝爾經濟學獎得主康納曼在《快思慢想》裡，把大腦分成反應快、憑直覺的「系統一」，和費力計算的「系統二」，並形容系統二很懶，能不動就不動。不同克數再加上打折，正好讓人懶得算、直接抓起補充包。動腦算一下，標價最貴的其實最便宜！',
     why: '大瓶裝 $449 打完 9 折是 $404，拿到 3,000g（每 100g 只要 $13.47），逆轉擊敗補充包！'
   }
 ];
 
-const PEOPLE = [{"key": "monty-hall", "name": "蒙提霍爾", "en": "Monty Hall", "file": "img/price/p13.webp", "kind": "AI 生成插畫"}, {"key": "goliath", "name": "歌利亞", "en": "Goliath", "file": "img/price/p14.webp", "kind": "AI 生成插畫"}, {"key": "torricelli", "name": "托里切利", "en": "Evangelista Torricelli", "file": "img/price/p15.webp", "kind": "AI 生成插畫"}, {"key": "schrodinger", "name": "薛丁格", "en": "Erwin Schrödinger", "file": "img/price/p16.webp", "kind": "AI 生成插畫"}, {"key": "troy", "name": "特洛伊木馬", "en": "Trojan Horse", "file": "img/price/p17.webp", "kind": "AI 生成插畫"}, {"key": "kahneman", "name": "康納曼", "en": "Daniel Kahneman", "file": "img/price/p18.webp", "kind": "AI 生成插畫"}];
+const PEOPLE = [{"key": "monty-hall", "name": "蒙提霍爾", "en": "Monty Hall", "file": "img/price/p13.webp"}, {"key": "goliath", "name": "歌利亞", "en": "Goliath", "file": "img/price/p14.webp"}, {"key": "torricelli", "name": "托里切利", "en": "Evangelista Torricelli", "file": "img/price/p15.webp"}, {"key": "schrodinger", "name": "薛丁格", "en": "Erwin Schrödinger", "file": "img/price/p16.webp"}, {"key": "troy", "name": "特洛伊木馬", "en": "Trojan Horse", "file": "img/price/p17.webp"}, {"key": "kahneman", "name": "康納曼", "en": "Daniel Kahneman", "file": "img/price/p18.webp"}];
 QUESTIONS.forEach((q, i) => { q.person = PEOPLE[i]; });
 
 function originHTML(q) {
   const p = q.person;
   return `<section class="origin" aria-label="名詞解說">
     <figure>
-      <img class="person-image" src="${p.file}" alt="${p.name}：${p.kind}" width="160" height="200" onerror="this.hidden=true;this.nextElementSibling.hidden=false;this.nextElementSibling.style.display='flex'">
+      <img class="person-image" src="${p.file}" alt="${p.name}" width="160" height="200" onerror="this.hidden=true;this.nextElementSibling.hidden=false;this.nextElementSibling.style.display='flex'">
       <span class="person-fallback" hidden>${p.name}<br>圖像暫時無法顯示</span>
-      <figcaption><strong>${p.name}</strong>${p.en}<br>${p.kind}</figcaption>
+      <figcaption><strong>${p.name}</strong>${p.en}</figcaption>
     </figure>
     <div class="origin-copy"><h4>為什麼叫「${q.name}」？</h4><p>${q.origin}</p>
     </div>
@@ -677,9 +670,6 @@ const ART_3D = {
         <text x="34" y="36" text-anchor="middle" font-size="11" font-weight="900" fill="#2B2100">會員9折</text>`)
 };
 
-// 颱風橫幅：TYPHOON_UNTIL 當天（台灣時間）結束後自動不顯示；要提早關就改成過去的日期
-const TYPHOON_UNTIL = '2026-10-24';
-const showStorm = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10) <= TYPHOON_UNTIL;
 const PAGE_URL = 'https://invosdata-mkt.github.io/h5-games/price-challenge';
 
 // 挑戰連結：?r=角色&n=答對題數&t=總秒數
@@ -693,7 +683,6 @@ const VS = (() => {
 })();
 if (VS) track('challenge_link_open', { friend_role: ROLES[VS.r].role, friend_correct: VS.n, friend_seconds: VS.t });
 
-const stormIcon = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 4.5c-3-2-8-2.4-11.5-.6C5.8 5.8 4 9.6 4.7 13.3"/><path d="M3 19.5c3 2 8 2.4 11.5.6 3.7-1.9 5.5-5.7 4.8-9.4"/><circle cx="12" cy="12" r="3"/></svg>';
 const shareIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
 const linkIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
 
@@ -714,28 +703,17 @@ function renderIntro() {
       <span class="k">你收到一封挑戰書</span>
       <b>朋友答對 <span class="num">${VS.n}/6</span>、只花 <span class="num">${mmss(VS.t)}</span>，是「${ROLES[VS.r].role}」。你敢比嗎？</b>
     </section>` : '';
-  const storm = showStorm() ? `
-    <section class="storm">${stormIcon}<div><b>颱風天在家沒事？</b><span>來場超級比一比，看看你是不是全民比價王。</span></div></section>` : '';
   app.innerHTML = `
     ${topbar('<span class="pill">超級比一比</span>')}
-    ${storm}
     ${vs}
     <section class="hero">
       <span class="kicker">全民比價王挑戰</span>
       <h1>超級比一比<em>你是比價王嗎？</em></h1>
       <p class="lead">賣場貨架上，每個標價都在考你。6 題二選一、由易到難，只算總時間——答得越準越快，越接近比價王。</p>
     </section>
-    <section class="mathwarn" aria-label="數學警告">
-      <span class="sign" aria-hidden="true">÷</span>
-      <div>
-        <b>先說好：這遊戲會算數學。</b>
-        <p>別緊張，只有除法，不考微積分。不想算也行，憑直覺選——只是賣場最愛直覺派。</p>
-        <span class="eq">例：$299 ÷ 1,200 抽 = 每抽多少？</span>
-      </div>
-    </section>
+    <p class="mathwarn">警告：會算數學</p>
     <div class="cases">${list}</div>
-    <button class="btn block" id="start" type="button">${VS ? '接受挑戰 →' : '開始比一比 →'}</button>
-    <p class="foot">免下載直接玩・約 1–2 分鐘・題目價格為情境示意</p>`;
+    <button class="btn block" id="start" type="button">${VS ? '接受挑戰 →' : '開始比一比 →'}</button>`;
   document.getElementById('start').addEventListener('click', () => {
     state = { i: 0, picks: [], started: Date.now(), clock: null };
     state.clock = setInterval(() => { const c = document.getElementById('clock'); if (c) c.textContent = mmss(elapsed()); }, 500);
@@ -760,7 +738,7 @@ function optHTML(key, o, q) {
           <span class="promo">${o.promo}</span>
           
         </div>
-        <span class="price"><small>$</small>${fmt(o.price)}</span>
+        ${o.was ? `<s class="was">$${fmt(o.was)}</s>` : ''}<span class="price"><small>$</small>${fmt(o.price)}</span>
       </div>
     </button>`;
 }
@@ -847,7 +825,7 @@ function renderResult() {
     ${topbar('<span class="pill">比一比結果</span>')}
     <section class="persona">
       <span class="kicker">你的賣場購物角色是</span>
-      <img class="result-art" src="${r.img}" alt="${r.role}的 AI 生成角色插畫" width="320" height="400" onerror="this.hidden=true;this.nextElementSibling.style.display='flex'">
+      <img class="result-art" src="${r.img}" alt="${r.role}角色插畫" width="320" height="400" onerror="this.hidden=true;this.nextElementSibling.style.display='flex'">
       <span class="emblem" aria-hidden="true" style="display:none">${r.icon}</span>
       <span class="role">${r.role}</span>
       <p class="desc">${r.desc}</p>
@@ -937,23 +915,20 @@ function drawShareCard(r, correct, secs) {
     const draw = img => {
       g.fillStyle = '#3560FF'; g.fillRect(0, 0, W, H);
       g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-      g.font = `900 84px ${F}`; g.fillText('超級比一比', W / 2, 150);
-      g.font = `500 36px ${F}`; g.globalAlpha = .88; g.fillText('全民比價王挑戰', W / 2, 205); g.globalAlpha = 1;
-      rr(60, 250, W - 120, 930, 40); g.fill();
+      g.font = `900 72px ${F}`; g.fillText('超級比一比', W / 2, 110);
+      g.font = `500 32px ${F}`; g.globalAlpha = .88; g.fillText('全民比價王挑戰', W / 2, 160); g.globalAlpha = 1;
+      rr(50, 195, W - 100, 1010, 40); g.fill();
       if (img) {
-        const iw = 340, ih = 425, ix = (W - iw) / 2, iy = 300;
-        g.save(); rr(ix, iy, iw, ih, 28); g.clip(); g.drawImage(img, ix, iy, iw, ih); g.restore();
+        // 角色圖佔卡片主體（約 6 成高）
+        const iw = 600, ih = 750, ix = (W - iw) / 2, iy = 230;
+        g.save(); rr(ix, iy, iw, ih, 32); g.clip(); g.drawImage(img, ix, iy, iw, ih); g.restore();
       }
-      g.fillStyle = '#737380'; g.font = `500 34px ${F}`; g.fillText('我的賣場購物角色是', W / 2, 800);
-      g.fillStyle = '#3560FF'; g.font = `900 80px ${F}`; g.fillText(r.role, W / 2, 895);
-      g.fillStyle = '#EBEFFF'; rr(130, 935, 380, 120, 24); g.fill(); rr(570, 935, 380, 120, 24); g.fill();
-      g.fillStyle = '#101119'; g.font = `800 52px ui-monospace, Menlo, monospace`;
-      g.fillText(`${correct}/6`, 320, 1000); g.fillText(mmss(secs), 760, 1000);
-      g.fillStyle = '#737380'; g.font = `500 28px ${F}`;
-      g.fillText('看穿陷阱', 320, 1040); g.fillText('總時間', 760, 1040);
-      g.fillStyle = '#101119'; g.font = `800 46px ${F}`; g.fillText('你敢跟我比一比嗎？', W / 2, 1130);
-      g.fillStyle = '#FFFFFF'; g.font = `700 34px ${F}`; g.fillText('發票存摺 invos', W / 2, 1250);
-      g.font = `400 26px ${F}`; g.globalAlpha = .85; g.fillText('invosdata-mkt.github.io/h5-games/price-challenge', W / 2, 1300); g.globalAlpha = 1;
+      g.fillStyle = '#737380'; g.font = `500 30px ${F}`; g.fillText('我的賣場購物角色是', W / 2, 1030);
+      g.fillStyle = '#3560FF'; g.font = `900 72px ${F}`; g.fillText(r.role, W / 2, 1105);
+      g.fillStyle = '#101119'; g.font = `700 38px ${F}`;
+      g.fillText(`答對 ${correct}/6・總時間 ${mmss(secs)}・你敢比嗎？`, W / 2, 1165);
+      g.fillStyle = '#FFFFFF'; g.font = `700 32px ${F}`; g.fillText('發票存摺 invos', W / 2, 1262);
+      g.font = `400 24px ${F}`; g.globalAlpha = .85; g.fillText('invosdata-mkt.github.io/h5-games/price-challenge', W / 2, 1305); g.globalAlpha = 1;
       c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob')), 'image/png');
     };
     const img = new Image();
