@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>超級比一比｜全民比價王挑戰・發票存摺 invos</title>
+<title>超級比一比｜你是全民比價王嗎？・發票存摺 invos</title>
 <meta name="description" content="6 題賣場二選一，只算總時間。看看你是不是全民比價王，再找朋友來比一比。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="超級比一比｜你是全民比價王嗎？">
@@ -371,7 +371,7 @@ button:focus-visible, a:focus-visible { outline-color: var(--brand); }
 
 @media (max-width: 560px) {
   .app { gap: 16px; }
-  .hero h1 { font-size: 42px; }
+  .hero h1 { font-size: 36px; }
   .opt { padding: 8px; gap: 7px; border-radius: 14px; }
   .opt .name { font-size: 15px; }
   .opt .spec, .opt .unit { font-size: 13px; }
@@ -707,8 +707,7 @@ function renderIntro() {
     ${topbar('<span class="pill">超級比一比</span>')}
     ${vs}
     <section class="hero">
-      <span class="kicker">全民比價王挑戰</span>
-      <h1>超級比一比<em>你是比價王嗎？</em></h1>
+      <h1>超級比一比<em>你是全民比價王嗎？</em></h1>
       <p class="lead">賣場貨架上，每個標價都在考你。6 題二選一、由易到難，只算總時間——答得越準越快，越接近比價王。</p>
     </section>
     <p class="mathwarn">！！！警告：需要算數學！！！</p>
@@ -913,8 +912,7 @@ function drawShareCard(r, correct, secs) {
     const draw = img => {
       g.fillStyle = '#3560FF'; g.fillRect(0, 0, W, H);
       g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-      g.font = `900 72px ${F}`; g.fillText('超級比一比', W / 2, 110);
-      g.font = `500 32px ${F}`; g.globalAlpha = .88; g.fillText('全民比價王挑戰', W / 2, 160); g.globalAlpha = 1;
+      g.font = `900 72px ${F}`; g.fillText('超級比一比', W / 2, 125);
       rr(50, 195, W - 100, 1010, 40); g.fill();
       if (img) {
         // 角色圖佔卡片主體（約 6 成高）
