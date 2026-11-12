@@ -61,6 +61,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* 場景 */
 .scene { position: relative; flex: 1; min-height: 0; }
+.hand { height: 50%; flex: none; }
 .shelf { position: absolute; left: 0; right: 0; top: 0; bottom: 26%; overflow: hidden; }
 .shelf i { position: absolute; left: -4%; right: -4%; height: 10px; background: #C9D8F8; border-radius: 4px; }
 .shelf i:nth-child(4) { top: 22%; } .shelf i:nth-child(5) { top: 50%; } .shelf i:nth-child(6) { top: 78%; }
@@ -68,7 +69,7 @@ button { font-family: inherit; cursor: pointer; }
 .goods { position: absolute; left: 0; right: 0; height: 28%; }
 .goods.g1 { top: -6%; } .goods.g2 { top: 22%; } .goods.g3 { top: 50%; }
 
-.clerk { position: absolute; left: 50%; bottom: 22%; width: 46%; max-width: 200px; transform: translateX(-50%); }
+.clerk { position: absolute; left: 50%; bottom: 22%; width: 36%; max-width: 150px; transform: translateX(-50%); }
 .clerk.nod { animation: nod .35s; }
 @keyframes nod { 40% { transform: translateX(-50%) translateY(6px) rotate(-2deg); } }
 
@@ -107,21 +108,35 @@ button { font-family: inherit; cursor: pointer; }
 /* 手機（滑動找 App） */
 .hand { padding: 10px 16px 14px; background: #fff; z-index: 3; }
 .phone {
-  width: 100%; height: 214px; border: 4px solid var(--ink); border-radius: 26px;
+  width: 100%; height: 100%; border: 4px solid var(--ink); border-radius: 26px;
   background: linear-gradient(160deg, #3B5BDB, #7048E8 60%, #E64980); color: #fff; position: relative; overflow: hidden;
   box-shadow: 0 6px 0 rgba(18, 23, 34, .18);
   touch-action: none; cursor: grab;
 }
-.phone .idle { position: absolute; inset: 0; z-index: 3; background: rgba(18, 23, 34, .93); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 0 16px; }
+.phone .idle { position: absolute; inset: 0; z-index: 3; background: #121722; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 0 16px; }
 .phone .idle b { font-size: 20px; font-weight: 900; }
 .phone .idle span { font-size: 13px; color: #A9B4CC; font-weight: 500; }
 .pages { position: absolute; left: 0; top: 0; bottom: 18px; width: 300%; display: flex; transition: transform .2s cubic-bezier(.2, .8, .3, 1); }
 .pages.drag { transition: none; }
-.page { width: 33.3333%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; padding: 10px 8px 0; }
+.page { width: 33.3333%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); padding: 12px 8px 4px; }
 .app-i { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); white-space: nowrap; }
 .app-i i { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; font-style: normal; font-size: 26px; background: var(--c, #fff); box-shadow: 0 2px 6px rgba(0, 0, 0, .25); pointer-events: none; }
 .app-i.me i { background: #fff; border: 3px solid var(--blue); color: var(--blue); font-weight: 900; font-size: 24px; font-family: var(--f); }
 .app-i.wrong i { animation: shake .3s; outline: 3px solid var(--red); }
+.app-i.fld > i { background: rgba(255, 255, 255, .32); display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3px; padding: 6px; place-items: stretch; }
+.app-i.fld > i u { border-radius: 3px; background: var(--m, #fff); position: relative; }
+.app-i.fld > i u.me { background: #fff; box-shadow: inset 0 0 0 2px var(--blue); }
+.app-i.fld > i u.sub { background: rgba(255, 255, 255, .55); }
+.app-i.fld > i u.sub.t::after { content: ''; position: absolute; inset: 25%; border-radius: 50%; background: var(--blue); }
+.wdg { grid-column: 1 / -1; grid-row: span 2; margin: 2px 6px 8px; border-radius: 22px; background: #fff; color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 3px 10px rgba(0, 0, 0, .25); }
+.wdg * { pointer-events: none; }
+.wdg .wt { font-size: 12px; font-weight: 900; color: var(--blue); }
+.wdg .wb { display: flex; height: 46px; } .wdg .wb i { background: var(--ink); margin-right: 2px; }
+.wdg .wc { font-family: var(--fn); font-size: 11px; letter-spacing: .16em; color: var(--muted); }
+.fview { position: absolute; inset: 0; z-index: 2; background: rgba(18, 23, 34, .8); display: flex; flex-direction: column; padding: 10px 14px 12px; }
+.fhead { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 17px; margin-bottom: 6px; }
+.fback { background: rgba(255, 255, 255, .18); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 900; }
+.fgrid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); background: rgba(255, 255, 255, .14); border-radius: 22px; padding: 6px; }
 .pdots { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; justify-content: center; gap: 6px; z-index: 1; }
 .pdots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .4); }
 .pdots i.on { background: #fff; }
@@ -135,18 +150,25 @@ button { font-family: inherit; cursor: pointer; }
 .ms small { font-family: var(--f); font-size: 15px; font-weight: 900; margin-left: 3px; }
 .ms.slow { color: var(--red); }
 .beam { position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; background: #FF3B3B; box-shadow: 0 0 14px 4px rgba(255, 59, 59, .55); z-index: 2; pointer-events: none; }
-.show.aim .ms { font-family: var(--f); font-size: 15px; font-weight: 900; color: var(--red); }
+.beam { animation: pulse .7s infinite; }
+@keyframes pulse { 50% { opacity: .45; } }
+.show.aim .ms { font-family: var(--f); font-size: 19px; font-weight: 900; color: var(--red); }
 .show.aim.hit .beam { background: #19C37D; box-shadow: 0 0 14px 4px rgba(25, 195, 125, .6); }
 .show.aim.hit .ms { color: var(--green); }
 
 /* 開場、結果 */
 .sheet { position: absolute; inset: 0; z-index: 10; background: var(--blue); color: #fff; display: flex; flex-direction: column; padding: calc(28px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; }
 .sheet .tag { font-size: 14px; font-weight: 700; color: #DCE5FF; }
-.hero-b { align-self: flex-start; margin-top: 26px; background: var(--bubble); color: var(--ink); border: 4px solid var(--ink); border-radius: 26px; padding: 6px 24px 8px; font-size: 44px; font-weight: 900; position: relative; transform: rotate(-3deg); box-shadow: 0 6px 0 rgba(0, 0, 0, .18); }
+.hero-b { align-self: flex-start; margin-top: 18px; background: var(--bubble); color: var(--ink); border: 4px solid var(--ink); border-radius: 26px; padding: 6px 24px 8px; font-size: 44px; font-weight: 900; position: relative; transform: rotate(-3deg); box-shadow: 0 6px 0 rgba(0, 0, 0, .18); }
 .hero-b::after { content: ''; position: absolute; left: 34px; bottom: -15px; width: 22px; height: 22px; background: inherit; border-right: 4px solid var(--ink); border-bottom: 4px solid var(--ink); transform: rotate(45deg); }
-.sheet h1 { font-size: 58px; line-height: 1.08; font-weight: 900; margin: 34px 0 0; letter-spacing: .01em; }
+.sheet h1 { font-size: 50px; line-height: 1.08; font-weight: 900; margin: 28px 0 0; letter-spacing: .01em; }
 .sheet h1 em { font-style: normal; color: var(--yellow); }
 .sheet .lead { font-size: 17px; line-height: 1.7; font-weight: 500; color: #EEF2FF; margin: 16px 0 0; }
+.diffs { margin: 18px 0 0; display: grid; gap: 8px; }
+.diff { display: flex; align-items: center; gap: 12px; text-align: left; border: 2px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .08); color: #fff; border-radius: 16px; padding: 10px 14px; font-size: 13px; font-weight: 500; line-height: 1.45; }
+.diff b { flex: none; font-size: 17px; font-weight: 900; width: 2.6em; }
+.diff.on { background: #fff; color: var(--ink); border-color: #fff; }
+.diff.on b { color: var(--blue); }
 .how { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
 .how li { display: flex; gap: 12px; align-items: center; background: rgba(255, 255, 255, .12); border-radius: 16px; padding: 12px 14px; font-size: 15px; font-weight: 700; line-height: 1.45; }
 .how li b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: var(--blue); display: grid; place-items: center; font-family: var(--fn); font-size: 15px; }
@@ -178,8 +200,8 @@ button { font-family: inherit; cursor: pointer; }
 .hint { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; margin: 12px 0 0; font-weight: 500; flex: none; }
 #shareImg { width: 100%; border-radius: 18px; margin-top: 10px; flex: none; -webkit-user-select: auto; user-select: auto; -webkit-touch-callout: default; }
 @media (max-height: 700px) {
-  .sheet h1 { font-size: 46px; margin-top: 26px; } .hero-b { font-size: 34px; margin-top: 12px; } .how { margin-top: 14px; gap: 7px; } .how li { padding: 9px 12px; }
-  .phone { height: 190px; } .app-i i { width: 44px; height: 44px; font-size: 22px; } .bars { height: 48px; } .r-num { font-size: 68px; }
+  .sheet h1 { font-size: 38px; margin-top: 22px; } .sheet h1 br { display: none; } .hero-b { font-size: 30px; margin-top: 10px; } .diffs { margin-top: 10px; gap: 6px; } .diff { padding: 7px 12px; } .how { margin-top: 14px; gap: 7px; } .how li { padding: 9px 12px; }
+  .app-i i { width: 42px; height: 42px; font-size: 21px; } .app-i { font-size: 10px; gap: 2px; } .bars { height: 48px; } .wdg .wb { height: 34px; } .r-num { font-size: 68px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -222,6 +244,7 @@ button { font-family: inherit; cursor: pointer; }
       <div class="pages" id="pages"></div>
       <div class="pdots" id="pdots"><i></i><i></i><i></i></div>
       <div class="swipe-tip" id="swipe-tip" hidden>‹</div>
+      <div class="fview" id="fview" hidden><div class="fhead"><span class="fback" data-back="1">‹ 返回</span><span id="ftitle"></span></div><div class="fgrid" id="fgrid"></div></div>
       <div class="show" id="ph-show" hidden>
         <span class="bars" id="bars"></span>
         <span class="code">/INV0S88</span>
@@ -236,14 +259,15 @@ button { font-family: inherit; cursor: pointer; }
     <span class="tag">發票存摺 × 結帳反應挑戰</span>
     <div class="hero-b">載具？</div>
     <h1>刷載具<br><em>快手</em></h1>
-    <p class="lead">店員一問，你要滑多久才找到載具？<br>5 位客人，測出你的結帳速度。</p>
-    <ul class="how">
-      <li><b>1</b>店員問「載具？」→ 滑手機找到「發票存摺」點開</li>
-      <li><b>2</b>他問的是袋子、會員 → 手機先不要動</li>
-      <li id="how-motion" hidden><b>★</b>體感模式：手機先垂在身邊，聽到「載具？」才舉起來，最後傾斜手機讓條碼對到紅光。請開聲音</li>
-    </ul>
+    <p class="lead">店員一問「載具？」，你要多久才亮得出來？<br>他問袋子、會員的時候，手機先不要動。</p>
+    <div class="diffs" id="diffs">
+      <button class="diff" type="button" data-d="easy"><b>簡單</b><span>桌面有放載具小工具，點一下就好</span></button>
+      <button class="diff on" type="button" data-d="mid"><b>中等</b><span>滑手機找到「發票存摺」，打開才能刷</span></button>
+      <button class="diff" type="button" data-d="hard"><b>困難</b><span>App 被收進好幾層資料夾，跟著藍色小圖示找</span></button>
+    </div>
+    <p class="s-hint" id="how-motion" hidden>體感模式：條碼打開後，把手機往前伸向掃描器才算刷到</p>
     <div class="grow"></div>
-    <button class="cta" id="b-motion" type="button" hidden>體感模式：真的掏手機</button>
+    <button class="cta" id="b-motion" type="button" hidden>體感模式：伸手刷條碼</button>
     <button class="cta" id="b-start" type="button">開始結帳</button>
     <p class="s-hint" id="s-hint"></p>
   </section>
@@ -251,13 +275,13 @@ button { font-family: inherit; cursor: pointer; }
   <!-- 結果 -->
   <section class="sheet" id="s-result" hidden>
     <div class="r-card">
-      <span class="tag">你的刷載具速度（5 次平均）</span>
+      <span class="tag" id="r-tag">你的刷載具速度（5 次平均）</span>
       <div class="r-num"><span id="r-avg">0.00</span><small>秒</small></div>
       <div class="r-title" id="r-title"></div>
       <p class="r-line" id="r-line"></p>
     </div>
     <div class="r-rounds" id="r-rounds"></div>
-    <div class="watch"><b>不想每次都滑手機找？把載具放在手腕上</b>發票存摺支援 Apple Watch 與 Android 手錶，抬手就能刷，不用掏手機、解鎖、找 App。</div>
+    <div class="watch" id="r-watch"></div>
     <div class="btns">
       <a class="cta" id="a-store" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dresult">免費下載發票存摺</a>
       <div class="row2">
@@ -276,7 +300,15 @@ const track = (ev, p = {}) => { try { (window.dataLayer = window.dataLayer || []
 const rnd = (a, b) => a + Math.random() * (b - a);
 const fmt = ms => (ms / 1000).toFixed(2);
 
-const ROUNDS = 5, PENALTY = 300, TIMEOUT = 6000;
+const ROUNDS = 5, PENALTY = 300;
+const DIFF = {
+  easy: { name: '簡單', t: [600, 900, 1300, 1900], to: 4000, idle: '點桌面上的「載具小工具」就能刷' },
+  mid: { name: '中等', t: [1200, 1700, 2300, 3200], to: 6000, idle: '左右滑，找到「發票存摺」點開' },
+  hard: { name: '困難', t: [2500, 3500, 4800, 6500], to: 12000, idle: '發票存摺被收進資料夾，跟著藍色小圖示一層一層找' }
+};
+let diff = 'mid';
+const PATHS = [['財務', '發票記帳'], ['生活', '省錢', '發票'], ['工具', '條碼'], ['生活', '購物', '結帳用'], ['財務', '報帳', '發票']];
+const L1 = ['生活', '工具', '財務', '娛樂', '旅遊'], SUBS = ['其他', '未分類', '舊的', '很少用', '備用'];
 const DECOYS = ['要袋子嗎？', '會員？', '要加購嗎？', '統編？', '集點嗎？', '要加熱嗎？'];
 const TITLES = [
   [1200, '櫃檯閃電', '店員還沒問完，你的條碼已經在等了。'],
@@ -285,7 +317,7 @@ const TITLES = [
   [3200, '慢半拍', '店員已經開始看向下一位客人了。'],
   [Infinity, '後面的人在嘆氣', '你找載具的時候，隊伍又多了三個人。']
 ];
-const APPS = [['📷', '相機', '#E9ECEF'], ['🗺️', '地圖', '#D3F9D8'], ['🎵', '音樂', '#FFE3E3'], ['⛅', '天氣', '#D0EBFF'], ['💬', '訊息', '#D3F9D8'], ['🖼️', '相簿', '#FFF3BF'], ['⏰', '時鐘', '#343A40'], ['🧮', '計算機', '#FFE8CC'], ['📅', '行事曆', '#fff'], ['📝', '備忘錄', '#FFF3BF'], ['✉️', '郵件', '#D0EBFF'], ['📞', '電話', '#B2F2BB'], ['🎮', '遊戲', '#E5DBFF'], ['🛒', '購物', '#FFD8A8'], ['▶️', '影片', '#FFC9C9'], ['⚙️', '設定', '#DEE2E6'], ['🏦', '銀行', '#C5F6FA'], ['🍱', '外送', '#FFD8A8'], ['🚕', '叫車', '#FFEC99'], ['❤️', '健康', '#fff'], ['🔤', '翻譯', '#D0EBFF'], ['👛', '錢包', '#FCC2D7'], ['📚', '閱讀', '#FFE8CC']];
+const APPS = [['📷', '相機', '#E9ECEF'], ['🗺️', '地圖', '#D3F9D8'], ['🎵', '音樂', '#FFE3E3'], ['⛅', '天氣', '#D0EBFF'], ['💬', '訊息', '#D3F9D8'], ['🖼️', '相簿', '#FFF3BF'], ['⏰', '時鐘', '#343A40'], ['🧮', '計算機', '#FFE8CC'], ['📅', '行事曆', '#fff'], ['📝', '備忘錄', '#FFF3BF'], ['✉️', '郵件', '#D0EBFF'], ['📞', '電話', '#B2F2BB'], ['🎮', '遊戲', '#E5DBFF'], ['🛒', '購物', '#FFD8A8'], ['▶️', '影片', '#FFC9C9'], ['⚙️', '設定', '#DEE2E6'], ['🏦', '銀行', '#C5F6FA'], ['🍱', '外送', '#FFD8A8'], ['🚕', '叫車', '#FFEC99'], ['❤️', '健康', '#fff'], ['🔤', '翻譯', '#D0EBFF'], ['👛', '錢包', '#FCC2D7'], ['📚', '閱讀', '#FFE8CC'], ['🌐', '瀏覽器', '#D0EBFF'], ['📰', '新聞', '#E9ECEF'], ['🏃', '運動', '#D3F9D8'], ['📈', '股票', '#343A40'], ['🎫', '票券', '#FFE3E3'], ['🍜', '美食', '#FFF3BF'], ['🚇', '捷運', '#C5F6FA'], ['🎙️', '錄音', '#FFC9C9'], ['🔦', '手電筒', '#343A40'], ['🧭', '指南針', '#fff'], ['☁️', '雲端', '#D0EBFF'], ['🎥', '會議', '#E5DBFF'], ['🔖', '書籤', '#FFD8A8']];
 const COLORS = ['#2956E8', '#0A9F6E', '#F59E0B', '#D93A3F', '#8B5CF6'];
 
 /* ---------- 場景裝飾 ---------- */
@@ -346,7 +378,6 @@ function drawQueue() {
 function startGame(useMotion) {
   clearAll();
   if (useMotion !== undefined) motion = !!useMotion;
-  if (motion) soundOn = true, $('b-snd').textContent = '🔊 音效開';
   round = 0; times = []; pens = []; draws = [];
   decoyRounds = new Set();
   const pool = [1, 2, 3, 4].sort(() => Math.random() - .5);
@@ -354,71 +385,55 @@ function startGame(useMotion) {
   if (Math.random() < .5) decoyRounds.add(pool[2]);
   $('s-start').hidden = true; $('s-result').hidden = true;
   $('shareImg').hidden = true; $('r-hint').textContent = '';
-  track('start', { mode: motion ? 'motion' : 'swipe' });
+  track('start', { mode: motion ? 'motion' : 'swipe', diff });
   startRound();
 }
-const IDLE = {
-  swipe: '<b>聽到「載具？」再拿出手機</b><span>左右滑，找到「發票存摺」點開。太早滑、點錯 App 都加 0.3 秒</span>',
-  pose: '<b>先把手機放下</b><span>手自然垂在身邊，或把手機平放</span>',
-  ready: '<b>聽到「載具？」才舉起來</b><span>太早舉加 0.3 秒</span>'
-};
 function startRound() {
   pen = 0;
   $('ph-show').hidden = true; $('ph-idle').hidden = false; $('swipe-tip').hidden = true;
-  buildHome(); drawQueue();
-  if (motion) { state = 'pose'; downSince = 0; raised = false; $('ph-idle').innerHTML = IDLE.pose; bubble('手機先放下喔'); }
-  else { $('ph-idle').innerHTML = IDLE.swipe; beginWait(); }
+  $('ph-idle').innerHTML = `<b>聽到「載具？」再拿出手機</b><span>${DIFF[diff].idle}。${motion ? '打開後把手機伸向掃描器。' : ''}太早碰、點錯 App 都加 0.3 秒</span>`;
+  buildHome(); drawQueue(); beginWait();
 }
 function beginWait() {
   state = 'wait'; scanning();
   later(decoyRounds.has(round) ? showDecoy : showGo, rnd(1100, 2400));
 }
-function unlock() {
-  locked = false; draws.push(performance.now() - t0);
-  $('ph-idle').hidden = true; if (round === 0) $('swipe-tip').hidden = false;
-  tone(880, .06, 'triangle', .08);
-}
+/* 體感：條碼打開後，把手機往前伸（加速度超過門檻）才算刷到 */
+const REACH = 5.5;
+let aimStart = 0, grav = null, motSeen = false;
 function startAim() {
-  state = 'aim'; aimSince = 0;
-  aimT = Math.max(30, Math.min(110, curBeta + (Math.random() < .5 ? -1 : 1) * rnd(14, 24)));
+  state = 'aim'; aimStart = performance.now();
   const sh = $('ph-show'); sh.hidden = false; sh.className = 'show aim';
-  $('beam').hidden = false; $('ph-ms').className = 'ms'; $('ph-ms').textContent = '前後傾斜手機，讓紅光掃到條碼';
+  $('beam').hidden = false; $('beam').style.transform = 'translateY(-14px)';
+  $('ph-ms').className = 'ms'; $('ph-ms').textContent = '把手機伸向掃描器！';
   $('swipe-tip').hidden = true; tone(880, .06, 'triangle', .08);
-  bubble('對準掃描器喔', 'ask go');
-  aimMove(curBeta);
+  bubble('伸過來刷喔', 'ask go');
 }
-function aimMove(b) {
-  const off = Math.max(-95, Math.min(95, (b - aimT) * 3.2)), hit = Math.abs(off) < 16, now = performance.now();
-  $('beam').style.transform = `translateY(${off - 14}px)`;
-  $('ph-show').classList.toggle('hit', hit);
-  if (!hit) { aimSince = 0; return; }
-  if (!aimSince) aimSince = now;
-  else if (now - aimSince > 250) finishRound(now - t0, false);
+function onMotion(e) {
+  let a = e.acceleration, mag = 0;
+  if (a && a.x !== null && a.x !== undefined) mag = Math.hypot(a.x || 0, a.y || 0, a.z || 0);
+  else {
+    const g = e.accelerationIncludingGravity; if (!g || g.x === null || g.x === undefined) return;
+    if (!grav) grav = { x: g.x, y: g.y, z: g.z };
+    grav.x += (g.x - grav.x) * .1; grav.y += (g.y - grav.y) * .1; grav.z += (g.z - grav.z) * .1;
+    mag = Math.hypot(g.x - grav.x, g.y - grav.y, g.z - grav.z);
+  }
+  motSeen = true;
+  if (motion && state === 'aim' && performance.now() - aimStart > 150 && mag > REACH) {
+    try { navigator.vibrate && navigator.vibrate(60); } catch (err) {}
+    finishRound(performance.now() - t0, false);
+  }
 }
-function onOri(e) {
-  if (e.beta === null || e.beta === undefined) return;
-  oriSeen = true; curBeta = e.beta;
-  if (!motion) return;
-  if (state === 'aim') return aimMove(e.beta);
-  const b = e.beta, down = b < 20 || Math.abs(b) > 150, up = b > 45 && b < 135, now = performance.now();
-  if (down) raised = false;
-  if (state === 'pose') {
-    if (!down) { downSince = 0; return; }
-    if (!downSince) downSince = now;
-    else if (now - downSince > 450) { $('ph-idle').innerHTML = IDLE.ready; try { navigator.vibrate && navigator.vibrate(60); } catch (err) {} tone(520, .08, 'triangle', .08); beginWait(); }
-  } else if ((state === 'wait' || state === 'decoy') && up && !raised) { raised = true; early(); }
-  else if (state === 'go' && locked && up) unlock();
-}
-window.addEventListener('deviceorientation', onOri);
+window.addEventListener('devicemotion', onMotion);
 async function enableMotion() {
   try {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      if (await DeviceOrientationEvent.requestPermission() !== 'granted') return false;
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      if (await DeviceMotionEvent.requestPermission() !== 'granted') return false;
     }
   } catch (e) { return false; }
-  oriSeen = false;
+  motSeen = false;
   await new Promise(r => setTimeout(r, 900));
-  return oriSeen;
+  return motSeen;
 }
 function showDecoy() {
   state = 'decoy';
@@ -431,19 +446,67 @@ function showGo() {
   state = 'go';
   bubble('載具？', 'ask go');
   sfx.ask(); nod(); say('載具');
-  try { motion && navigator.vibrate && navigator.vibrate(120); } catch (err) {}
   t0 = performance.now();
-  if (motion) { locked = true; if (raised) unlock(); } else { locked = false; $('ph-idle').hidden = true; if (round === 0) $('swipe-tip').hidden = false; }
-  later(() => finishRound(TIMEOUT + (motion ? 3000 : 0), true), TIMEOUT + (motion ? 3000 : 0));
+  $('ph-idle').hidden = true; if (round === 0 && diff === 'mid') $('swipe-tip').hidden = false;
+  const to = DIFF[diff].to + (motion ? 2000 : 0);
+  later(() => finishRound(to, true), to);
 }
 let page = 0, motion = false, locked = false, raised = false, downSince = 0, draws = [], oriSeen = false, curBeta = 70, aimT = 70, aimSince = 0;
-function setPage(n) { page = Math.max(0, Math.min(2, n)); $('pages').style.transform = `translateX(${-page * 33.3333}%)`; [...$('pdots').children].forEach((d, i) => d.classList.toggle('on', i === page)); if (page > 0) $('swipe-tip').hidden = true; }
+let maxPage = 2, folders = [], stack = [];
+function setPage(n) { page = Math.max(0, Math.min(maxPage, n)); $('pages').style.transform = `translateX(${-page * 33.3333}%)`; [...$('pdots').children].forEach((d, i) => d.classList.toggle('on', i === page)); if (page > 0) $('swipe-tip').hidden = true; }
+const ME = '<span class="app-i me" data-app="me"><i>發</i>發票存摺</span>';
+const appH = a => `<span class="app-i" data-app="x"><i style="--c:${a[2]}">${a[0]}</i>${a[1]}</span>`;
+const hasMe = k => k === 'me' || !!(k && k.kids && k.kids.some(hasMe));
+function kidH(k) {
+  if (k === 'me') return ME;
+  if (!k.kids) return appH(k);
+  const minis = k.kids.slice(0, 9).map(c => c === 'me' ? '<u class="me"></u>' : c.kids ? `<u class="sub${hasMe(c) ? ' t' : ''}"></u>` : `<u style="--m:${c[2]}"></u>`).join('');
+  return `<span class="app-i fld" data-folder="${k.id}"><i>${minis}</i>${k.name}</span>`;
+}
+function mkFolder(name, kids) { const f = { id: folders.length, name, kids }; folders.push(f); return f; }
 function buildHome() {
-  const apps = APPS.slice().sort(() => Math.random() - .5).map(a => `<span class="app-i" data-app="x"><i style="--c:${a[2]}">${a[0]}</i>${a[1]}</span>`);
-  const pg = Math.random() < .2 ? 0 : (Math.random() < .5 ? 1 : 2);
-  apps.splice(pg * 8 + Math.floor(Math.random() * 8), 0, '<span class="app-i me" data-app="me"><i>發</i>發票存摺</span>');
-  let h = ''; for (let i = 0; i < 3; i++) h += '<div class="page">' + apps.slice(i * 8, i * 8 + 8).join('') + '</div>';
-  $('pages').innerHTML = h; setPage(0);
+  folders = []; stack = []; $('fview').hidden = true;
+  const pool = APPS.slice().sort(() => Math.random() - .5); let pi = 0;
+  const take = n => { const r = []; while (n--) r.push(pool[pi++ % pool.length]); return r; };
+  const mix = (arr, item) => { arr.splice(Math.floor(Math.random() * (arr.length + 1)), 0, item); return arr; };
+  const pagesH = [];
+  if (diff === 'easy') {
+    maxPage = 2;
+    const bars = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1].map(x => `<i style="width:${x * 2}px"></i>`).join('');
+    pagesH.push(`<span class="wdg" data-app="me"><span class="wt">發票存摺｜載具小工具</span><span class="wb">${bars}</span><span class="wc">/INV0S88</span></span>` + take(8).map(appH).join(''));
+    pagesH.push(take(16).map(appH).join('')); pagesH.push(take(12).map(appH).join(''));
+  } else if (diff === 'mid') {
+    maxPage = 2;
+    const all = take(36).map(appH), pg = Math.random() < .2 ? 0 : (Math.random() < .5 ? 1 : 2);
+    all.splice(pg * 12 + Math.floor(Math.random() * 12), 0, ME);
+    for (let i = 0; i < 3; i++) pagesH.push(all.slice(i * 12, i * 12 + 12).join(''));
+  } else {
+    maxPage = 0;
+    const path = PATHS[Math.floor(Math.random() * PATHS.length)];
+    const subs = SUBS.slice().sort(() => Math.random() - .5);
+    const home = take(7);
+    L1.forEach((name, i) => {
+      const kids = take(6);
+      if (name === path[0]) {
+        let inner = mix(take(5), 'me');
+        if (path.length === 3) inner = mix(take(4).concat([mkFolder(subs[4], take(5))]), mkFolder(path[2], inner));
+        mix(kids, mkFolder(path[1], inner));
+        mix(kids, mkFolder(subs[i % 4], take(5)));
+      } else { mix(kids, mkFolder(subs[i % 4], take(6))); if (i % 2) mix(kids, mkFolder(subs[(i + 1) % 4], take(4))); }
+      mix(home, mkFolder(name, kids));
+    });
+    pagesH.push(home.map(kidH).join(''));
+  }
+  $('pages').innerHTML = pagesH.map(h => '<div class="page">' + h + '</div>').join('');
+  $('pdots').hidden = maxPage === 0;
+  setPage(0);
+}
+function renderFolder() {
+  if (!stack.length) { $('fview').hidden = true; return; }
+  const f = folders[stack[stack.length - 1]];
+  $('ftitle').textContent = stack.map(id => folders[id].name).join(' › ');
+  $('fgrid').innerHTML = f.kids.map(kidH).join('');
+  $('fview').hidden = false;
 }
 function penalize(msg) {
   const now = performance.now();
@@ -454,34 +517,39 @@ function penalize(msg) {
   if (was === 'wait') later(() => { if (state === 'wait') scanning(); }, 650);
   if (was === 'go') later(() => { if (state === 'go') bubble('載具？', 'ask go'); }, 600);
 }
-function early() { if (state === 'decoy') penalize('我問的不是載具啦！'); else if (state === 'wait') penalize(motion ? '還沒問你，手機先放下！' : '還沒問你啦！'); }
+function early() { if (state === 'decoy') penalize('我問的不是載具啦！'); else if (state === 'wait') penalize('還沒問你啦！'); }
 function openApp(el) {
   if (state !== 'go' || !el) return;
   if (el.dataset.app === 'me') return motion ? startAim() : finishRound(performance.now() - t0, false);
   el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 320);
   penalize('開錯 App 了！');
 }
-function tap() { if (state === 'go') { if (!locked) openApp($('pages').querySelector('.me')); } else if (!motion) early(); }
+function tap() { if (state === 'go') openApp(document.querySelector('#phone [data-app="me"]')); else early(); }
 (function gestures() {
   const ph = $('phone'); let x0 = null, dx = 0, target = null;
   ph.addEventListener('pointerdown', e => {
     e.preventDefault();
-    if (state !== 'go') { if (!motion) early(); return; }
-    if (locked) return;
-    x0 = e.clientX; dx = 0; target = e.target.closest('.app-i');
+    if (state !== 'go') { early(); return; }
+    x0 = e.clientX; dx = 0; target = e.target.closest('[data-app],[data-folder],[data-back]');
     try { ph.setPointerCapture(e.pointerId); } catch (err) {}
     $('pages').classList.add('drag');
   });
   ph.addEventListener('pointermove', e => {
     if (x0 === null) return;
-    dx = e.clientX - x0;
+    dx = (maxPage === 0 || stack.length) ? 0 : e.clientX - x0;
     $('pages').style.transform = `translateX(calc(${-page * 33.3333}% + ${dx}px))`;
   });
   const end = () => {
     if (x0 === null) return;
     $('pages').classList.remove('drag'); x0 = null;
     if (Math.abs(dx) > 28) setPage(page + (dx < 0 ? 1 : -1));
-    else { setPage(page); openApp(target); }
+    else {
+      setPage(page);
+      if (!target) return;
+      if (target.dataset.back) { stack.pop(); renderFolder(); tone(500, .04, 'triangle', .05); }
+      else if (target.dataset.folder !== undefined) { stack.push(+target.dataset.folder); renderFolder(); tone(700, .04, 'triangle', .05); }
+      else openApp(target);
+    }
   };
   ph.addEventListener('pointerup', end); ph.addEventListener('pointercancel', end);
 })();
@@ -504,23 +572,30 @@ function finishRound(ms, missed) {
 function showResult() {
   state = 'off'; drawQueue();
   const avg = times.reduce((a, b) => a + b, 0) / times.length, best = Math.min(...times);
-  const t = TITLES.find(x => avg - (motion ? 1500 : 0) < x[0]);
+  const ti = DIFF[diff].t.findIndex(x => avg - (motion ? 600 : 0) < x);
+  const t = TITLES[ti < 0 ? 4 : ti];
   const dAvg = draws.length ? draws.reduce((a, b) => a + b, 0) / draws.length : 0;
-  last = { avg, best, title: t[1], line: t[2] + (motion && dAvg ? ` 其中掏手機平均 ${fmt(dAvg)} 秒。` : '') };
+  last = { avg, best, title: t[1], line: t[2] };
   $('r-avg').textContent = fmt(avg);
   $('r-title').textContent = t[1];
   $('r-line').textContent = last.line;
+  $('r-tag').textContent = `你的刷載具速度（${DIFF[diff].name}・5 次平均）`;
+  $('r-watch').innerHTML = diff === 'easy'
+    ? '<b>你剛剛點的就是載具小工具</b>把發票存摺的小工具放上桌面，結帳時不用找 App。再試試中等或困難，感受一下差別。'
+    : '<b>不想每次都滑手機找？</b>把發票存摺的載具小工具放上桌面，或用 Apple Watch、Android 手錶，抬手就能刷。選「簡單」玩一次就知道差多少。';
+  last.diff = DIFF[diff].name;
   $('r-rounds').innerHTML = times.map((ms, i) => `<div class="${ms === best ? 'best' : pens[i] ? 'pen' : ''}"><small>第 ${i + 1} 位</small>${fmt(ms)}</div>`).join('');
   $('s-result').hidden = false; $('s-result').scrollTop = 0;
   sfx.end();
-  track('complete', { avg: Math.round(avg), best: Math.round(best), title: t[1], mode: motion ? 'motion' : 'swipe', draw: Math.round(dAvg) });
+  track('complete', { avg: Math.round(avg), best: Math.round(best), title: t[1], mode: motion ? 'motion' : 'swipe', diff });
 }
 
-document.addEventListener('keydown', e => { if (state === 'off') return; if (e.code === 'ArrowRight') setPage(page + 1); else if (e.code === 'ArrowLeft') setPage(page - 1); else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (state !== 'go' || $('pages').querySelector('.me').parentNode === $('pages').children[page]) tap(); } });
+document.addEventListener('keydown', e => { if (state === 'off') return; if (e.code === 'ArrowRight') setPage(page + 1); else if (e.code === 'ArrowLeft') setPage(page - 1);  });
 $('b-start').onclick = () => startGame(false);
-if (typeof DeviceOrientationEvent !== 'undefined' && window.matchMedia && matchMedia('(pointer: coarse)').matches) {
+$('diffs').addEventListener('click', e => { const b = e.target.closest('.diff'); if (!b) return; diff = b.dataset.d; [...$('diffs').children].forEach(x => x.classList.toggle('on', x === b)); });
+if (typeof DeviceMotionEvent !== 'undefined' && window.matchMedia && matchMedia('(pointer: coarse)').matches) {
   $('b-motion').hidden = false; $('how-motion').hidden = false;
-  $('b-start').className = 'cta ghost'; $('b-start').textContent = '一般模式（不用動手機）';
+  $('b-start').className = 'cta ghost'; $('b-start').textContent = '一般模式（點開就算刷到）';
 }
 $('b-motion').onclick = async () => {
   say(' ');
@@ -548,7 +623,7 @@ async function drawCard() {
   g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('發票存摺 × 刷載具快手', 90, 150);
   g.fillStyle = '#FFF7CC'; roundRect(g, 90, 210, 360, 130, 40); g.fill(); g.lineWidth = 6; g.strokeStyle = '#121722'; g.stroke();
   g.fillStyle = '#121722'; g.font = `900 72px ${F}`; g.fillText('載具？', 130, 300);
-  g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText('滑手機找載具，我只要', 90, 480);
+  g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText(`找載具（${last.diff}），我只要`, 90, 480);
   g.font = `800 230px ${N}`; g.fillText(fmt(last.avg), 80, 720);
   const w = g.measureText(fmt(last.avg)).width; g.font = `900 70px ${F}`; g.fillText('秒', 80 + w + 30, 720);
   g.font = `900 60px ${F}`; const tw = g.measureText(last.title).width;
@@ -562,7 +637,7 @@ async function drawCard() {
 $('b-share').onclick = async () => {
   track('share');
   const url = location.origin + location.pathname;
-  const text = `店員問「載具？」我滑手機找出來只要 ${fmt(last.avg)} 秒（${last.title}）。你能更快嗎？`;
+  const text = `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。你能更快嗎？`;
   const c = await drawCard();
   try {
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));
