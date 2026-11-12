@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>刷載具快手｜店員問「載具？」你要滑多久・發票存摺 invos</title>
+<meta name="description" content="店員一問「載具？」，滑手機找到發票存摺亮出條碼，5 位客人測出你的結帳速度。">
+<meta property="og:title" content="刷載具快手｜店員問「載具？」你要滑多久">
+<meta property="og:description" content="滑手機找載具要幾秒？5 位客人測出你的結帳速度。小心店員問的不是載具。">
+<meta property="og:type" content="website">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@700;800&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --ink: #121722;
+  --muted: #5A6476;
+  --line: #CBD6EC;
+  --blue: #2956E8;
+  --blue-dark: #193BB5;
+  --blue-soft: #DCE6FF;
+  --green: #0A9F6E;
+  --green-soft: #DDF5EC;
+  --red: #D93A3F;
+  --red-soft: #FCE4E4;
+  --yellow: #FFD43B;
+  --bubble: #FFF7CC;
+  --wall: #EAF1FF;
+  --f: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  --fn: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: #D9E4FF;
+  color: var(--ink);
+  font-family: var(--f);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+  overscroll-behavior: none;
+}
+button { font-family: inherit; cursor: pointer; }
+.app {
+  position: relative;
+  max-width: 440px; height: 100dvh; min-height: 560px;
+  margin: 0 auto;
+  background: var(--wall);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (min-width: 441px) { .app { box-shadow: 0 0 60px rgba(25, 59, 181, .18); } }
+
+/* 頂列 */
+.top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px; z-index: 3; }
+.brand { font-weight: 900; font-size: 15px; color: var(--blue-dark); letter-spacing: .02em; }
+.snd { border: 0; background: #fff; color: var(--muted); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; box-shadow: 0 1px 0 var(--line); }
+
+/* 場景 */
+.scene { position: relative; flex: 1; min-height: 0; }
+.shelf { position: absolute; left: 0; right: 0; top: 0; bottom: 26%; overflow: hidden; }
+.shelf i { position: absolute; left: -4%; right: -4%; height: 10px; background: #C9D8F8; border-radius: 4px; }
+.shelf i:nth-child(4) { top: 22%; } .shelf i:nth-child(5) { top: 50%; } .shelf i:nth-child(6) { top: 78%; }
+.shelf b { position: absolute; bottom: 0; width: 7%; border-radius: 5px 5px 0 0; opacity: .5; }
+.goods { position: absolute; left: 0; right: 0; height: 28%; }
+.goods.g1 { top: -6%; } .goods.g2 { top: 22%; } .goods.g3 { top: 50%; }
+
+.clerk { position: absolute; left: 50%; bottom: 22%; width: 46%; max-width: 200px; transform: translateX(-50%); }
+.clerk.nod { animation: nod .35s; }
+@keyframes nod { 40% { transform: translateX(-50%) translateY(6px) rotate(-2deg); } }
+
+.bubble {
+  position: absolute; left: 50%; top: 4%; transform: translateX(-50%);
+  min-width: 150px; max-width: 86%; text-align: center; white-space: nowrap;
+  background: #fff; border: 3px solid var(--ink); border-radius: 22px;
+  padding: 10px 20px; font-weight: 900; font-size: 20px; color: var(--muted);
+  box-shadow: 0 5px 0 rgba(18, 23, 34, .12);
+  z-index: 2;
+}
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -13px; width: 20px; height: 20px; background: inherit; border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink); transform: translateX(-50%) rotate(45deg); }
+.bubble.ask { background: var(--bubble); color: var(--ink); font-size: 34px; padding: 8px 26px; animation: pop .18s cubic-bezier(.2, 1.6, .5, 1); }
+.bubble.go { background: var(--yellow); }
+.bubble.ok { background: var(--green-soft); color: var(--green); font-size: 22px; }
+.bubble.bad { background: var(--red-soft); color: var(--red); font-size: 20px; animation: shake .3s; }
+@keyframes pop { from { transform: translateX(-50%) scale(.6); } }
+@keyframes shake { 25% { margin-left: -8px; } 75% { margin-left: 8px; } }
+.dots span { display: inline-block; animation: dot 1s infinite; } .dots span:nth-child(2) { animation-delay: .15s; } .dots span:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 30% { transform: translateY(-5px); } 60% { transform: none; } }
+
+.counter { position: absolute; left: 0; right: 0; bottom: 0; height: 26%; background: #fff; border-top: 5px solid var(--ink); }
+.counter::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 14px; background: var(--blue); }
+.scanner { position: absolute; left: 50%; top: -30px; transform: translateX(-50%); width: 74px; height: 46px; background: var(--ink); border-radius: 10px 10px 4px 4px; }
+.scanner::after { content: ''; position: absolute; left: 10px; right: 10px; top: 12px; height: 6px; border-radius: 3px; background: #FF5A5F; box-shadow: 0 0 10px #FF5A5F; opacity: .55; }
+.scanner.beep::after { opacity: 1; background: #3CE6A0; box-shadow: 0 0 18px #3CE6A0; }
+
+.queue { position: absolute; left: 14px; right: 14px; bottom: 8px; display: flex; align-items: flex-end; gap: 6px; }
+.queue .lab { font-size: 12px; font-weight: 700; color: var(--muted); margin-right: 2px; padding-bottom: 6px; white-space: nowrap; }
+.p { width: 30px; height: 44px; position: relative; transition: opacity .3s, transform .3s; }
+.p::before { content: ''; position: absolute; left: 7px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: #F2C9A5; border: 2px solid var(--ink); }
+.p::after { content: ''; position: absolute; left: 2px; right: 2px; bottom: 0; height: 26px; border-radius: 12px 12px 4px 4px; background: var(--c, var(--blue)); border: 2px solid var(--ink); }
+.p.done { opacity: .22; transform: scale(.82); }
+.p.now { transform: translateY(-5px); }
+
+/* 手機（滑動找 App） */
+.hand { padding: 10px 16px 14px; background: #fff; z-index: 3; }
+.phone {
+  width: 100%; height: 214px; border: 4px solid var(--ink); border-radius: 26px;
+  background: linear-gradient(160deg, #3B5BDB, #7048E8 60%, #E64980); color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 6px 0 rgba(18, 23, 34, .18);
+  touch-action: none; cursor: grab;
+}
+.phone .idle { position: absolute; inset: 0; z-index: 3; background: rgba(18, 23, 34, .93); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 0 16px; }
+.phone .idle b { font-size: 20px; font-weight: 900; }
+.phone .idle span { font-size: 13px; color: #A9B4CC; font-weight: 500; }
+.pages { position: absolute; left: 0; top: 0; bottom: 18px; width: 300%; display: flex; transition: transform .2s cubic-bezier(.2, .8, .3, 1); }
+.pages.drag { transition: none; }
+.page { width: 33.3333%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; padding: 10px 8px 0; }
+.app-i { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); white-space: nowrap; }
+.app-i i { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; font-style: normal; font-size: 26px; background: var(--c, #fff); box-shadow: 0 2px 6px rgba(0, 0, 0, .25); pointer-events: none; }
+.app-i.me i { background: #fff; border: 3px solid var(--blue); color: var(--blue); font-weight: 900; font-size: 24px; font-family: var(--f); }
+.app-i.wrong i { animation: shake .3s; outline: 3px solid var(--red); }
+.pdots { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; justify-content: center; gap: 6px; z-index: 1; }
+.pdots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .4); }
+.pdots i.on { background: #fff; }
+.swipe-tip { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 2; font-size: 22px; font-weight: 900; opacity: .85; animation: nudge 1s infinite; pointer-events: none; }
+@keyframes nudge { 50% { transform: translate(-6px, -50%); } }
+.phone .show { position: absolute; inset: 0; z-index: 4; background: #fff; color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.bars { display: flex; align-items: stretch; height: 64px; }
+.bars i { display: block; background: var(--ink); margin-right: 2px; }
+.code { font-family: var(--fn); font-size: 13px; letter-spacing: .18em; color: var(--muted); }
+.ms { font-family: var(--fn); font-size: 34px; font-weight: 800; color: var(--green); line-height: 1; margin-top: 2px; }
+.ms small { font-family: var(--f); font-size: 15px; font-weight: 900; margin-left: 3px; }
+.ms.slow { color: var(--red); }
+.beam { position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; background: #FF3B3B; box-shadow: 0 0 14px 4px rgba(255, 59, 59, .55); z-index: 2; pointer-events: none; }
+.show.aim .ms { font-family: var(--f); font-size: 15px; font-weight: 900; color: var(--red); }
+.show.aim.hit .beam { background: #19C37D; box-shadow: 0 0 14px 4px rgba(25, 195, 125, .6); }
+.show.aim.hit .ms { color: var(--green); }
+
+/* 開場、結果 */
+.sheet { position: absolute; inset: 0; z-index: 10; background: var(--blue); color: #fff; display: flex; flex-direction: column; padding: calc(28px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; }
+.sheet .tag { font-size: 14px; font-weight: 700; color: #DCE5FF; }
+.hero-b { align-self: flex-start; margin-top: 26px; background: var(--bubble); color: var(--ink); border: 4px solid var(--ink); border-radius: 26px; padding: 6px 24px 8px; font-size: 44px; font-weight: 900; position: relative; transform: rotate(-3deg); box-shadow: 0 6px 0 rgba(0, 0, 0, .18); }
+.hero-b::after { content: ''; position: absolute; left: 34px; bottom: -15px; width: 22px; height: 22px; background: inherit; border-right: 4px solid var(--ink); border-bottom: 4px solid var(--ink); transform: rotate(45deg); }
+.sheet h1 { font-size: 58px; line-height: 1.08; font-weight: 900; margin: 34px 0 0; letter-spacing: .01em; }
+.sheet h1 em { font-style: normal; color: var(--yellow); }
+.sheet .lead { font-size: 17px; line-height: 1.7; font-weight: 500; color: #EEF2FF; margin: 16px 0 0; }
+.how { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.how li { display: flex; gap: 12px; align-items: center; background: rgba(255, 255, 255, .12); border-radius: 16px; padding: 12px 14px; font-size: 15px; font-weight: 700; line-height: 1.45; }
+.how li b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: var(--blue); display: grid; place-items: center; font-family: var(--fn); font-size: 15px; }
+.grow { flex: 1; min-height: 18px; }
+.cta { display: block; width: 100%; border: 0; border-radius: 999px; padding: 17px 20px; font-size: 19px; font-weight: 900; text-align: center; text-decoration: none; background: var(--yellow); color: var(--ink); box-shadow: 0 6px 0 rgba(0, 0, 0, .22); }
+.cta:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0, 0, 0, .22); }
+.cta.ghost { background: transparent; color: #fff; box-shadow: none; border: 2px solid rgba(255, 255, 255, .55); font-size: 16px; padding: 12px 20px; margin-top: 12px; }
+.s-hint { text-align: center; font-size: 13px; color: #DCE5FF; min-height: 18px; margin: 10px 0 0; }
+
+#s-result { background: var(--wall); color: var(--ink); padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
+.r-card { background: var(--blue); color: #fff; border-radius: 28px; padding: 24px 24px 26px; position: relative; overflow: hidden; flex: none; }
+.r-card::after { content: ''; position: absolute; right: -90px; bottom: -110px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255, 255, 255, .08); }
+.r-num { font-family: var(--fn); font-size: 84px; font-weight: 800; line-height: 1; margin-top: 12px; letter-spacing: -.02em; }
+.r-num small { font-family: var(--f); font-size: 26px; font-weight: 900; margin-left: 6px; letter-spacing: 0; }
+.r-title { display: inline-block; margin-top: 14px; background: var(--ink); color: var(--yellow); font-size: 24px; font-weight: 900; padding: 8px 20px; border-radius: 999px; position: relative; z-index: 1; }
+.r-line { margin: 12px 0 0; font-size: 15px; font-weight: 500; color: #EEF2FF; line-height: 1.6; position: relative; z-index: 1; }
+.r-rounds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px; flex: none; }
+.r-rounds div { background: #fff; border-radius: 12px; padding: 8px 2px; text-align: center; font-family: var(--fn); font-size: 14px; font-weight: 800; }
+.r-rounds div small { display: block; font-family: var(--f); font-size: 11px; font-weight: 700; color: var(--muted); }
+.r-rounds div.best { background: var(--green-soft); color: var(--green); }
+.r-rounds div.pen { color: var(--red); }
+.watch { margin-top: 12px; background: #fff; border-radius: 18px; padding: 14px 16px; font-size: 14px; line-height: 1.65; font-weight: 500; color: var(--muted); flex: none; }
+.watch b { color: var(--ink); font-weight: 900; font-size: 15px; display: block; margin-bottom: 2px; }
+.btns { display: grid; gap: 12px; margin-top: 14px; flex: none; }
+#s-result .cta { background: var(--blue); color: #fff; box-shadow: 0 6px 0 var(--blue-dark); }
+#s-result .cta.white { background: #fff; color: var(--ink); box-shadow: 0 6px 0 var(--line); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row2 .cta { font-size: 16px; padding: 14px 10px; }
+.hint { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; margin: 12px 0 0; font-weight: 500; flex: none; }
+#shareImg { width: 100%; border-radius: 18px; margin-top: 10px; flex: none; -webkit-user-select: auto; user-select: auto; -webkit-touch-callout: default; }
+@media (max-height: 700px) {
+  .sheet h1 { font-size: 46px; margin-top: 26px; } .hero-b { font-size: 34px; margin-top: 12px; } .how { margin-top: 14px; gap: 7px; } .how li { padding: 9px 12px; }
+  .phone { height: 190px; } .app-i i { width: 44px; height: 44px; font-size: 22px; } .bars { height: 48px; } .r-num { font-size: 68px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <span class="brand">發票存摺｜刷載具快手</span>
+    <button class="snd" id="b-snd" type="button">🔊 音效開</button>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="shelf" aria-hidden="true">
+      <div class="goods g1" id="g1"></div><div class="goods g2" id="g2"></div><div class="goods g3" id="g3"></div>
+      <i></i><i></i><i></i>
+    </div>
+    <div class="bubble" id="bubble" aria-live="polite"></div>
+    <svg class="clerk" id="clerk" viewBox="0 0 200 230" aria-hidden="true">
+      <path d="M22 230c0-62 34-92 78-92s78 30 78 92z" fill="#2956E8" stroke="#121722" stroke-width="5"/>
+      <path d="M70 142h60l-8 88H78z" fill="#fff" stroke="#121722" stroke-width="5"/>
+      <rect x="86" y="118" width="28" height="30" rx="8" fill="#F2C9A5" stroke="#121722" stroke-width="5"/>
+      <circle cx="100" cy="82" r="50" fill="#FFD9B8" stroke="#121722" stroke-width="5"/>
+      <path d="M46 62c8-30 28-44 54-44s46 14 54 44l-8 4c-24-12-68-12-92 0z" fill="#2956E8" stroke="#121722" stroke-width="5" stroke-linejoin="round"/>
+      <rect x="84" y="30" width="32" height="14" rx="5" fill="#FFD43B" stroke="#121722" stroke-width="4"/>
+      <circle cx="80" cy="88" r="5.5" fill="#121722"/><circle cx="120" cy="88" r="5.5" fill="#121722"/>
+      <circle cx="68" cy="102" r="7" fill="#FF9E9E" opacity=".55"/><circle cx="132" cy="102" r="7" fill="#FF9E9E" opacity=".55"/>
+      <path d="M88 108q12 9 24 0" fill="none" stroke="#121722" stroke-width="5" stroke-linecap="round"/>
+      <rect x="82" y="168" width="36" height="20" rx="5" fill="#FFD43B" stroke="#121722" stroke-width="4"/>
+    </svg>
+    <div class="counter">
+      <div class="scanner" id="scanner"></div>
+      <div class="queue" id="queue"></div>
+    </div>
+  </div>
+
+  <div class="hand">
+    <div class="phone" id="phone" role="group" aria-label="手機主畫面，左右滑動找到發票存摺">
+      <div class="idle" id="ph-idle"><b>聽到「載具？」再拿出手機</b><span>左右滑，找到「發票存摺」點開。太早滑、點錯 App 都加 0.3 秒</span></div>
+      <div class="pages" id="pages"></div>
+      <div class="pdots" id="pdots"><i></i><i></i><i></i></div>
+      <div class="swipe-tip" id="swipe-tip" hidden>‹</div>
+      <div class="show" id="ph-show" hidden>
+        <span class="bars" id="bars"></span>
+        <span class="code">/INV0S88</span>
+        <span class="ms" id="ph-ms"></span>
+        <span class="beam" id="beam" hidden></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 開場 -->
+  <section class="sheet" id="s-start">
+    <span class="tag">發票存摺 × 結帳反應挑戰</span>
+    <div class="hero-b">載具？</div>
+    <h1>刷載具<br><em>快手</em></h1>
+    <p class="lead">店員一問，你要滑多久才找到載具？<br>5 位客人，測出你的結帳速度。</p>
+    <ul class="how">
+      <li><b>1</b>店員問「載具？」→ 滑手機找到「發票存摺」點開</li>
+      <li><b>2</b>他問的是袋子、會員 → 手機先不要動</li>
+      <li id="how-motion" hidden><b>★</b>體感模式：手機先垂在身邊，聽到「載具？」才舉起來，最後傾斜手機讓條碼對到紅光。請開聲音</li>
+    </ul>
+    <div class="grow"></div>
+    <button class="cta" id="b-motion" type="button" hidden>體感模式：真的掏手機</button>
+    <button class="cta" id="b-start" type="button">開始結帳</button>
+    <p class="s-hint" id="s-hint"></p>
+  </section>
+
+  <!-- 結果 -->
+  <section class="sheet" id="s-result" hidden>
+    <div class="r-card">
+      <span class="tag">你的刷載具速度（5 次平均）</span>
+      <div class="r-num"><span id="r-avg">0.00</span><small>秒</small></div>
+      <div class="r-title" id="r-title"></div>
+      <p class="r-line" id="r-line"></p>
+    </div>
+    <div class="r-rounds" id="r-rounds"></div>
+    <div class="watch"><b>不想每次都滑手機找？把載具放在手腕上</b>發票存摺支援 Apple Watch 與 Android 手錶，抬手就能刷，不用掏手機、解鎖、找 App。</div>
+    <div class="btns">
+      <a class="cta" id="a-store" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dresult">免費下載發票存摺</a>
+      <div class="row2">
+        <button class="cta white" id="b-share" type="button">挑戰朋友</button>
+        <button class="cta white" id="b-again" type="button">再玩一次</button>
+      </div>
+    </div>
+    <p class="hint" id="r-hint"></p>
+    <img id="shareImg" alt="我的刷載具成績圖" hidden>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const track = (ev, p = {}) => { try { (window.dataLayer = window.dataLayer || []).push({ event: 'carrier_game_' + ev, ...p }); } catch (e) {} };
+const rnd = (a, b) => a + Math.random() * (b - a);
+const fmt = ms => (ms / 1000).toFixed(2);
+
+const ROUNDS = 5, PENALTY = 300, TIMEOUT = 6000;
+const DECOYS = ['要袋子嗎？', '會員？', '要加購嗎？', '統編？', '集點嗎？', '要加熱嗎？'];
+const TITLES = [
+  [1200, '櫃檯閃電', '店員還沒問完，你的條碼已經在等了。'],
+  [1700, '結帳老手', '流暢，後面排隊的人默默感謝你。'],
+  [2300, '標準客人', '不快不慢，店員對你沒有意見。'],
+  [3200, '慢半拍', '店員已經開始看向下一位客人了。'],
+  [Infinity, '後面的人在嘆氣', '你找載具的時候，隊伍又多了三個人。']
+];
+const APPS = [['📷', '相機', '#E9ECEF'], ['🗺️', '地圖', '#D3F9D8'], ['🎵', '音樂', '#FFE3E3'], ['⛅', '天氣', '#D0EBFF'], ['💬', '訊息', '#D3F9D8'], ['🖼️', '相簿', '#FFF3BF'], ['⏰', '時鐘', '#343A40'], ['🧮', '計算機', '#FFE8CC'], ['📅', '行事曆', '#fff'], ['📝', '備忘錄', '#FFF3BF'], ['✉️', '郵件', '#D0EBFF'], ['📞', '電話', '#B2F2BB'], ['🎮', '遊戲', '#E5DBFF'], ['🛒', '購物', '#FFD8A8'], ['▶️', '影片', '#FFC9C9'], ['⚙️', '設定', '#DEE2E6'], ['🏦', '銀行', '#C5F6FA'], ['🍱', '外送', '#FFD8A8'], ['🚕', '叫車', '#FFEC99'], ['❤️', '健康', '#fff'], ['🔤', '翻譯', '#D0EBFF'], ['👛', '錢包', '#FCC2D7'], ['📚', '閱讀', '#FFE8CC']];
+const COLORS = ['#2956E8', '#0A9F6E', '#F59E0B', '#D93A3F', '#8B5CF6'];
+
+/* ---------- 場景裝飾 ---------- */
+(function decorate() {
+  const pal = ['#F59E0B', '#D93A3F', '#0A9F6E', '#8B5CF6', '#2956E8', '#F472B6', '#14B8A6'];
+  ['g1', 'g2', 'g3'].forEach((id, r) => {
+    let h = '';
+    for (let i = 0; i < 11; i++) h += `<b style="left:${2 + i * 8.9}%;height:${48 + ((i * 37 + r * 53) % 40)}%;background:${pal[(i + r * 3) % pal.length]}"></b>`;
+    $(id).innerHTML = h;
+  });
+  const w = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 1, 3];
+  $('bars').innerHTML = w.map(x => `<i style="width:${x * 2}px"></i>`).join('');
+})();
+
+/* ---------- 音效 ---------- */
+let audioCtx = null, soundOn = true;
+function tone(freq, dur, type = 'sine', vol = .12, when = 0) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = audioCtx.currentTime + when;
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t + dur);
+  } catch (e) {}
+}
+const sfx = {
+  scan: () => tone(1250, .07, 'square', .04),
+  ask: () => tone(660, .1, 'triangle', .1),
+  ok: () => { tone(1568, .09, 'square', .08); tone(2093, .14, 'square', .08, .09); },
+  bad: () => tone(160, .22, 'sawtooth', .1),
+  end: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .16, 'triangle', .1, i * .1))
+};
+function say(t) {
+  if (!soundOn || !('speechSynthesis' in window)) return;
+  try { const u = new SpeechSynthesisUtterance(t); u.lang = 'zh-TW'; u.rate = 1.15; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+}
+$('b-snd').onclick = () => { soundOn = !soundOn; $('b-snd').textContent = soundOn ? '🔊 音效開' : '🔇 音效關'; };
+
+/* ---------- 遊戲 ---------- */
+let state = 'off', round = 0, times = [], pens = [], pen = 0, t0 = 0, timers = [], decoyRounds = new Set(), lastPen = 0, scanInt = null, last = null;
+const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
+const clearAll = () => { timers.forEach(clearTimeout); timers = []; clearInterval(scanInt); };
+
+function bubble(text, cls = '') { const b = $('bubble'); b.className = 'bubble ' + cls; b.innerHTML = text; void b.offsetWidth; }
+function nod() { $('clerk').classList.add('nod'); setTimeout(() => $('clerk').classList.remove('nod'), 360); }
+function scanning() {
+  bubble('嗶<span class="dots"><span>・</span><span>・</span><span>・</span></span>刷商品中');
+  clearInterval(scanInt);
+  scanInt = setInterval(() => { if (state === 'wait') { sfx.scan(); $('scanner').classList.add('beep'); setTimeout(() => $('scanner').classList.remove('beep'), 120); } }, 620);
+}
+function drawQueue() {
+  let h = '<span class="lab">排隊</span>';
+  for (let i = 0; i < ROUNDS; i++) h += `<span class="p ${i < round ? 'done' : i === round ? 'now' : ''}" style="--c:${COLORS[i]}"></span>`;
+  $('queue').innerHTML = h;
+}
+
+function startGame(useMotion) {
+  clearAll();
+  if (useMotion !== undefined) motion = !!useMotion;
+  if (motion) soundOn = true, $('b-snd').textContent = '🔊 音效開';
+  round = 0; times = []; pens = []; draws = [];
+  decoyRounds = new Set();
+  const pool = [1, 2, 3, 4].sort(() => Math.random() - .5);
+  decoyRounds.add(pool[0]); decoyRounds.add(pool[1]);
+  if (Math.random() < .5) decoyRounds.add(pool[2]);
+  $('s-start').hidden = true; $('s-result').hidden = true;
+  $('shareImg').hidden = true; $('r-hint').textContent = '';
+  track('start', { mode: motion ? 'motion' : 'swipe' });
+  startRound();
+}
+const IDLE = {
+  swipe: '<b>聽到「載具？」再拿出手機</b><span>左右滑，找到「發票存摺」點開。太早滑、點錯 App 都加 0.3 秒</span>',
+  pose: '<b>先把手機放下</b><span>手自然垂在身邊，或把手機平放</span>',
+  ready: '<b>聽到「載具？」才舉起來</b><span>太早舉加 0.3 秒</span>'
+};
+function startRound() {
+  pen = 0;
+  $('ph-show').hidden = true; $('ph-idle').hidden = false; $('swipe-tip').hidden = true;
+  buildHome(); drawQueue();
+  if (motion) { state = 'pose'; downSince = 0; raised = false; $('ph-idle').innerHTML = IDLE.pose; bubble('手機先放下喔'); }
+  else { $('ph-idle').innerHTML = IDLE.swipe; beginWait(); }
+}
+function beginWait() {
+  state = 'wait'; scanning();
+  later(decoyRounds.has(round) ? showDecoy : showGo, rnd(1100, 2400));
+}
+function unlock() {
+  locked = false; draws.push(performance.now() - t0);
+  $('ph-idle').hidden = true; if (round === 0) $('swipe-tip').hidden = false;
+  tone(880, .06, 'triangle', .08);
+}
+function startAim() {
+  state = 'aim'; aimSince = 0;
+  aimT = Math.max(30, Math.min(110, curBeta + (Math.random() < .5 ? -1 : 1) * rnd(14, 24)));
+  const sh = $('ph-show'); sh.hidden = false; sh.className = 'show aim';
+  $('beam').hidden = false; $('ph-ms').className = 'ms'; $('ph-ms').textContent = '前後傾斜手機，讓紅光掃到條碼';
+  $('swipe-tip').hidden = true; tone(880, .06, 'triangle', .08);
+  bubble('對準掃描器喔', 'ask go');
+  aimMove(curBeta);
+}
+function aimMove(b) {
+  const off = Math.max(-95, Math.min(95, (b - aimT) * 3.2)), hit = Math.abs(off) < 16, now = performance.now();
+  $('beam').style.transform = `translateY(${off - 14}px)`;
+  $('ph-show').classList.toggle('hit', hit);
+  if (!hit) { aimSince = 0; return; }
+  if (!aimSince) aimSince = now;
+  else if (now - aimSince > 250) finishRound(now - t0, false);
+}
+function onOri(e) {
+  if (e.beta === null || e.beta === undefined) return;
+  oriSeen = true; curBeta = e.beta;
+  if (!motion) return;
+  if (state === 'aim') return aimMove(e.beta);
+  const b = e.beta, down = b < 20 || Math.abs(b) > 150, up = b > 45 && b < 135, now = performance.now();
+  if (down) raised = false;
+  if (state === 'pose') {
+    if (!down) { downSince = 0; return; }
+    if (!downSince) downSince = now;
+    else if (now - downSince > 450) { $('ph-idle').innerHTML = IDLE.ready; try { navigator.vibrate && navigator.vibrate(60); } catch (err) {} tone(520, .08, 'triangle', .08); beginWait(); }
+  } else if ((state === 'wait' || state === 'decoy') && up && !raised) { raised = true; early(); }
+  else if (state === 'go' && locked && up) unlock();
+}
+window.addEventListener('deviceorientation', onOri);
+async function enableMotion() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      if (await DeviceOrientationEvent.requestPermission() !== 'granted') return false;
+    }
+  } catch (e) { return false; }
+  oriSeen = false;
+  await new Promise(r => setTimeout(r, 900));
+  return oriSeen;
+}
+function showDecoy() {
+  state = 'decoy';
+  const q = DECOYS[Math.floor(Math.random() * DECOYS.length)];
+  bubble(q, 'ask');
+  sfx.ask(); nod(); say(q.replace('？', ''));
+  later(() => { state = 'wait'; scanning(); later(showGo, rnd(900, 1900)); }, 1050);
+}
+function showGo() {
+  state = 'go';
+  bubble('載具？', 'ask go');
+  sfx.ask(); nod(); say('載具');
+  try { motion && navigator.vibrate && navigator.vibrate(120); } catch (err) {}
+  t0 = performance.now();
+  if (motion) { locked = true; if (raised) unlock(); } else { locked = false; $('ph-idle').hidden = true; if (round === 0) $('swipe-tip').hidden = false; }
+  later(() => finishRound(TIMEOUT + (motion ? 3000 : 0), true), TIMEOUT + (motion ? 3000 : 0));
+}
+let page = 0, motion = false, locked = false, raised = false, downSince = 0, draws = [], oriSeen = false, curBeta = 70, aimT = 70, aimSince = 0;
+function setPage(n) { page = Math.max(0, Math.min(2, n)); $('pages').style.transform = `translateX(${-page * 33.3333}%)`; [...$('pdots').children].forEach((d, i) => d.classList.toggle('on', i === page)); if (page > 0) $('swipe-tip').hidden = true; }
+function buildHome() {
+  const apps = APPS.slice().sort(() => Math.random() - .5).map(a => `<span class="app-i" data-app="x"><i style="--c:${a[2]}">${a[0]}</i>${a[1]}</span>`);
+  const pg = Math.random() < .2 ? 0 : (Math.random() < .5 ? 1 : 2);
+  apps.splice(pg * 8 + Math.floor(Math.random() * 8), 0, '<span class="app-i me" data-app="me"><i>發</i>發票存摺</span>');
+  let h = ''; for (let i = 0; i < 3; i++) h += '<div class="page">' + apps.slice(i * 8, i * 8 + 8).join('') + '</div>';
+  $('pages').innerHTML = h; setPage(0);
+}
+function penalize(msg) {
+  const now = performance.now();
+  if (now - lastPen < 350) return;
+  lastPen = now; pen += PENALTY; sfx.bad();
+  const was = state;
+  bubble(msg + '<br>+0.3 秒', 'bad');
+  if (was === 'wait') later(() => { if (state === 'wait') scanning(); }, 650);
+  if (was === 'go') later(() => { if (state === 'go') bubble('載具？', 'ask go'); }, 600);
+}
+function early() { if (state === 'decoy') penalize('我問的不是載具啦！'); else if (state === 'wait') penalize(motion ? '還沒問你，手機先放下！' : '還沒問你啦！'); }
+function openApp(el) {
+  if (state !== 'go' || !el) return;
+  if (el.dataset.app === 'me') return motion ? startAim() : finishRound(performance.now() - t0, false);
+  el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 320);
+  penalize('開錯 App 了！');
+}
+function tap() { if (state === 'go') { if (!locked) openApp($('pages').querySelector('.me')); } else if (!motion) early(); }
+(function gestures() {
+  const ph = $('phone'); let x0 = null, dx = 0, target = null;
+  ph.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (state !== 'go') { if (!motion) early(); return; }
+    if (locked) return;
+    x0 = e.clientX; dx = 0; target = e.target.closest('.app-i');
+    try { ph.setPointerCapture(e.pointerId); } catch (err) {}
+    $('pages').classList.add('drag');
+  });
+  ph.addEventListener('pointermove', e => {
+    if (x0 === null) return;
+    dx = e.clientX - x0;
+    $('pages').style.transform = `translateX(calc(${-page * 33.3333}% + ${dx}px))`;
+  });
+  const end = () => {
+    if (x0 === null) return;
+    $('pages').classList.remove('drag'); x0 = null;
+    if (Math.abs(dx) > 28) setPage(page + (dx < 0 ? 1 : -1));
+    else { setPage(page); openApp(target); }
+  };
+  ph.addEventListener('pointerup', end); ph.addEventListener('pointercancel', end);
+})();
+function finishRound(ms, missed) {
+  if (state !== 'go' && state !== 'aim') return;
+  $('ph-show').className = 'show'; $('beam').hidden = true;
+  clearAll();
+  state = 'shown';
+  const total = ms + pen;
+  times.push(total); pens.push(pen > 0 || missed);
+  $('ph-idle').hidden = true; $('ph-show').hidden = false; $('swipe-tip').hidden = true;
+  const el = $('ph-ms');
+  el.className = 'ms' + (missed || pen ? ' slow' : '');
+  el.innerHTML = missed ? '太慢了' : fmt(total) + '<small>秒</small>';
+  if (missed) { sfx.bad(); bubble('後面還有人在排喔', 'bad'); }
+  else { sfx.ok(); $('scanner').classList.add('beep'); setTimeout(() => $('scanner').classList.remove('beep'), 400); bubble(pen ? '好…謝謝' : '嗶！謝謝光臨', 'ok'); }
+  track('round', { round: round + 1, ms: Math.round(total), penalty: pen, missed });
+  later(() => { round++; if (round >= ROUNDS) showResult(); else startRound(); }, missed ? 1200 : 950);
+}
+function showResult() {
+  state = 'off'; drawQueue();
+  const avg = times.reduce((a, b) => a + b, 0) / times.length, best = Math.min(...times);
+  const t = TITLES.find(x => avg - (motion ? 1500 : 0) < x[0]);
+  const dAvg = draws.length ? draws.reduce((a, b) => a + b, 0) / draws.length : 0;
+  last = { avg, best, title: t[1], line: t[2] + (motion && dAvg ? ` 其中掏手機平均 ${fmt(dAvg)} 秒。` : '') };
+  $('r-avg').textContent = fmt(avg);
+  $('r-title').textContent = t[1];
+  $('r-line').textContent = last.line;
+  $('r-rounds').innerHTML = times.map((ms, i) => `<div class="${ms === best ? 'best' : pens[i] ? 'pen' : ''}"><small>第 ${i + 1} 位</small>${fmt(ms)}</div>`).join('');
+  $('s-result').hidden = false; $('s-result').scrollTop = 0;
+  sfx.end();
+  track('complete', { avg: Math.round(avg), best: Math.round(best), title: t[1], mode: motion ? 'motion' : 'swipe', draw: Math.round(dAvg) });
+}
+
+document.addEventListener('keydown', e => { if (state === 'off') return; if (e.code === 'ArrowRight') setPage(page + 1); else if (e.code === 'ArrowLeft') setPage(page - 1); else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (state !== 'go' || $('pages').querySelector('.me').parentNode === $('pages').children[page]) tap(); } });
+$('b-start').onclick = () => startGame(false);
+if (typeof DeviceOrientationEvent !== 'undefined' && window.matchMedia && matchMedia('(pointer: coarse)').matches) {
+  $('b-motion').hidden = false; $('how-motion').hidden = false;
+  $('b-start').className = 'cta ghost'; $('b-start').textContent = '一般模式（不用動手機）';
+}
+$('b-motion').onclick = async () => {
+  say(' ');
+  $('s-hint').textContent = '偵測動作感測中…';
+  if (await enableMotion()) { $('s-hint').textContent = ''; startGame(true); }
+  else { $('s-hint').textContent = '這支手機沒有開放動作感測，改用一般模式。'; setTimeout(() => startGame(false), 1200); }
+};
+$('b-again').onclick = () => { track('replay'); startGame(); };
+
+/* ---------- 商店連結 ---------- */
+(function storeLink() {
+  const a = $('a-store'), ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) a.href = 'https://apps.apple.com/app/apple-store/id1276986959?pt=120214736&mt=8&ct=h5_carrier_speed_result';
+  a.addEventListener('click', () => track('store_click', { target: 'result' }));
+})();
+
+/* ---------- 分享 ---------- */
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+async function drawCard() {
+  try { await document.fonts.ready; } catch (e) {}
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+  const g = c.getContext('2d'), F = '"Noto Sans TC","PingFang TC",sans-serif', N = '"JetBrains Mono",monospace';
+  g.fillStyle = '#2956E8'; g.fillRect(0, 0, 1080, 1350);
+  g.fillStyle = '#fff'; g.globalAlpha = .08; g.beginPath(); g.arc(900, 1180, 520, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
+  g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('發票存摺 × 刷載具快手', 90, 150);
+  g.fillStyle = '#FFF7CC'; roundRect(g, 90, 210, 360, 130, 40); g.fill(); g.lineWidth = 6; g.strokeStyle = '#121722'; g.stroke();
+  g.fillStyle = '#121722'; g.font = `900 72px ${F}`; g.fillText('載具？', 130, 300);
+  g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText('滑手機找載具，我只要', 90, 480);
+  g.font = `800 230px ${N}`; g.fillText(fmt(last.avg), 80, 720);
+  const w = g.measureText(fmt(last.avg)).width; g.font = `900 70px ${F}`; g.fillText('秒', 80 + w + 30, 720);
+  g.font = `900 60px ${F}`; const tw = g.measureText(last.title).width;
+  g.fillStyle = '#121722'; roundRect(g, 90, 790, tw + 90, 110, 55); g.fill();
+  g.fillStyle = '#FFD43B'; g.fillText(last.title, 135, 867);
+  g.fillStyle = '#DCE5FF'; g.font = `700 42px ${F}`; g.fillText(`最快一次 ${fmt(last.best)} 秒`, 90, 990);
+  g.fillStyle = '#fff'; g.font = `900 72px ${F}`; g.fillText('你能更快嗎？', 90, 1130);
+  g.fillStyle = '#DCE5FF'; g.font = `500 32px ${F}`; g.fillText('invosdata-mkt.github.io/h5-games/carrier-speed.html', 90, 1260);
+  return c;
+}
+$('b-share').onclick = async () => {
+  track('share');
+  const url = location.origin + location.pathname;
+  const text = `店員問「載具？」我滑手機找出來只要 ${fmt(last.avg)} 秒（${last.title}）。你能更快嗎？`;
+  const c = await drawCard();
+  try {
+    const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    const file = new File([blob], 'carrier-speed.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: text + ' ' + url }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  $('shareImg').src = c.toDataURL('image/png'); $('shareImg').hidden = false;
+  try { await navigator.clipboard.writeText(text + ' ' + url); $('r-hint').textContent = '挑戰文字已複製；長按下方圖片可以儲存。'; }
+  catch (e) { $('r-hint').textContent = '長按下方圖片儲存，傳給朋友挑戰。'; }
+  $('shareImg').scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+bubble('歡迎光臨');
+drawQueue();
+</script>
+</body>
+</html>
