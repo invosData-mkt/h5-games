@@ -12,6 +12,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-82LNTS7C14"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-82LNTS7C14',{page_title:'Barcode Hero 載具英雄（H5）'});</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@700;800&display=swap">
 <style>
@@ -354,7 +356,8 @@ button { font-family: inherit; cursor: pointer; }
 
 <script>
 const $ = id => document.getElementById(id);
-const track = (ev, p = {}) => { try { (window.dataLayer = window.dataLayer || []).push({ event: 'carrier_game_' + ev, ...p }); } catch (e) {} };
+// GA4：invos.com.tw 資源（G-82LNTS7C14），事件都帶 game＝barcode_hero
+const track = (ev, p = {}) => { try { gtag('event', ev, Object.assign({ game: 'barcode_hero' }, p)); } catch (e) {} };
 const rnd = (a, b) => a + Math.random() * (b - a);
 const fmt = ms => (ms / 1000).toFixed(2);
 
