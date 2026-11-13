@@ -152,6 +152,17 @@ button { font-family: inherit; cursor: pointer; }
 .wdg .wb { display: flex; height: 46px; } .wdg .wb i { background: var(--ink); margin-right: 2px; }
 .wdg .wc { font-family: var(--fn); font-size: 11px; letter-spacing: .16em; color: var(--muted); }
 .fview { position: absolute; inset: 0; z-index: 2; background: rgba(18, 23, 34, .8); display: flex; flex-direction: column; padding: 10px 14px 12px; }
+.nview { position: absolute; inset: 0; z-index: 2; background: #fff; color: var(--ink); overflow-y: auto; padding: 10px 14px 14px; }
+.nview * { pointer-events: none; } .nview [data-nback] { pointer-events: auto; }
+.nhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 17px; }
+.nhead .fback { background: var(--blue-soft); color: var(--blue-dark); }
+.nlead { border-radius: 16px; background: #F1F3F5; padding: 12px 14px; }
+.nlead h3 { margin: 6px 0 6px; font-size: 18px; line-height: 1.35; font-weight: 900; }
+.nlead p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); font-weight: 500; }
+.nlead time { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.ntag { display: inline-block; font-size: 11px; font-weight: 900; color: #fff; background: var(--red); border-radius: 6px; padding: 1px 7px; margin-right: 6px; }
+.nitem { padding: 10px 2px; border-bottom: 1px solid #E9ECEF; font-size: 14px; font-weight: 700; line-height: 1.45; }
+.nitem .ntag { background: var(--blue); }
 .fhead { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 17px; margin-bottom: 6px; }
 .fback { background: rgba(255, 255, 255, .18); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 900; }
 .fgrid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); background: rgba(255, 255, 255, .14); border-radius: 22px; padding: 6px; }
@@ -278,6 +289,18 @@ button { font-family: inherit; cursor: pointer; }
       <div class="tip" id="tip"></div>
       <div class="pdots" id="pdots"><i></i><i></i><i></i></div>
       <div class="swipe-tip" id="swipe-tip" hidden>‹</div>
+      <div class="nview" id="nview" hidden>
+        <div class="nhead"><span class="fback" data-nback="1">‹ 返回</span><b>新聞</b></div>
+        <article class="nlead">
+          <span class="ntag">國際・科技</span>
+          <h3>輝達宣布黃仁勳辭去執行長　財務長克雷斯暫代</h3>
+          <p>輝達董事會 11 月 12 日宣布，黃仁勳即日起辭去總裁、執行長及董事職務，由財務長 Colette Kress 暫代執行長，董事會將從內外部物色正式人選。</p>
+          <time>2026/11/12</time>
+        </article>
+        <div class="nitem"><span class="ntag">生活</span>9–10 月統一發票 11/25 開獎，雲端發票專屬獎一起開</div>
+        <div class="nitem"><span class="ntag">生活</span>排隊結帳找不到載具？把載具放上桌面小工具最快</div>
+        <div class="nitem"><span class="ntag">提醒</span>店員還在等你喔，按左上角「返回」繼續找載具</div>
+      </div>
       <div class="fview" id="fview" hidden><div class="fhead"><span class="fback" data-back="1">‹ 返回</span><span id="ftitle"></span></div><div class="fgrid" id="fgrid"></div></div>
       <div class="show" id="ph-show" hidden>
         <span class="bars" id="bars"></span>
@@ -558,7 +581,7 @@ let maxPage = 2, folders = [], stack = [], wdgPage = 0;
 function setPage(n) { page = Math.max(0, Math.min(maxPage, n)); $('pages').style.transform = `translateX(${-page * 33.3333}%)`; [...$('pdots').children].forEach((d, i) => d.classList.toggle('on', i === page)); if (page > 0) $('swipe-tip').hidden = true; }
 const LOGO = '<svg viewBox="12 12 88 84" aria-hidden="true"><defs><linearGradient id="ivg" x1="56" y1="96.9" x2="56" y2="16.3" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00d3f7"/><stop offset=".2" stop-color="#3560ff"/><stop offset=".5" stop-color="#3560ff"/><stop offset=".8" stop-color="#1da3d8"/><stop offset="1" stop-color="#05e5b1"/></linearGradient></defs><path fill="#00C2E8" d="M61.9,66.7c0,.2-5.3,16.6-2.9,22.9s2.6,2.4,2.6,2.4h-22.7c-1.5,0-2.6-.8-3.2-2.4h0c-2.4-6.3,2.9-22.7,2.9-22.9,0,0,23.3,0,23.3,0Z"/><path fill="#00C2E8" d="M76.2,16c1.5,0,2.6.8,3.2,2.4h0c2.4,6.3-2.9,22.7-2.9,22.9h-23.3c0-.2,5.3-16.6,2.9-22.9-.8-2.1-2.6-2.4-2.7-2.4h22.8Z"/><path fill="url(#ivg)" d="M96,37c0,.1-3.5,13.5-9.7,26.8-3.7,7.8-7.4,14.2-11,18.8-4.5,5.8-9,8.9-13.2,9.3h-23.5.4c4.2-.4,8.7-3.5,13.2-9.3,3.6-4.6,7.3-11,11-18.8,6.2-13.4,10.3-26.7,10.3-26.8h22.5ZM76.4,16h-.4c-4.2.4-8.7,3.5-13.2,9.3-3.6,4.6-7.3,11-11,18.8-6.2,13.4-10.3,26.7-10.3,26.8h-22.5c0-.2,3.5-13.5,9.7-26.8,3.7-7.8,7.4-14.2,11-18.8,4.6-5.8,9-8.9,13.2-9.3h23.5ZM25.4,16.4c0,3.6,2.9,6.5,6.6,6.5v1.2c-3.6,0-6.6,2.9-6.6,6.5v6.8h-1.2v-6.8c0-3.6-2.9-6.5-6.6-6.5h-1.6v-1.2h1.7c3.6,0,6.6-2.9,6.6-6.5h1.2-.1Z"/></svg>';
 const ME = `<span class="app-i me" data-app="me"><i>${LOGO}</i>發票存摺</span>`;
-const appH = a => `<span class="app-i" data-app="x"><i style="--c:${a[2]}">${a[0]}</i>${a[1]}</span>`;
+const appH = a => `<span class="app-i" data-app="${a[1] === '新聞' ? 'news' : 'x'}"><i style="--c:${a[2]}">${a[0]}</i>${a[1]}</span>`;
 const hasMe = k => k === 'me' || !!(k && k.kids && k.kids.some(hasMe));
 function kidH(k) {
   if (k === 'me') return ME;
@@ -568,7 +591,7 @@ function kidH(k) {
 }
 function mkFolder(name, kids) { const f = { id: folders.length, name, kids }; folders.push(f); return f; }
 function buildHome() {
-  folders = []; stack = []; $('fview').hidden = true;
+  folders = []; stack = []; $('fview').hidden = true; $('nview').hidden = true;
   const pool = APPS.slice().sort(() => Math.random() - .5); let pi = 0;
   const take = n => { const r = []; while (n--) r.push(pool[pi++ % pool.length]); return r; };
   const mix = (arr, item) => { arr.splice(Math.floor(Math.random() * (arr.length + 1)), 0, item); return arr; };
@@ -630,6 +653,7 @@ function early() {
 function openApp(el) {
   if (state !== 'go' || !el) return;
   if (el.dataset.app === 'me') return motion ? (diff === 'easy' ? undefined : startAim()) : finishRound(performance.now() - t0, false);
+  if (el.dataset.app === 'news') { $('nview').hidden = false; $('nview').scrollTop = 0; tone(700, .04, 'triangle', .05); track('easter_news', { diff }); return; }
   el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 320);
   penalize('開錯 App 了！');
 }
@@ -639,7 +663,7 @@ function tap() { if (state === 'go') openApp(document.querySelector('#phone [dat
   ph.addEventListener('pointerdown', e => {
     e.preventDefault();
     if (state !== 'go') { early(); return; }
-    x0 = e.clientX; dx = 0; target = e.target.closest('[data-app],[data-folder],[data-back]');
+    x0 = e.clientX; dx = 0; target = e.target.closest('[data-app],[data-folder],[data-back],[data-nback]');
     try { ph.setPointerCapture(e.pointerId); } catch (err) {}
     $('pages').classList.add('drag');
   });
@@ -655,7 +679,8 @@ function tap() { if (state === 'go') openApp(document.querySelector('#phone [dat
     else {
       setPage(page);
       if (!target) return;
-      if (target.dataset.back) { stack.pop(); renderFolder(); tone(500, .04, 'triangle', .05); }
+      if (target.dataset.nback) { $('nview').hidden = true; tone(500, .04, 'triangle', .05); }
+      else if (target.dataset.back) { stack.pop(); renderFolder(); tone(500, .04, 'triangle', .05); }
       else if (target.dataset.folder !== undefined) { stack.push(+target.dataset.folder); renderFolder(); tone(700, .04, 'triangle', .05); }
       else openApp(target);
     }
