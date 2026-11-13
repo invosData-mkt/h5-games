@@ -97,6 +97,7 @@ button { font-family: inherit; cursor: pointer; }
 .scanner::after { content: ''; position: absolute; left: 10px; right: 10px; top: 12px; height: 6px; border-radius: 3px; background: #FF5A5F; box-shadow: 0 0 10px #FF5A5F; opacity: .55; }
 .scanner.beep::after { opacity: 1; background: #3CE6A0; box-shadow: 0 0 18px #3CE6A0; }
 
+.tip { position: absolute; right: 14px; top: 22px; max-width: 58%; text-align: right; font-size: 12px; font-weight: 700; color: var(--red); line-height: 1.4; }
 .queue { position: absolute; left: 14px; right: 14px; bottom: 8px; display: flex; align-items: flex-end; gap: 6px; }
 .queue .lab { font-size: 12px; font-weight: 700; color: var(--muted); margin-right: 2px; padding-bottom: 6px; white-space: nowrap; }
 .p { width: 30px; height: 44px; position: relative; transition: opacity .3s, transform .3s; }
@@ -142,6 +143,7 @@ button { font-family: inherit; cursor: pointer; }
 .pdots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .4); }
 .pdots i.on { background: #fff; }
 .swipe-tip { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 2; font-size: 22px; font-weight: 900; opacity: .85; animation: nudge 1s infinite; pointer-events: none; }
+.phone.jolt { animation: shake .3s; }
 @keyframes nudge { 50% { transform: translate(-6px, -50%); } }
 .phone .show { position: absolute; inset: 0; z-index: 4; background: #fff; color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .bars { display: flex; align-items: stretch; height: 64px; }
@@ -239,6 +241,7 @@ button { font-family: inherit; cursor: pointer; }
     <div class="counter">
       <div class="scanner" id="scanner"></div>
       <div class="queue" id="queue"></div>
+      <div class="tip" id="tip"></div>
     </div>
   </div>
 
@@ -265,7 +268,7 @@ button { font-family: inherit; cursor: pointer; }
     <h1>刷載具<br><em>快手</em></h1>
     <p class="lead">店員一問「載具？」，你要多久才亮得出來？<br>他問袋子、會員的時候，手機先不要動。</p>
     <div class="diffs" id="diffs">
-      <button class="diff" type="button" data-d="easy"><b>簡單</b><span>桌面有放載具小工具，點一下就好</span></button>
+      <button class="diff" type="button" data-d="easy"><b>簡單</b><span>桌面有放載具小工具，滑到那一頁點一下就好</span></button>
       <button class="diff on" type="button" data-d="mid"><b>中等</b><span>滑手機找到「發票存摺」，打開才能刷</span></button>
       <button class="diff" type="button" data-d="hard"><b>困難</b><span>App 被收進好幾層資料夾，跟著藍色小圖示找，不限時</span></button>
     </div>
@@ -308,7 +311,7 @@ const fmt = ms => (ms / 1000).toFixed(2);
 
 const ROUNDS = 5, PENALTY = 300;
 const DIFF = {
-  easy: { name: '簡單', t: [600, 900, 1300, 1900], to: 4000, idle: '點桌面上的「載具小工具」就能刷' },
+  easy: { name: '簡單', t: [900, 1300, 1800, 2500], to: 5000, idle: '滑到放「載具小工具」的那一頁，點一下就能刷' },
   mid: { name: '中等', t: [1200, 1700, 2300, 3200], to: 6000, idle: '左右滑，找到「發票存摺」點開' },
   hard: { name: '困難', t: [2500, 3500, 4800, 6500], to: 12000, idle: '發票存摺被收進資料夾，跟著藍色小圖示一層一層找（不限時）' }
 };
@@ -396,8 +399,8 @@ function startGame(useMotion) {
 }
 function startRound() {
   pen = 0;
-  $('ph-show').hidden = true; $('ph-idle').hidden = false; $('swipe-tip').hidden = true;
-  $('ph-idle').innerHTML = `<b>聽到「載具？」再拿出手機</b><span>${motion && diff === 'easy' ? '小工具就在桌面，直接把手機伸向掃描器' : DIFF[diff].idle}。${motion && diff !== 'easy' ? '打開後把手機伸向掃描器。' : ''}太早碰、點錯 App 都加 0.3 秒</span>`;
+  $('ph-show').hidden = true; $('ph-idle').hidden = true; $('swipe-tip').hidden = true;
+  $('tip').textContent = round === 0 ? (motion ? '聽到「載具？」才能滑、才能伸手，太早動就扣 0.3 秒' : '聽到「載具？」才能滑，太早碰手機就扣 0.3 秒') : '';
   buildHome(); drawQueue(); beginWait();
 }
 function beginWait() {
@@ -405,7 +408,8 @@ function beginWait() {
   later(decoyRounds.has(round) ? showDecoy : showGo, rnd(1100, 2400));
 }
 /* 體感：條碼打開後，把手機往前伸（加速度超過門檻）才算刷到 */
-const REACH = 2.2;
+const REACH = 3.6;
+let hot = 0;
 let aimStart = 0, grav = null, motSeen = false;
 function startAim() {
   state = 'aim'; aimStart = performance.now();
@@ -425,8 +429,12 @@ function onMotion(e) {
     mag = Math.hypot(g.x - grav.x, g.y - grav.y, g.z - grav.z);
   }
   motSeen = true;
-  const easyReach = motion && state === 'go' && diff === 'easy' && page === 0 && performance.now() - t0 > 120;
-  if (mag > REACH && (easyReach || (motion && state === 'aim' && performance.now() - aimStart > 150))) {
+  hot = mag > REACH ? hot + 1 : 0;
+  if (!motion || hot < 2) return;
+  if (state === 'wait' || state === 'decoy') { hot = 0; early(); return; }
+  const easyReach = state === 'go' && diff === 'easy' && page === wdgPage && performance.now() - t0 > 120;
+  if (easyReach || (state === 'aim' && performance.now() - aimStart > 150)) {
+    hot = 0;
     try { navigator.vibrate && navigator.vibrate(60); } catch (err) {}
     finishRound(performance.now() - t0, false);
   }
@@ -455,12 +463,12 @@ function showGo() {
   sfx.ask(); nod(); say('載具');
   if (motion && diff === 'easy') bubble('載具？伸過來刷', 'ask go');
   t0 = performance.now();
-  $('ph-idle').hidden = true; if (round === 0 && diff === 'mid') $('swipe-tip').hidden = false;
+  $('tip').textContent = ''; if (round === 0 && diff !== 'hard') $('swipe-tip').hidden = false;
   const to = diff === 'hard' ? 0 : DIFF[diff].to + (motion ? 2000 : 0);
   if (to) later(() => finishRound(to, true), to);
 }
 let page = 0, motion = false, locked = false, raised = false, downSince = 0, draws = [], oriSeen = false, curBeta = 70, aimT = 70, aimSince = 0;
-let maxPage = 2, folders = [], stack = [];
+let maxPage = 2, folders = [], stack = [], wdgPage = 0;
 function setPage(n) { page = Math.max(0, Math.min(maxPage, n)); $('pages').style.transform = `translateX(${-page * 33.3333}%)`; [...$('pdots').children].forEach((d, i) => d.classList.toggle('on', i === page)); if (page > 0) $('swipe-tip').hidden = true; }
 const LOGO = '<svg viewBox="12 12 88 84" aria-hidden="true"><defs><linearGradient id="ivg" x1="56" y1="96.9" x2="56" y2="16.3" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00d3f7"/><stop offset=".2" stop-color="#3560ff"/><stop offset=".5" stop-color="#3560ff"/><stop offset=".8" stop-color="#1da3d8"/><stop offset="1" stop-color="#05e5b1"/></linearGradient></defs><path fill="#00C2E8" d="M61.9,66.7c0,.2-5.3,16.6-2.9,22.9s2.6,2.4,2.6,2.4h-22.7c-1.5,0-2.6-.8-3.2-2.4h0c-2.4-6.3,2.9-22.7,2.9-22.9,0,0,23.3,0,23.3,0Z"/><path fill="#00C2E8" d="M76.2,16c1.5,0,2.6.8,3.2,2.4h0c2.4,6.3-2.9,22.7-2.9,22.9h-23.3c0-.2,5.3-16.6,2.9-22.9-.8-2.1-2.6-2.4-2.7-2.4h22.8Z"/><path fill="url(#ivg)" d="M96,37c0,.1-3.5,13.5-9.7,26.8-3.7,7.8-7.4,14.2-11,18.8-4.5,5.8-9,8.9-13.2,9.3h-23.5.4c4.2-.4,8.7-3.5,13.2-9.3,3.6-4.6,7.3-11,11-18.8,6.2-13.4,10.3-26.7,10.3-26.8h22.5ZM76.4,16h-.4c-4.2.4-8.7,3.5-13.2,9.3-3.6,4.6-7.3,11-11,18.8-6.2,13.4-10.3,26.7-10.3,26.8h-22.5c0-.2,3.5-13.5,9.7-26.8,3.7-7.8,7.4-14.2,11-18.8,4.6-5.8,9-8.9,13.2-9.3h23.5ZM25.4,16.4c0,3.6,2.9,6.5,6.6,6.5v1.2c-3.6,0-6.6,2.9-6.6,6.5v6.8h-1.2v-6.8c0-3.6-2.9-6.5-6.6-6.5h-1.6v-1.2h1.7c3.6,0,6.6-2.9,6.6-6.5h1.2-.1Z"/></svg>';
 const ME = `<span class="app-i me" data-app="me"><i>${LOGO}</i>發票存摺</span>`;
@@ -482,8 +490,13 @@ function buildHome() {
   if (diff === 'easy') {
     maxPage = 2;
     const bars = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1].map(x => `<i style="width:${x * 2}px"></i>`).join('');
-    pagesH.push(`<span class="wdg" data-app="me"><span class="wt">${LOGO}發票存摺｜載具小工具</span><span class="wb">${bars}</span><span class="wc">/INV0S88</span></span>` + take(8).map(appH).join(''));
-    pagesH.push(take(16).map(appH).join('')); pagesH.push(take(12).map(appH).join(''));
+    const wdg = `<span class="wdg" data-app="me"><span class="wt">${LOGO}發票存摺｜載具小工具</span><span class="wb">${bars}</span><span class="wc">/INV0S88</span></span>`;
+    wdgPage = Math.random() < .2 ? 0 : (Math.random() < .5 ? 1 : 2);
+    const wrow = Math.floor(Math.random() * 3) * 4;
+    for (let i = 0; i < 3; i++) {
+      if (i !== wdgPage) { pagesH.push(take(16).map(appH).join('')); continue; }
+      const a = take(8).map(appH); a.splice(wrow > 8 ? 8 : wrow, 0, wdg); pagesH.push(a.join(''));
+    }
   } else if (diff === 'mid') {
     maxPage = 2;
     const all = take(36).map(appH), pg = Math.random() < .2 ? 0 : (Math.random() < .5 ? 1 : 2);
@@ -526,7 +539,8 @@ function penalize(msg) {
   if (was === 'wait') later(() => { if (state === 'wait') scanning(); }, 650);
   if (was === 'go') later(() => { if (state === 'go') bubble('載具？', 'ask go'); }, 600);
 }
-function early() { if (state === 'decoy') penalize('我問的不是載具啦！'); else if (state === 'wait') penalize('還沒問你啦！'); }
+function early() {
+  const ph = $('phone'); ph.classList.remove('jolt'); void ph.offsetWidth; ph.classList.add('jolt'); if (state === 'decoy') penalize('我問的不是載具啦！'); else if (state === 'wait') penalize('還沒問你啦！'); }
 function openApp(el) {
   if (state !== 'go' || !el) return;
   if (el.dataset.app === 'me') return motion ? (diff === 'easy' ? undefined : startAim()) : finishRound(performance.now() - t0, false);
@@ -590,7 +604,7 @@ function showResult() {
   $('r-line').textContent = last.line;
   $('r-tag').textContent = `你的刷載具速度（${DIFF[diff].name}・5 次平均）`;
   $('r-watch').innerHTML = diff === 'easy'
-    ? '<b>你剛剛點的就是載具小工具</b>把發票存摺的小工具放上桌面，結帳時不用找 App。再試試中等或困難，感受一下差別。'
+    ? '<b>你剛剛刷的就是載具小工具</b>把發票存摺的小工具放上桌面，結帳時不用找 App。再試試中等或困難，感受一下差別。'
     : '<b>不想每次都滑手機找？</b>把發票存摺的載具小工具放上桌面，或用 Apple Watch、Android 手錶，抬手就能刷。選「簡單」玩一次就知道差多少。';
   last.diff = DIFF[diff].name;
   [...$('again').children].forEach(x => x.classList.toggle('cur', x.dataset.d === diff));
