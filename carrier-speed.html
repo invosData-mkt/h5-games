@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>BARCODES Hero 載具英雄｜店員問「載具？」你多快亮出來・發票存摺 invos</title>
+<title>Barcode Hero 載具英雄｜店員問「載具？」你多快亮出來・發票存摺 invos</title>
 <meta name="description" content="店員一問「載具？」，滑手機找到發票存摺亮出條碼，5 位客人測出你的結帳速度。">
-<meta property="og:title" content="BARCODES Hero 載具英雄｜店員問「載具？」你多快亮出來">
+<meta property="og:title" content="Barcode Hero 載具英雄｜店員問「載具？」你多快亮出來">
 <meta property="og:description" content="滑手機找載具要幾秒？5 位客人測出你的結帳速度。小心店員問的不是載具。">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -245,7 +245,7 @@ button { font-family: inherit; cursor: pointer; }
 <div class="app">
 
   <div class="top">
-    <span class="brand">BARCODES Hero 載具英雄</span>
+    <span class="brand">Barcode Hero 載具英雄</span>
     <button class="snd" id="b-snd" type="button">🔊 音效開</button>
   </div>
 
@@ -310,7 +310,7 @@ button { font-family: inherit; cursor: pointer; }
   <section class="sheet" id="s-start">
     <span class="tag">發票存摺 × 結帳反應挑戰</span>
     <div class="hero-b">載具？</div>
-    <h1><span class="en">BARCODES Hero</span>載具<em>英雄</em></h1>
+    <h1><span class="en">Barcode Hero</span>載具<em>英雄</em></h1>
     <p class="lead">店員一問「載具？」，你要多久才亮得出來？<br>他問袋子、會員的時候，手機先不要動。</p>
     <div class="diffs" id="diffs">
       <button class="diff" type="button" data-d="easy"><b>簡單</b><span>桌面有放載具小工具，滑到那一頁點一下就好</span></button>
@@ -762,7 +762,7 @@ async function drawCard() {
   const g = c.getContext('2d'), F = '"Noto Sans TC","PingFang TC",sans-serif', N = '"JetBrains Mono",monospace';
   g.fillStyle = '#2956E8'; g.fillRect(0, 0, 1080, 1350);
   g.fillStyle = '#fff'; g.globalAlpha = .08; g.beginPath(); g.arc(900, 1180, 520, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
-  g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('BARCODES Hero 載具英雄｜發票存摺', 90, 150);
+  g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('Barcode Hero 載具英雄｜發票存摺', 90, 150);
   g.fillStyle = '#FFF7CC'; roundRect(g, 90, 210, 360, 130, 40); g.fill(); g.lineWidth = 6; g.strokeStyle = '#121722'; g.stroke();
   g.fillStyle = '#121722'; g.font = `900 72px ${F}`; g.fillText('載具？', 130, 300);
   g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText(last.kicked ? '找載具找到被架走，總共' : `找載具（${last.diff}），我只要`, 90, 480);
@@ -779,7 +779,7 @@ async function drawCard() {
 $('b-share').onclick = async () => {
   track('share');
   const url = location.origin + location.pathname;
-  const text = last.kicked ? `我玩 BARCODES Hero 困難模式，找載具找到被店員架走了。你撐得過嗎？` : `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。你能更快嗎？`;
+  const text = last.kicked ? `我玩 Barcode Hero 困難模式，找載具找到被店員架走了。你撐得過嗎？` : `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。你能更快嗎？`;
   const c = await drawCard();
   try {
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));
