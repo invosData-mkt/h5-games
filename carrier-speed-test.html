@@ -78,9 +78,6 @@ button { font-family: inherit; cursor: pointer; }
 .queue.m2 .p:not(.done):not(.now) { animation: stomp .5s infinite; }
 .queue.m3 .p:not(.done):not(.now) { animation: stomp .25s infinite; }
 @keyframes stomp { 50% { transform: translateY(-4px); } }
-.patience { position: absolute; right: 12px; bottom: 10px; width: 34%; height: 10px; border-radius: 6px; background: #E9ECEF; border: 2px solid var(--ink); overflow: hidden; }
-.patience i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: var(--green); transition: width .25s, background .25s; }
-.patience { overflow: visible; } .patience span { position: absolute; right: calc(100% + 6px); bottom: -4px; font-size: 11px; font-weight: 900; color: var(--muted); white-space: nowrap; }
 .kicked .hand { animation: drag 1.4s ease-in forwards; }
 @keyframes drag { 15% { transform: translateX(10px) rotate(2deg); } 100% { transform: translateX(-130%) rotate(-12deg); } }
 .kicked .queue .p { transition: transform .5s; transform: translateX(var(--kx, 0)) translateY(-4px); }
@@ -277,7 +274,6 @@ button { font-family: inherit; cursor: pointer; }
     <div class="counter">
       <div class="scanner" id="scanner"></div>
       <div class="queue" id="queue"></div>
-      <div class="patience" id="patience" hidden><span>店員耐心</span><i id="pat-bar"></i></div>
       <div class="qb" id="qb" hidden></div>
     </div>
   </div>
@@ -441,8 +437,6 @@ function setMood(m) {
 function moodTick() {
   if (diff !== 'hard' || kicked) return;
   const el = elapsedTotal();
-  $('pat-bar').style.width = Math.max(0, 100 - el / LIMIT * 100) + '%';
-  $('pat-bar').style.background = el > MOODS[3] ? 'var(--red)' : el > MOODS[2] ? '#F59E0B' : el > MOODS[1] ? '#FCC419' : 'var(--green)';
   const m = el > MOODS[3] ? 3 : el > MOODS[2] ? 2 : el > MOODS[1] ? 1 : 0;
   if (m !== mood) setMood(m);
   if (el >= LIMIT) return kickOut();
@@ -475,7 +469,6 @@ function resetKick() {
   kicked = false; mood = -1; setMood(0); $('qb').hidden = true;
   document.querySelector('.app').classList.remove('kicked');
   const st = $('stamp'); if (st) st.remove();
-  $('patience').hidden = diff !== 'hard'; $('pat-bar').style.width = '100%'; $('pat-bar').style.background = 'var(--green)';
 }
 
 function bubble(text, cls = '') { const b = $('bubble'); b.className = 'bubble ' + cls; b.innerHTML = text; void b.offsetWidth; }
