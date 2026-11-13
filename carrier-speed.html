@@ -206,6 +206,7 @@ button { font-family: inherit; cursor: pointer; }
 .how li { display: flex; gap: 12px; align-items: center; background: rgba(255, 255, 255, .12); border-radius: 16px; padding: 12px 14px; font-size: 15px; font-weight: 700; line-height: 1.45; }
 .how li b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: var(--blue); display: grid; place-items: center; font-family: var(--fn); font-size: 15px; }
 .grow { flex: 1; min-height: 18px; }
+#s-start .cta { margin-top: 20px; } #b-motion:not([hidden]) + #b-start { margin-top: 12px; }
 .cta { display: block; width: 100%; border: 0; border-radius: 999px; padding: 17px 20px; font-size: 19px; font-weight: 900; text-align: center; text-decoration: none; background: var(--yellow); color: var(--ink); box-shadow: 0 6px 0 rgba(0, 0, 0, .22); }
 .cta:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0, 0, 0, .22); }
 .cta.ghost { background: transparent; color: #fff; box-shadow: none; border: 2px solid rgba(255, 255, 255, .55); font-size: 16px; padding: 12px 20px; margin-top: 12px; }
@@ -324,7 +325,6 @@ button { font-family: inherit; cursor: pointer; }
       <button class="diff" type="button" data-d="hard"><b>困難</b><span>App 被收進好幾層資料夾，跟著藍色小圖示找，不限時</span></button>
     </div>
     <p class="s-hint" id="how-motion" hidden>體感模式：條碼打開後，把手機往前伸向掃描器才算刷到</p>
-    <div class="grow"></div>
     <button class="cta" id="b-motion" type="button" hidden>體感模式：伸手刷條碼</button>
     <button class="cta" id="b-start" type="button">開始結帳</button>
     <p class="s-hint" id="s-hint"></p>
