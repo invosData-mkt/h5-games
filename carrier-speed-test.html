@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>刷載具快手｜店員問「載具？」你要滑多久・發票存摺 invos</title>
+<title>BARCODES Hero 載具英雄｜店員問「載具？」你多快亮出來・發票存摺 invos</title>
 <meta name="description" content="店員一問「載具？」，滑手機找到發票存摺亮出條碼，5 位客人測出你的結帳速度。">
-<meta property="og:title" content="刷載具快手｜店員問「載具？」你要滑多久">
+<meta property="og:title" content="BARCODES Hero 載具英雄｜店員問「載具？」你多快亮出來">
 <meta property="og:description" content="滑手機找載具要幾秒？5 位客人測出你的結帳速度。小心店員問的不是載具。">
 <meta property="og:type" content="website">
 <meta name="robots" content="noindex">
@@ -69,7 +69,7 @@ button { font-family: inherit; cursor: pointer; }
 .goods { position: absolute; left: 0; right: 0; height: 28%; }
 .goods.g1 { top: -6%; } .goods.g2 { top: 22%; } .goods.g3 { top: 50%; }
 
-.clerk { position: absolute; left: 50%; bottom: 22%; width: 36%; max-width: 150px; transform: translateX(-50%); }
+.clerk { position: absolute; left: 50%; bottom: 25%; height: 48%; width: auto; max-width: 46%; transform: translateX(-50%); }
 .clerk.nod { animation: nod .35s; }
 @keyframes nod { 40% { transform: translateX(-50%) translateY(6px) rotate(-2deg); } }
 
@@ -93,15 +93,16 @@ button { font-family: inherit; cursor: pointer; }
 
 .counter { position: absolute; left: 0; right: 0; bottom: 0; height: 26%; background: #fff; border-top: 5px solid var(--ink); }
 .counter::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 14px; background: var(--blue); }
-.scanner { position: absolute; left: 50%; top: -30px; transform: translateX(-50%); width: 74px; height: 46px; background: var(--ink); border-radius: 10px 10px 4px 4px; }
+.scanner { position: absolute; left: 72%; top: -26px; transform: translateX(-50%); width: 64px; height: 40px; background: var(--ink); border-radius: 10px 10px 4px 4px; }
 .scanner::after { content: ''; position: absolute; left: 10px; right: 10px; top: 12px; height: 6px; border-radius: 3px; background: #FF5A5F; box-shadow: 0 0 10px #FF5A5F; opacity: .55; }
 .scanner.beep::after { opacity: 1; background: #3CE6A0; box-shadow: 0 0 18px #3CE6A0; }
 
-.tip { position: absolute; right: 14px; top: 22px; max-width: 58%; text-align: right; font-size: 12px; font-weight: 700; color: var(--red); line-height: 1.4; }
-.queue { position: absolute; left: 14px; right: 14px; bottom: 8px; display: flex; align-items: flex-end; gap: 6px; }
+.tip { position: absolute; left: 12px; right: 12px; bottom: 24px; z-index: 2; text-align: center; font-size: 12px; font-weight: 700; color: #fff; line-height: 1.4; background: rgba(217, 58, 63, .92); border-radius: 12px; padding: 6px 10px; pointer-events: none; }
+.tip:empty { display: none; }
+.queue { position: absolute; left: 12px; bottom: 6px; display: flex; align-items: flex-end; gap: 5px; }
 .queue .lab { font-size: 12px; font-weight: 700; color: var(--muted); margin-right: 2px; padding-bottom: 6px; white-space: nowrap; }
-.p { width: 30px; height: 44px; position: relative; transition: opacity .3s, transform .3s; }
-.p::before { content: ''; position: absolute; left: 7px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: #F2C9A5; border: 2px solid var(--ink); }
+.p { width: 26px; height: 38px; position: relative; transition: opacity .3s, transform .3s; }
+.p::before { content: ''; position: absolute; left: calc(50% - 9px); top: 0; width: 18px; height: 18px; z-index: 1; border-radius: 50%; background: #F2C9A5; border: 2px solid var(--ink); }
 .p::after { content: ''; position: absolute; left: 2px; right: 2px; bottom: 0; height: 26px; border-radius: 12px 12px 4px 4px; background: var(--c, var(--blue)); border: 2px solid var(--ink); }
 .p.done { opacity: .22; transform: scale(.82); }
 .p.now { transform: translateY(-5px); }
@@ -166,6 +167,7 @@ button { font-family: inherit; cursor: pointer; }
 .hero-b::after { content: ''; position: absolute; left: 34px; bottom: -15px; width: 22px; height: 22px; background: inherit; border-right: 4px solid var(--ink); border-bottom: 4px solid var(--ink); transform: rotate(45deg); }
 .sheet h1 { font-size: 50px; line-height: 1.08; font-weight: 900; margin: 28px 0 0; letter-spacing: .01em; }
 .sheet h1 em { font-style: normal; color: var(--yellow); }
+.sheet h1 .en { display: block; font-family: var(--fn); font-size: .46em; letter-spacing: .02em; color: #DCE5FF; margin-bottom: 4px; }
 .sheet .lead { font-size: 17px; line-height: 1.7; font-weight: 500; color: #EEF2FF; margin: 16px 0 0; }
 .diffs { margin: 18px 0 0; display: grid; gap: 8px; }
 .diff { display: flex; align-items: center; gap: 12px; text-align: left; border: 2px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .08); color: #fff; border-radius: 16px; padding: 10px 14px; font-size: 13px; font-weight: 500; line-height: 1.45; }
@@ -206,6 +208,11 @@ button { font-family: inherit; cursor: pointer; }
 .hint { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; margin: 12px 0 0; font-weight: 500; flex: none; }
 #shareImg { width: 100%; border-radius: 18px; margin-top: 10px; flex: none; -webkit-user-select: auto; user-select: auto; -webkit-touch-callout: default; }
 @media (max-height: 700px) {
+  .bubble { font-size: 16px; padding: 6px 14px; min-width: 120px; border-width: 2.5px; } .bubble.ask { font-size: 26px; padding: 4px 18px; } .bubble.ok { font-size: 18px; } .bubble.bad { font-size: 15px; }
+  .top { padding: 8px 14px 2px; } .brand { font-size: 14px; }
+  .sheet { padding-top: calc(16px + env(safe-area-inset-top, 0px)); } .hero-b { display: none; } .sheet h1 { margin-top: 6px; }
+  .sheet .lead { font-size: 15px; line-height: 1.6; margin-top: 10px; } .diff { font-size: 12px; } .diff b { font-size: 15px; }
+  .cta { padding: 14px 18px; font-size: 17px; } .cta.ghost { padding: 10px 18px; margin-top: 8px; }
   .sheet h1 { font-size: 38px; margin-top: 22px; } .sheet h1 br { display: none; } .hero-b { font-size: 30px; margin-top: 10px; } .diffs { margin-top: 10px; gap: 6px; } .diff { padding: 7px 12px; } .how { margin-top: 14px; gap: 7px; } .how li { padding: 9px 12px; }
   .app-i i { width: 42px; height: 42px; font-size: 21px; } .app-i { font-size: 10px; gap: 2px; } .bars { height: 48px; } .wdg .wb { height: 34px; } .r-num { font-size: 68px; }
 }
@@ -216,7 +223,7 @@ button { font-family: inherit; cursor: pointer; }
 <div class="app">
 
   <div class="top">
-    <span class="brand">發票存摺｜刷載具快手</span>
+    <span class="brand">BARCODES Hero 載具英雄</span>
     <button class="snd" id="b-snd" type="button">🔊 音效開</button>
   </div>
 
@@ -241,7 +248,6 @@ button { font-family: inherit; cursor: pointer; }
     <div class="counter">
       <div class="scanner" id="scanner"></div>
       <div class="queue" id="queue"></div>
-      <div class="tip" id="tip"></div>
     </div>
   </div>
 
@@ -249,6 +255,7 @@ button { font-family: inherit; cursor: pointer; }
     <div class="phone" id="phone" role="group" aria-label="手機主畫面，左右滑動找到發票存摺">
       <div class="idle" id="ph-idle"><b>聽到「載具？」再拿出手機</b><span>左右滑，找到「發票存摺」點開。太早滑、點錯 App 都加 0.3 秒</span></div>
       <div class="pages" id="pages"></div>
+      <div class="tip" id="tip"></div>
       <div class="pdots" id="pdots"><i></i><i></i><i></i></div>
       <div class="swipe-tip" id="swipe-tip" hidden>‹</div>
       <div class="fview" id="fview" hidden><div class="fhead"><span class="fback" data-back="1">‹ 返回</span><span id="ftitle"></span></div><div class="fgrid" id="fgrid"></div></div>
@@ -265,7 +272,7 @@ button { font-family: inherit; cursor: pointer; }
   <section class="sheet" id="s-start">
     <span class="tag">發票存摺 × 結帳反應挑戰</span>
     <div class="hero-b">載具？</div>
-    <h1>刷載具<br><em>快手</em></h1>
+    <h1><span class="en">BARCODES Hero</span>載具<em>英雄</em></h1>
     <p class="lead">店員一問「載具？」，你要多久才亮得出來？<br>他問袋子、會員的時候，手機先不要動。</p>
     <div class="diffs" id="diffs">
       <button class="diff" type="button" data-d="easy"><b>簡單</b><span>桌面有放載具小工具，滑到那一頁點一下就好</span></button>
@@ -379,7 +386,7 @@ function scanning() {
   scanInt = setInterval(() => { if (state === 'wait') { sfx.scan(); $('scanner').classList.add('beep'); setTimeout(() => $('scanner').classList.remove('beep'), 120); } }, 620);
 }
 function drawQueue() {
-  let h = '<span class="lab">排隊</span>';
+  let h = '';
   for (let i = 0; i < ROUNDS; i++) h += `<span class="p ${i < round ? 'done' : i === round ? 'now' : ''}" style="--c:${COLORS[i]}"></span>`;
   $('queue').innerHTML = h;
 }
@@ -644,7 +651,7 @@ async function drawCard() {
   const g = c.getContext('2d'), F = '"Noto Sans TC","PingFang TC",sans-serif', N = '"JetBrains Mono",monospace';
   g.fillStyle = '#2956E8'; g.fillRect(0, 0, 1080, 1350);
   g.fillStyle = '#fff'; g.globalAlpha = .08; g.beginPath(); g.arc(900, 1180, 520, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
-  g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('發票存摺 × 刷載具快手', 90, 150);
+  g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('BARCODES Hero 載具英雄｜發票存摺', 90, 150);
   g.fillStyle = '#FFF7CC'; roundRect(g, 90, 210, 360, 130, 40); g.fill(); g.lineWidth = 6; g.strokeStyle = '#121722'; g.stroke();
   g.fillStyle = '#121722'; g.font = `900 72px ${F}`; g.fillText('載具？', 130, 300);
   g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText(`找載具（${last.diff}），我只要`, 90, 480);
