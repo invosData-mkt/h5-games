@@ -71,6 +71,21 @@ button { font-family: inherit; cursor: pointer; }
 
 .clerk { position: absolute; left: 50%; bottom: 25%; height: 48%; width: auto; max-width: 46%; transform: translateX(-50%); }
 .clerk.nod { animation: nod .35s; }
+.clerk.m3 { animation: fume .25s infinite; }
+@keyframes fume { 50% { transform: translateX(calc(-50% + 2px)); } }
+.qb { position: absolute; left: 8px; bottom: calc(100% + 6px); z-index: 2; max-width: 62%; background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; padding: 4px 10px; font-size: 13px; font-weight: 900; color: var(--red); white-space: nowrap; animation: pop .18s; }
+.qb::after { content: ''; position: absolute; left: 18px; bottom: -8px; width: 12px; height: 12px; background: #fff; border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); transform: rotate(45deg); }
+.queue.m2 .p:not(.done):not(.now) { animation: stomp .5s infinite; }
+.queue.m3 .p:not(.done):not(.now) { animation: stomp .25s infinite; }
+@keyframes stomp { 50% { transform: translateY(-4px); } }
+.patience { position: absolute; right: 12px; bottom: 10px; width: 34%; height: 10px; border-radius: 6px; background: #E9ECEF; border: 2px solid var(--ink); overflow: hidden; }
+.patience i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: var(--green); transition: width .25s, background .25s; }
+.patience { overflow: visible; } .patience span { position: absolute; right: calc(100% + 6px); bottom: -4px; font-size: 11px; font-weight: 900; color: var(--muted); white-space: nowrap; }
+.kicked .hand { animation: drag 1.4s ease-in forwards; }
+@keyframes drag { 15% { transform: translateX(10px) rotate(2deg); } 100% { transform: translateX(-130%) rotate(-12deg); } }
+.kicked .queue .p { transition: transform .5s; transform: translateX(var(--kx, 0)) translateY(-4px); }
+.stamp { position: absolute; left: 50%; top: 42%; z-index: 20; transform: translate(-50%, -50%) rotate(-10deg); border: 6px solid var(--red); color: var(--red); background: rgba(255, 255, 255, .9); border-radius: 18px; padding: 8px 22px; font-size: 40px; font-weight: 900; white-space: nowrap; animation: stampIn .25s cubic-bezier(.2, 1.6, .5, 1); pointer-events: none; }
+@keyframes stampIn { from { transform: translate(-50%, -50%) rotate(-10deg) scale(2.2); opacity: 0; } }
 @keyframes nod { 40% { transform: translateX(-50%) translateY(6px) rotate(-2deg); } }
 
 .bubble {
@@ -242,12 +257,17 @@ button { font-family: inherit; cursor: pointer; }
       <rect x="84" y="30" width="32" height="14" rx="5" fill="#FFD43B" stroke="#121722" stroke-width="4"/>
       <circle cx="80" cy="88" r="5.5" fill="#121722"/><circle cx="120" cy="88" r="5.5" fill="#121722"/>
       <circle cx="68" cy="102" r="7" fill="#FF9E9E" opacity=".55"/><circle cx="132" cy="102" r="7" fill="#FF9E9E" opacity=".55"/>
-      <path d="M88 108q12 9 24 0" fill="none" stroke="#121722" stroke-width="5" stroke-linecap="round"/>
+      <path id="mouth" d="M88 108q12 9 24 0" fill="none" stroke="#121722" stroke-width="5" stroke-linecap="round"/>
+      <g id="brows" fill="none" stroke="#121722" stroke-width="5" stroke-linecap="round" opacity="0"><path id="browL" d="M70 74h18"/><path id="browR" d="M112 74h18"/></g>
+      <g id="sweat" opacity="0"><path d="M146 58q6 10 0 16q-6-6 0-16z" fill="#7FD3F7" stroke="#121722" stroke-width="3"/></g>
+      <g id="vein" opacity="0" stroke="#E03131" stroke-width="5" stroke-linecap="round"><path d="M136 34q6 6 0 12M150 34q-6 6 0 12M137 33q6-5 12 0M137 47q6 5 12 0" fill="none"/></g>
       <rect x="82" y="168" width="36" height="20" rx="5" fill="#FFD43B" stroke="#121722" stroke-width="4"/>
     </svg>
     <div class="counter">
       <div class="scanner" id="scanner"></div>
       <div class="queue" id="queue"></div>
+      <div class="patience" id="patience" hidden><span>店員耐心</span><i id="pat-bar"></i></div>
+      <div class="qb" id="qb" hidden></div>
     </div>
   </div>
 
@@ -376,7 +396,64 @@ $('b-snd').onclick = () => { soundOn = !soundOn; $('b-snd').textContent = soundO
 /* ---------- 遊戲 ---------- */
 let state = 'off', round = 0, times = [], pens = [], pen = 0, t0 = 0, timers = [], decoyRounds = new Set(), lastPen = 0, scanInt = null, last = null;
 const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
-const clearAll = () => { timers.forEach(clearTimeout); timers = []; clearInterval(scanInt); };
+const clearAll = () => { timers.forEach(clearTimeout); timers = []; clearInterval(scanInt); clearInterval(moodInt); };
+/* 困難：總時間越久店員越不耐煩，超過上限被架走 */
+const LIMIT = 40000, MOODS = [0, 12000, 22000, 32000];
+const GRUMBLE = [[], ['載具…有嗎？', '還在找嗎？', '後面有人在等喔'], ['先生／小姐，可以快一點嗎', '要不要先不要載具？', '唉……'], ['我要叫下一位了喔！', '你是來找載具還是來找人的', '後面的人都要回家了']];
+const QGRUMBLE = [[], ['……', '嗯？'], ['快一點啦', '冰要融化了', '我只買一瓶水欸'], ['到底好了沒！', '我便當要涼了！', '換一台結帳啦！']];
+let moodInt = null, mood = 0, kicked = false, lastGrumble = 0;
+function elapsedTotal() { return times.reduce((a, b) => a + b, 0) + (state === 'go' || state === 'aim' ? performance.now() - t0 + pen : 0); }
+function setMood(m) {
+  mood = m;
+  const mouth = ['M88 108q12 9 24 0', 'M89 110h22', 'M88 114q12-9 24 0', 'M86 116q14-14 28 0'][m];
+  $('mouth').setAttribute('d', mouth);
+  $('brows').setAttribute('opacity', m ? 1 : 0);
+  $('browL').setAttribute('d', m >= 2 ? 'M70 70l18 8' : 'M70 74h18');
+  $('browR').setAttribute('d', m >= 2 ? 'M130 70l-18 8' : 'M112 74h18');
+  $('sweat').setAttribute('opacity', m === 1 ? 1 : 0);
+  $('vein').setAttribute('opacity', m >= 2 ? 1 : 0);
+  $('clerk').classList.toggle('m3', m === 3);
+  $('queue').className = 'queue' + (m >= 2 ? ' m' + m : '');
+}
+function moodTick() {
+  if (diff !== 'hard' || kicked) return;
+  const el = elapsedTotal();
+  $('pat-bar').style.width = Math.max(0, 100 - el / LIMIT * 100) + '%';
+  $('pat-bar').style.background = el > MOODS[3] ? 'var(--red)' : el > MOODS[2] ? '#F59E0B' : el > MOODS[1] ? '#FCC419' : 'var(--green)';
+  const m = el > MOODS[3] ? 3 : el > MOODS[2] ? 2 : el > MOODS[1] ? 1 : 0;
+  if (m !== mood) setMood(m);
+  if (el >= LIMIT) return kickOut();
+  const now = performance.now();
+  if (m && (state === 'go' || state === 'aim') && now - lastGrumble > [0, 3200, 2400, 1700][m]) {
+    lastGrumble = now;
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    if (Math.random() < .55) { bubble(pick(GRUMBLE[m]), 'bad'); say(''); }
+    else { const q = $('qb'); q.textContent = pick(QGRUMBLE[m]); q.hidden = false; later(() => { q.hidden = true; }, 1300); }
+    if (m >= 2) tone(140 + m * 20, .12, 'sawtooth', .05);
+  }
+}
+let kickTotal = 0;
+function kickOut(total) {
+  kickTotal = total || elapsedTotal();
+  kicked = true; clearAll(); state = 'kicked';
+  setMood(3);
+  bubble('請你先到旁邊找好嗎！', 'bad'); say('請你先到旁邊找好嗎');
+  $('qb').textContent = '架走架走！'; $('qb').hidden = false;
+  [...$('queue').children].forEach((p, i) => p.style.setProperty('--kx', (40 + i * 18) + 'px'));
+  document.querySelector('.app').classList.add('kicked');
+  sfx.bad(); setTimeout(() => tone(110, .5, 'sawtooth', .08), 250);
+  try { navigator.vibrate && navigator.vibrate([80, 60, 160]); } catch (e) {}
+  const st = document.createElement('div'); st.className = 'stamp'; st.id = 'stamp'; st.textContent = '被架走了';
+  $('scene').appendChild(st);
+  track('kicked', { round: round + 1, total: Math.round(kickTotal) });
+  setTimeout(showKicked, 1700);
+}
+function resetKick() {
+  kicked = false; mood = -1; setMood(0); $('qb').hidden = true;
+  document.querySelector('.app').classList.remove('kicked');
+  const st = $('stamp'); if (st) st.remove();
+  $('patience').hidden = diff !== 'hard'; $('pat-bar').style.width = '100%'; $('pat-bar').style.background = 'var(--green)';
+}
 
 function bubble(text, cls = '') { const b = $('bubble'); b.className = 'bubble ' + cls; b.innerHTML = text; void b.offsetWidth; }
 function nod() { $('clerk').classList.add('nod'); setTimeout(() => $('clerk').classList.remove('nod'), 360); }
@@ -395,6 +472,7 @@ function startGame(useMotion) {
   clearAll();
   if (useMotion !== undefined) motion = !!useMotion;
   round = 0; times = []; pens = []; draws = [];
+  resetKick();
   decoyRounds = new Set();
   const pool = [1, 2, 3, 4].sort(() => Math.random() - .5);
   decoyRounds.add(pool[0]); decoyRounds.add(pool[1]);
@@ -466,6 +544,7 @@ function showDecoy() {
 }
 function showGo() {
   state = 'go';
+  if (diff === 'hard') { clearInterval(moodInt); moodInt = setInterval(moodTick, 250); }
   bubble('載具？', 'ask go');
   sfx.ask(); nod(); say('載具');
   if (motion && diff === 'easy') bubble('載具？伸過來刷', 'ask go');
@@ -585,6 +664,7 @@ function tap() { if (state === 'go') openApp(document.querySelector('#phone [dat
 })();
 function finishRound(ms, missed) {
   if (state !== 'go' && state !== 'aim') return;
+  if (diff === 'hard' && times.reduce((a, b) => a + b, 0) + ms + pen >= LIMIT) return kickOut(times.reduce((a, b) => a + b, 0) + ms + pen);
   $('ph-show').className = 'show'; $('beam').hidden = true;
   clearAll();
   state = 'shown';
@@ -598,6 +678,19 @@ function finishRound(ms, missed) {
   else { sfx.ok(); $('scanner').classList.add('beep'); setTimeout(() => $('scanner').classList.remove('beep'), 400); bubble(pen ? '好…謝謝' : '嗶！謝謝光臨', 'ok'); }
   track('round', { round: round + 1, ms: Math.round(total), penalty: pen, missed });
   later(() => { round++; if (round >= ROUNDS) showResult(); else startRound(); }, missed ? 1200 : 950);
+}
+function showKicked() {
+  const total = kickTotal;
+  const st = $('stamp'); if (st) st.remove();
+  last = { avg: total, best: total, title: '被架走了', line: `店員和後面的客人把你請出去了。撐到第 ${round + 1} 位，前後花了 ${fmt(total)} 秒還沒找到載具。`, diff: DIFF[diff].name, kicked: true };
+  $('r-tag').textContent = '困難・總共花了';
+  $('r-avg').textContent = fmt(total);
+  $('r-title').textContent = '被架走了';
+  $('r-line').textContent = last.line;
+  $('r-watch').innerHTML = '<b>真實世界不會架走你，但後面的人會瞪你</b>把發票存摺的載具小工具放上桌面，或用 Apple Watch、Android 手錶，抬手就能刷。選「簡單」玩一次就知道差多少。';
+  [...$('again').children].forEach(x => x.classList.toggle('cur', x.dataset.d === diff));
+  $('r-rounds').innerHTML = times.map((ms, i) => `<div class="${pens[i] ? 'pen' : ''}"><small>第 ${i + 1} 位</small>${fmt(ms)}</div>`).join('') + `<div class="pen"><small>第 ${round + 1} 位</small>架走</div>`;
+  $('s-result').hidden = false; $('s-result').scrollTop = 0;
 }
 function showResult() {
   state = 'off'; drawQueue();
@@ -614,6 +707,7 @@ function showResult() {
     ? '<b>你剛剛刷的就是載具小工具</b>把發票存摺的小工具放上桌面，結帳時不用找 App。再試試中等或困難，感受一下差別。'
     : '<b>不想每次都滑手機找？</b>把發票存摺的載具小工具放上桌面，或用 Apple Watch、Android 手錶，抬手就能刷。選「簡單」玩一次就知道差多少。';
   last.diff = DIFF[diff].name;
+  if (diff === 'hard') last.line += ` 店員最後的心情：${['還算客氣', '有點不耐煩', '快爆炸了', '已經爆炸'][Math.max(0, mood)]}。`, $('r-line').textContent = last.line;
   [...$('again').children].forEach(x => x.classList.toggle('cur', x.dataset.d === diff));
   $('r-rounds').innerHTML = times.map((ms, i) => `<div class="${ms === best ? 'best' : pens[i] ? 'pen' : ''}"><small>第 ${i + 1} 位</small>${fmt(ms)}</div>`).join('');
   $('s-result').hidden = false; $('s-result').scrollTop = 0;
@@ -654,21 +748,21 @@ async function drawCard() {
   g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('BARCODES Hero 載具英雄｜發票存摺', 90, 150);
   g.fillStyle = '#FFF7CC'; roundRect(g, 90, 210, 360, 130, 40); g.fill(); g.lineWidth = 6; g.strokeStyle = '#121722'; g.stroke();
   g.fillStyle = '#121722'; g.font = `900 72px ${F}`; g.fillText('載具？', 130, 300);
-  g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText(`找載具（${last.diff}），我只要`, 90, 480);
+  g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText(last.kicked ? '找載具找到被架走，總共' : `找載具（${last.diff}），我只要`, 90, 480);
   g.font = `800 230px ${N}`; g.fillText(fmt(last.avg), 80, 720);
   const w = g.measureText(fmt(last.avg)).width; g.font = `900 70px ${F}`; g.fillText('秒', 80 + w + 30, 720);
   g.font = `900 60px ${F}`; const tw = g.measureText(last.title).width;
   g.fillStyle = '#121722'; roundRect(g, 90, 790, tw + 90, 110, 55); g.fill();
   g.fillStyle = '#FFD43B'; g.fillText(last.title, 135, 867);
-  g.fillStyle = '#DCE5FF'; g.font = `700 42px ${F}`; g.fillText(`最快一次 ${fmt(last.best)} 秒`, 90, 990);
-  g.fillStyle = '#fff'; g.font = `900 72px ${F}`; g.fillText('你能更快嗎？', 90, 1130);
+  g.fillStyle = '#DCE5FF'; g.font = `700 42px ${F}`; g.fillText(last.kicked ? '店員和後面的客人都受不了了' : `最快一次 ${fmt(last.best)} 秒`, 90, 990);
+  g.fillStyle = '#fff'; g.font = `900 72px ${F}`; g.fillText(last.kicked ? '你撐得過嗎？' : '你能更快嗎？', 90, 1130);
   g.fillStyle = '#DCE5FF'; g.font = `500 32px ${F}`; g.fillText('invosdata-mkt.github.io/h5-games/carrier-speed.html', 90, 1260);
   return c;
 }
 $('b-share').onclick = async () => {
   track('share');
   const url = location.origin + location.pathname;
-  const text = `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。你能更快嗎？`;
+  const text = last.kicked ? `我玩 BARCODES Hero 困難模式，找載具找到被店員架走了。你撐得過嗎？` : `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。你能更快嗎？`;
   const c = await drawCard();
   try {
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));
