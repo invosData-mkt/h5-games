@@ -236,6 +236,23 @@ button { font-family: inherit; cursor: pointer; }
 .row2 .cta { font-size: 16px; padding: 14px 10px; }
 .hint { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; margin: 12px 0 0; font-weight: 500; flex: none; }
 #shareImg { width: 100%; border-radius: 18px; margin-top: 10px; flex: none; -webkit-user-select: auto; user-select: auto; -webkit-touch-callout: default; }
+/* 指名挑戰、彩蛋收集 */
+.vs-b { margin-top: 16px; background: var(--yellow); color: var(--ink); border: 3px solid var(--ink); border-radius: 18px; padding: 10px 14px; font-size: 15px; font-weight: 700; line-height: 1.55; box-shadow: 0 5px 0 rgba(0, 0, 0, .2); }
+.vs-b b { font-size: 18px; font-weight: 900; } .vs-b .n { font-family: var(--fn); font-size: 21px; font-weight: 800; } .vs-b small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+#s-start.vs .hero-b { display: none; } #s-start.vs h1 { margin-top: 14px; font-size: 40px; }
+.r-vs { flex: none; margin-bottom: 12px; border-radius: 20px; padding: 12px 16px; font-size: 14px; font-weight: 700; line-height: 1.5; background: #fff; border: 3px solid var(--ink); color: var(--ink); }
+.r-vs.win { background: var(--green-soft); } .r-vs.lose { background: var(--red-soft); }
+.r-vs b { display: block; font-size: 21px; font-weight: 900; }
+.eggs { flex: none; margin-top: 12px; background: #fff; border-radius: 18px; padding: 12px 14px; }
+.eggs > span { font-size: 13px; font-weight: 700; color: var(--muted); } .eggs > span b { color: var(--ink); }
+.eggs .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.egg { border-radius: 14px; padding: 8px 10px; background: var(--bubble); border: 2px solid var(--ink); font-size: 14px; font-weight: 900; line-height: 1.35; position: relative; }
+.egg small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+.egg.lock { color: #9AA5B8; background: #F1F4FA; border: 2px dashed var(--line); }
+.egg .new { position: absolute; top: -9px; right: -6px; background: var(--red); color: #fff; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 999px; }
+#s-result .cta.share { background: var(--yellow); color: var(--ink); box-shadow: 0 6px 0 #C9A400; font-size: 19px; }
+.share-sub { text-align: center; font-size: 12px; color: var(--muted); margin: -4px 0 0; font-weight: 500; }
+.linkbtn { align-self: center; flex: none; background: none; border: 0; color: var(--blue); font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 8px; }
 @media (max-height: 700px) {
   .bubble { font-size: 16px; padding: 6px 14px; min-width: 120px; border-width: 2.5px; } .bubble.ask { font-size: 26px; padding: 4px 18px; } .bubble.ok { font-size: 18px; } .bubble.bad { font-size: 15px; }
   .top { padding: 8px 14px 2px; } .brand { font-size: 14px; }
@@ -317,6 +334,7 @@ button { font-family: inherit; cursor: pointer; }
   <section class="sheet" id="s-start">
     <span class="tag">發票存摺 × 結帳反應挑戰</span>
     <div class="hero-b">載具？</div>
+    <div class="vs-b" id="vs-b" hidden></div>
     <h1><span class="en">Barcode Hero</span>載具<em>英雄</em></h1>
     <p class="lead">店員一問「載具？」，你要多久才亮得出來？<br>他問袋子、會員的時候，手機先不要動。</p>
     <div class="diffs" id="diffs">
@@ -332,6 +350,7 @@ button { font-family: inherit; cursor: pointer; }
 
   <!-- 結果 -->
   <section class="sheet" id="s-result" hidden>
+    <div class="r-vs" id="r-vs" hidden></div>
     <div class="r-card">
       <span class="tag" id="r-tag">你的刷載具速度（5 次平均）</span>
       <div class="r-num"><span id="r-avg">0.00</span><small>秒</small></div>
@@ -339,10 +358,12 @@ button { font-family: inherit; cursor: pointer; }
       <p class="r-line" id="r-line"></p>
     </div>
     <div class="r-rounds" id="r-rounds"></div>
+    <div class="eggs" id="r-eggs"></div>
     <div class="watch" id="r-watch"></div>
     <div class="btns">
+      <button class="cta share" id="b-share" type="button">傳給結帳最慢的那個朋友</button>
+      <p class="share-sub">朋友點開會看到你的成績，玩完直接比輸贏</p>
       <a class="cta" id="a-store" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=tw.com.quickscanner.invoice&amp;referrer=utm_source%3Dh5%26utm_medium%3Dgame%26utm_campaign%3Dcarrier_speed%26utm_content%3Dresult">免費下載發票存摺</a>
-      <button class="cta white" id="b-share" type="button">挑戰朋友</button>
       <div class="again"><span>再玩一次</span><div class="row3" id="again">
         <button class="cta white" type="button" data-d="easy">簡單</button>
         <button class="cta white" type="button" data-d="mid">中等</button>
@@ -350,6 +371,7 @@ button { font-family: inherit; cursor: pointer; }
       </div></div>
     </div>
     <p class="hint" id="r-hint"></p>
+    <button class="linkbtn" id="b-img" type="button">存成績圖（貼限動用）</button>
     <img id="shareImg" alt="我的刷載具成績圖" hidden>
   </section>
 </div>
@@ -469,6 +491,7 @@ function kickOut(total) {
   const st = document.createElement('div'); st.className = 'stamp'; st.id = 'stamp'; st.textContent = '被架走了';
   $('scene').appendChild(st);
   track('kicked', { round: round + 1, total: Math.round(kickTotal) });
+  gotEgg('kicked');
   setTimeout(showKicked, 1700);
 }
 function resetKick() {
@@ -500,7 +523,7 @@ function startGame(useMotion) {
   decoyRounds.add(pool[0]); decoyRounds.add(pool[1]);
   if (Math.random() < .5) decoyRounds.add(pool[2]);
   $('s-start').hidden = true; $('s-result').hidden = true;
-  $('shareImg').hidden = true; $('r-hint').textContent = '';
+  $('shareImg').hidden = true; $('r-hint').textContent = ''; newEggs.clear();
   track('start', { mode: motion ? 'motion' : 'swipe', diff });
   startRound();
 }
@@ -652,7 +675,7 @@ function early() {
 function openApp(el) {
   if (state !== 'go' || !el) return;
   if (el.dataset.app === 'me') return motion ? (diff === 'easy' ? undefined : startAim()) : finishRound(performance.now() - t0, false);
-  if (el.dataset.app === 'news') { $('nview').hidden = false; $('nview').scrollTop = 0; tone(700, .04, 'triangle', .05); track('easter_news', { diff }); return; }
+  if (el.dataset.app === 'news') { $('nview').hidden = false; $('nview').scrollTop = 0; tone(700, .04, 'triangle', .05); track('easter_news', { diff }); gotEgg('news'); return; }
   el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 320);
   penalize('開錯 App 了！');
 }
@@ -706,7 +729,7 @@ function finishRound(ms, missed) {
 function showKicked() {
   const total = kickTotal;
   const st = $('stamp'); if (st) st.remove();
-  last = { avg: total, best: total, title: '被架走了', line: `店員和後面的客人把你請出去了。撐到第 ${round + 1} 位，前後花了 ${fmt(total)} 秒還沒找到載具。`, diff: DIFF[diff].name, kicked: true };
+  last = { avg: total, best: total, title: '被架走了', line: `店員和後面的客人把你請出去了。撐到第 ${round + 1} 位，前後花了 ${fmt(total)} 秒還沒找到載具。`, diff: DIFF[diff].name, d: diff, round: round + 1, kicked: true };
   $('r-tag').textContent = '困難・總共花了';
   $('r-avg').textContent = fmt(total);
   $('r-title').textContent = '被架走了';
@@ -714,6 +737,7 @@ function showKicked() {
   $('r-watch').innerHTML = '<b>真實世界不會架走你，但後面的人會瞪你</b>把發票存摺的載具小工具放上桌面，或用 Apple Watch、Android 手錶，抬手就能刷。選「簡單」玩一次就知道差多少。';
   [...$('again').children].forEach(x => x.classList.toggle('cur', x.dataset.d === diff));
   $('r-rounds').innerHTML = times.map((ms, i) => `<div class="${pens[i] ? 'pen' : ''}"><small>第 ${i + 1} 位</small>${fmt(ms)}</div>`).join('') + `<div class="pen"><small>第 ${round + 1} 位</small>架走</div>`;
+  afterResult();
   $('s-result').hidden = false; $('s-result').scrollTop = 0;
 }
 function showResult() {
@@ -722,7 +746,7 @@ function showResult() {
   const ti = DIFF[diff].t.findIndex(x => avg - (motion ? 600 : 0) < x);
   const t = TITLES[ti < 0 ? 4 : ti];
   const dAvg = draws.length ? draws.reduce((a, b) => a + b, 0) / draws.length : 0;
-  last = { avg, best, title: t[1], line: t[2] };
+  last = { avg, best, title: t[1], line: t[2], d: diff, round: ROUNDS, kicked: false };
   $('r-avg').textContent = fmt(avg);
   $('r-title').textContent = t[1];
   $('r-line').textContent = last.line;
@@ -734,6 +758,7 @@ function showResult() {
   if (diff === 'hard') last.line += ` 店員最後的心情：${['還算客氣', '有點不耐煩', '快爆炸了', '已經爆炸'][Math.max(0, mood)]}。`, $('r-line').textContent = last.line;
   [...$('again').children].forEach(x => x.classList.toggle('cur', x.dataset.d === diff));
   $('r-rounds').innerHTML = times.map((ms, i) => `<div class="${ms === best ? 'best' : pens[i] ? 'pen' : ''}"><small>第 ${i + 1} 位</small>${fmt(ms)}</div>`).join('');
+  afterResult();
   $('s-result').hidden = false; $('s-result').scrollTop = 0;
   sfx.end();
   track('complete', { avg: Math.round(avg), best: Math.round(best), title: t[1], mode: motion ? 'motion' : 'swipe', diff });
@@ -754,6 +779,77 @@ $('b-motion').onclick = async () => {
 };
 $('again').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (!b) return; diff = b.dataset.d; [...$('diffs').children].forEach(x => x.classList.toggle('on', x.dataset.d === diff)); track('replay', { diff }); startGame(); });
 
+/* ---------- 彩蛋收集（存在這支手機的 localStorage） ---------- */
+const EGGS = [
+  { id: 'news', name: '看到大新聞', got: '結帳到一半跑去看新聞', hint: '提示：手機裡有一則大新聞' },
+  { id: 'kicked', name: '被店員架走', got: '困難模式撐不過 40 秒', hint: '提示：困難模式別急，慢慢找' }
+];
+const eggs = new Set(), newEggs = new Set();
+try { JSON.parse(localStorage.getItem('bh_eggs') || '[]').forEach(x => { if (EGGS.some(e => e.id === x)) eggs.add(x); }); } catch (e) {}
+function gotEgg(id) {
+  if (eggs.has(id)) return;
+  eggs.add(id); newEggs.add(id);
+  try { localStorage.setItem('bh_eggs', JSON.stringify([...eggs])); } catch (e) {}
+  track('egg_unlock', { egg: id, count: eggs.size });
+}
+function renderEggs() {
+  $('r-eggs').innerHTML = `<span>隱藏彩蛋 <b>${eggs.size}/${EGGS.length}</b>${eggs.size === EGGS.length ? '，全收集！' : ''}</span><div class="row">` +
+    EGGS.map(e => eggs.has(e.id)
+      ? `<div class="egg">${newEggs.has(e.id) ? '<span class="new">NEW</span>' : ''}${e.name}<small>${e.got}</small></div>`
+      : `<div class="egg lock">？？？<small>${e.hint}</small></div>`).join('') + '</div>';
+}
+
+/* ---------- 指名挑戰：分享連結帶自己的成績，朋友點開直接比 ---------- */
+const titleOf = (ms, d) => { const i = DIFF[d].t.findIndex(x => ms < x); return TITLES[i < 0 ? 4 : i][1]; };
+const VS = (() => {
+  try {
+    const q = new URLSearchParams(location.search), ms = Math.round(+q.get('vs')), d = q.get('d');
+    if (!(ms >= 100 && ms <= 99999) || !Object.prototype.hasOwnProperty.call(DIFF, d)) return null;
+    const k = q.get('k') === '1' && d === 'hard';
+    return { ms, d, k, r: Math.min(ROUNDS, Math.max(1, Math.round(+q.get('r')) || 1)) };
+  } catch (e) { return null; }
+})();
+if (VS) {
+  diff = VS.d; [...$('diffs').children].forEach(x => x.classList.toggle('on', x.dataset.d === diff));
+  $('s-start').classList.add('vs');
+  $('vs-b').innerHTML = (VS.k
+    ? `🔥 <b>朋友來嗆你了</b><br>朋友玩困難模式，撐到第 ${VS.r} 位客人就被店員架走（花了 <span class="n">${fmt(VS.ms)}</span> 秒）。你撐得過嗎？`
+    : `🔥 <b>朋友來嗆你了</b><br>朋友玩${DIFF[VS.d].name}，找載具平均只要 <span class="n">${fmt(VS.ms)}</span> 秒（${titleOf(VS.ms, VS.d)}）。你能贏嗎？`)
+    + `<small>難度已經幫你選好：${DIFF[VS.d].name}</small>`;
+  $('vs-b').hidden = false;
+  if ($('b-motion').hidden) $('b-start').textContent = '接受挑戰';
+  track('vs_open', { diff: VS.d, kicked: VS.k });
+}
+let vsRes = 'none';
+function vsCompare() {
+  if (!VS) return null;
+  const n = DIFF[VS.d].name;
+  if (last.d !== VS.d) return { cls: '', res: 'other', head: `朋友玩的是${n}`, sub: `這局不算，選「${n}」再玩一次才能比。` };
+  if (VS.k && last.kicked) {
+    if (last.round > VS.r) return { cls: 'win', res: 'win', head: '你贏了！', sub: `兩個都被架走，但你撐到第 ${last.round} 位，朋友只撐到第 ${VS.r} 位。` };
+    if (last.round < VS.r) return { cls: 'lose', res: 'lose', head: '你輸了', sub: `兩個都被架走，朋友撐到第 ${VS.r} 位，你只撐到第 ${last.round} 位。` };
+    return { cls: '', res: 'tie', head: '平手', sub: `你們都在第 ${VS.r} 位客人被架走。` };
+  }
+  if (VS.k) return { cls: 'win', res: 'win', head: '你贏了！', sub: `你撐過 5 位客人，朋友在第 ${VS.r} 位就被架走。` };
+  if (last.kicked) return { cls: 'lose', res: 'lose', head: '你輸了', sub: `朋友平均 ${fmt(VS.ms)} 秒就搞定，你被架走了。` };
+  const gap = last.avg - VS.ms;
+  if (Math.abs(gap) < 10) return { cls: '', res: 'tie', head: '平手', sub: `你們都是 ${fmt(VS.ms)} 秒。` };
+  return gap < 0
+    ? { cls: 'win', res: 'win', head: `你贏朋友 ${fmt(-gap)} 秒！`, sub: `你 ${fmt(last.avg)} 秒，朋友 ${fmt(VS.ms)} 秒。` }
+    : { cls: 'lose', res: 'lose', head: `輸朋友 ${fmt(gap)} 秒`, sub: `你 ${fmt(last.avg)} 秒，朋友 ${fmt(VS.ms)} 秒。` };
+}
+function afterResult() {
+  renderEggs();
+  const v = vsCompare(), el = $('r-vs');
+  vsRes = v ? v.res : 'none';
+  el.hidden = !v;
+  if (v) { el.className = 'r-vs ' + v.cls; el.innerHTML = `<b>${v.head}</b>${v.sub}`; track('vs_result', { result: v.res, diff: last.d }); }
+  $('b-share').textContent = vsRes === 'win' ? '贏了！傳回去嗆朋友'
+    : vsRes === 'lose' ? '不服，換我出題嗆別人'
+    : last.kicked ? '嗆朋友：你撐得過 40 秒嗎？'
+    : '傳給結帳最慢的那個朋友';
+}
+
 /* ---------- 商店連結 ---------- */
 (function storeLink() {
   const a = $('a-store'), ua = navigator.userAgent;
@@ -772,6 +868,11 @@ async function drawCard() {
   g.fillStyle = '#DCE5FF'; g.font = `700 40px ${F}`; g.fillText('Barcode Hero 載具英雄｜發票存摺', 90, 150);
   g.fillStyle = '#FFF7CC'; roundRect(g, 90, 210, 360, 130, 40); g.fill(); g.lineWidth = 6; g.strokeStyle = '#121722'; g.stroke();
   g.fillStyle = '#121722'; g.font = `900 72px ${F}`; g.fillText('載具？', 130, 300);
+  if (eggs.size) {
+    g.font = `900 34px ${F}`; let y = 250;
+    g.fillStyle = '#FFD43B'; g.fillText(`隱藏彩蛋 ${eggs.size}/${EGGS.length}`, 520, y);
+    EGGS.filter(e => eggs.has(e.id)).forEach(e => { y += 58; g.font = `700 30px ${F}`; const w = g.measureText(e.name).width; g.fillStyle = 'rgba(255,255,255,.16)'; roundRect(g, 520, y - 38, w + 40, 52, 26); g.fill(); g.fillStyle = '#fff'; g.fillText(e.name, 540, y - 1); });
+  }
   g.fillStyle = '#fff'; g.font = `700 44px ${F}`; g.fillText(last.kicked ? '找載具找到被架走，總共' : `找載具（${last.diff}），我只要`, 90, 480);
   g.font = `800 230px ${N}`; g.fillText(fmt(last.avg), 80, 720);
   const w = g.measureText(fmt(last.avg)).width; g.font = `900 70px ${F}`; g.fillText('秒', 80 + w + 30, 720);
@@ -783,10 +884,32 @@ async function drawCard() {
   g.fillStyle = '#DCE5FF'; g.font = `500 32px ${F}`; g.fillText('invosdata-mkt.github.io/h5-games/carrier-speed.html', 90, 1260);
   return c;
 }
+function shareUrl() {
+  const p = { vs: Math.round(last.avg), d: last.d };
+  if (last.kicked) { p.k = 1; p.r = last.round; }
+  Object.assign(p, { utm_source: 'friend', utm_medium: 'share', utm_campaign: 'barcode_hero_vs' });
+  return location.origin + location.pathname + '?' + new URLSearchParams(p).toString();
+}
+function shareText() {
+  const pre = vsRes === 'win' ? '我在載具英雄比贏朋友了！' : '';
+  return pre + (last.kicked
+    ? `我玩 Barcode Hero 困難模式，撐到第 ${last.round} 位客人就被店員架走了。點連結挑戰，你撐得過嗎？`
+    : `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。點連結跟我比，你能更快嗎？`);
+}
 $('b-share').onclick = async () => {
-  track('share');
-  const url = location.origin + location.pathname;
-  const text = last.kicked ? `我玩 Barcode Hero 困難模式，找載具找到被店員架走了。你撐得過嗎？` : `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。你能更快嗎？`;
+  const url = shareUrl(), text = shareText(), info = { vs: vsRes, kicked: !!last.kicked, diff: last.d, eggs: eggs.size };
+  if (navigator.share) {
+    track('share', Object.assign({ method: 'native' }, info));
+    try { await navigator.share({ title: 'Barcode Hero 載具英雄', text, url }); return; }
+    catch (e) { if (e && e.name === 'AbortError') { track('share_cancel'); return; } }
+  }
+  track('share', Object.assign({ method: 'copy' }, info));
+  try { await navigator.clipboard.writeText(text + '\n' + url); $('r-hint').textContent = '挑戰連結已複製，貼給朋友就好。'; }
+  catch (e) { $('r-hint').textContent = '複製這個連結傳給朋友：' + url; }
+};
+$('b-img').onclick = async () => {
+  track('share_img', { kicked: !!last.kicked, diff: last.d });
+  const url = shareUrl(), text = shareText();
   const c = await drawCard();
   try {
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));
