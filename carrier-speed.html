@@ -891,10 +891,9 @@ function shareUrl() {
   return location.origin + location.pathname + '?' + new URLSearchParams(p).toString();
 }
 function shareText() {
-  const pre = vsRes === 'win' ? '我在載具英雄比贏朋友了！' : '';
-  return pre + (last.kicked
-    ? `我玩 Barcode Hero 困難模式，撐到第 ${last.round} 位客人就被店員架走了。點連結挑戰，你撐得過嗎？`
-    : `店員問「載具？」我找出來只要 ${fmt(last.avg)} 秒（${last.diff}・${last.title}）。點連結跟我比，你能更快嗎？`);
+  return last.kicked
+    ? `我掃掃載具撐到第 ${last.round} 位客人就被店員架走了，點連結跟我比，你撐得過嗎？`
+    : `我掃掃載具速度只要 ${fmt(last.avg)} 秒，點連結跟我比，你能更快嗎？`;
 }
 $('b-share').onclick = async () => {
   const url = shareUrl(), text = shareText(), info = { vs: vsRes, kicked: !!last.kicked, diff: last.d, eggs: eggs.size };
