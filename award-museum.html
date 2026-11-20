@@ -642,3 +642,115 @@ renderIntro();
 const ready=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load(`900 40px "Noto Sans TC"`),document.fonts.load(`700 40px "Noto Sans TC"`)]),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
 ready.then(()=>{$('hudName').textContent=`${P().name} 的回顧館`;buildExhibits();resetPlayer();loop()});
 </script>
+<!-- ================= 足跡（Sam 11/20）：好友逛完留下路線＋一句留言，館主進館看得到（不即時） =================
+     後端：Google Apps Script（year-review-2026/footprints_apps_script.js）。FOOTPRINT_API 空白時改存本機（只能同一支手機自己測）。 -->
+<style>
+  #fpBtn,#fpList{position:fixed;right:14px;z-index:7;border:1px solid rgba(226,176,74,.6);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:13px;cursor:pointer;background:rgba(10,10,10,.85);color:#E2B04A}
+  #fpBtn{top:calc(env(safe-area-inset-top,0px) + 146px)}
+  #fpList{top:calc(env(safe-area-inset-top,0px) + 100px)}
+  #fpBtn.pulse{animation:fpP 1.4s ease-in-out infinite}
+  @keyframes fpP{50%{box-shadow:0 0 0 6px rgba(226,176,74,.25)}}
+  #fpForm input{width:100%;box-sizing:border-box;border:1px solid #444;border-radius:12px;background:#151515;color:#F2EFE6;font:inherit;font-size:16px;padding:12px;margin:6px 0 4px}
+  #fpForm label{font-size:13px;font-weight:700;color:#B8B2A2}
+  #fpForm .cnt{font-size:12px;color:#8A8478;text-align:right}
+  #fpItems{list-style:none;margin:0;padding:0}
+  #fpItems li{padding:10px 0;border-bottom:1px solid #2A2A2A;line-height:1.6}
+  #fpItems b{color:#E2B04A}#fpItems small{color:#8A8478;margin-left:6px}
+  #fpForm .box,#fpView .box{background:#111;color:#F2EFE6}
+  #fpForm .btn.s,#fpView .btn.s{background:#222;color:#F2EFE6}
+</style>
+<button id="fpBtn" type="button" hidden>留下足跡</button>
+<button id="fpList" type="button" hidden>好友足跡 0</button>
+<div class="ov" id="fpForm"><div class="box">
+  <div class="no">留下足跡</div><h2>在館裡留一句話</h2>
+  <p class="note" style="font-size:14px;color:#B8B2A2">你剛剛走過的路線會留在館裡，館主下次進來就看得到。不用登入，只留暱稱跟一句話。</p>
+  <label for="fpName">暱稱</label><input id="fpName" maxlength="12" placeholder="例：小美" autocomplete="nickname">
+  <label for="fpMsg">留言</label><input id="fpMsg" maxlength="40" placeholder="例：外送 VIP 是你沒錯">
+  <div class="cnt" id="fpCnt">0 / 40</div>
+  <div class="row"><button class="btn s" id="fpCancel" type="button">先不要</button><button class="btn p" id="fpSend" type="button">留下足跡</button></div>
+</div></div>
+<div class="ov" id="fpView"><div class="box">
+  <div class="no">好友足跡</div><h2 id="fpViewT">誰來逛過</h2>
+  <ul id="fpItems"></ul>
+  <div class="row"><button class="btn s" id="fpViewClose" type="button">關閉</button></div>
+</div></div>
+<script>
+(function(){
+const FOOTPRINT_API='https://script.google.com/macros/s/AKfycbyD0tg600Y2cRXGsvIyHtY6EOWX8FnT9y2XwV-CCEmP13GSgYZwYm6xSbcqHzeexCM/exec';   // Apps Script「年度回顧館_足跡」（Sam 公司帳號，11/20 部署）
+const qs=new URLSearchParams(location.search);
+const VISIT_ROOM=/^[A-Za-z0-9_-]{4,40}$/.test(qs.get('room')||'')?qs.get('room'):null;
+if(VISIT_ROOM&&PERSONAS[qs.get('p')])st.p=qs.get('p');
+function myRid(){let r=null;try{r=localStorage.getItem('amRid')}catch(e){}
+  if(!r){r=Math.random().toString(36).slice(2,10);try{localStorage.setItem('amRid',r)}catch(e){}}return r}
+function myRoom(){return myRid()+'-'+st.p}
+function inviteUrl(){return location.origin+location.pathname+'?room='+encodeURIComponent(myRoom())+'&p='+st.p}
+const COLORS=['#E2B04A','#5EC8F2','#F27BA2','#7EC997','#F6AA5E','#B78ED8'];
+
+// ── 後端（沒設網址就存本機） ──
+async function fpLoad(room){
+  if(!FOOTPRINT_API){try{return JSON.parse(localStorage.getItem('amFP:'+room)||'[]')}catch(e){return []}}
+  try{const r=await fetch(FOOTPRINT_API+'?room='+encodeURIComponent(room));const j=await r.json();return j.ok?j.items:[]}catch(e){return []}}
+async function fpSave(room,item){
+  if(!FOOTPRINT_API){try{const a=JSON.parse(localStorage.getItem('amFP:'+room)||'[]');a.unshift(Object.assign({t:Date.now()},item));localStorage.setItem('amFP:'+room,JSON.stringify(a.slice(0,30)));return true}catch(e){return false}}
+  try{const r=await fetch(FOOTPRINT_API,{method:'POST',body:JSON.stringify(Object.assign({room},item))});const j=await r.json();return !!j.ok}catch(e){return false}}
+
+// ── 訪客：記錄路線 ──
+let path=[],fpSent=false,fpPulseT=null;
+setInterval(()=>{if(st.mode!=='visit'||typeof player==='undefined')return;const x=player.position.x,z=player.position.z,l=path[path.length-1];
+  if(!l||Math.hypot(x-l[0],z-l[1])>0.35){if(path.length<300)path.push([+x.toFixed(1),+z.toFixed(1)])}},350);
+$('fpBtn').onclick=()=>{$('fpBtn').classList.remove('pulse');$('fpForm').classList.add('on');setTimeout(()=>$('fpName').focus(),50)};
+$('fpCancel').onclick=()=>$('fpForm').classList.remove('on');
+$('fpMsg').oninput=()=>$('fpCnt').textContent=$('fpMsg').value.length+' / 40';
+$('fpSend').onclick=async()=>{const name=$('fpName').value.trim(),msg=$('fpMsg').value.trim();
+  if(!msg){toast('寫一句話再送出');return}
+  $('fpSend').disabled=true;$('fpSend').textContent='送出中…';
+  const room=VISIT_ROOM||myRoom();const ok=await fpSave(room,{name:name||'神秘好友',msg,path});
+  $('fpSend').disabled=false;$('fpSend').textContent='留下足跡';
+  if(ok){fpSent=true;$('fpForm').classList.remove('on');$('fpBtn').textContent='已留下足跡 ✓';$('fpBtn').disabled=true;toast('已留下足跡！館主進館就看得到')}
+  else toast('沒送出去，請再試一次')};
+
+// ── 館主：畫出好友足跡 ──
+let fpGroup=null,fpItems=[];
+function clearFP(){if(fpGroup){scene.remove(fpGroup);fpGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});fpGroup=null}}
+function bubble(name,msg,color){const c=document.createElement('canvas');c.width=640;c.height=200;const x=c.getContext('2d');
+  x.fillStyle='rgba(10,10,10,.88)';x.strokeStyle=color;x.lineWidth=6;rr(x,6,6,628,150,40);x.fill();x.stroke();
+  x.beginPath();x.moveTo(300,156);x.lineTo(320,194);x.lineTo(340,156);x.closePath();x.fillStyle=color;x.fill();
+  x.textAlign='center';x.fillStyle=color;x.font=`900 46px ${FONT}`;x.fillText(name,320,66);
+  x.fillStyle='#F2EFE6';x.font=`700 38px ${FONT}`;let m=msg;while(x.measureText(m).width>580&&m.length>1)m=m.slice(0,-1);if(m!==msg)m=m.slice(0,-1)+'…';x.fillText(m,320,124);
+  const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(4.2,1.31,1);s.renderOrder=10;return s}
+function ghost(color){const g=new THREE.Group();const m=new THREE.MeshLambertMaterial({color,transparent:true,opacity:.55});
+  const b=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.26,0.5,16),m);b.position.y=0.55;const h=new THREE.Mesh(new THREE.SphereGeometry(0.3,16,12),m);h.position.y=1.05;g.add(b,h);g.scale.setScalar(1.3);return g}
+function drawFP(items){clearFP();fpGroup=new THREE.Group();scene.add(fpGroup);
+  items.forEach((it,k)=>{const col=COLORS[k%COLORS.length],p=Array.isArray(it.path)?it.path:[];
+    const dm=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.75}),dg=new THREE.CircleGeometry(0.07,10);
+    p.forEach((q,i)=>{if(i%2)return;const d=new THREE.Mesh(dg,dm);d.rotation.x=-Math.PI/2;d.position.set(q[0]+(k%3-1)*0.06,0.03,q[1]);fpGroup.add(d)});
+    const end=p.length?p[p.length-1]:[(k%3-1)*1.2,6-k*0.8];
+    const gh=ghost(col);gh.position.set(end[0],0,end[1]);fpGroup.add(gh);
+    const b=bubble(it.name||'神秘好友',it.msg||'',col);b.position.set(end[0],2.6+(k%2)*0.5,end[1]);fpGroup.add(b)})}
+function renderList(){const ul=$('fpItems');ul.innerHTML='';$('fpViewT').textContent=fpItems.length?`${fpItems.length} 位好友來逛過`:'還沒有好友來逛';
+  fpItems.forEach(it=>{const li=document.createElement('li'),b=document.createElement('b'),s=document.createElement('small'),p=document.createElement('div');
+    b.textContent=it.name||'神秘好友';s.textContent=it.t?new Date(it.t).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}):'';p.textContent=it.msg||'';li.append(b,s,p);ul.appendChild(li)})}
+$('fpList').onclick=()=>{renderList();$('fpView').classList.add('on')};
+$('fpViewClose').onclick=()=>$('fpView').classList.remove('on');
+async function loadMine(){const room=myRoom();fpItems=await fpLoad(room);if(st.mode!=='me'||myRoom()!==room)return;
+  $('fpList').textContent='好友足跡 '+fpItems.length;$('fpList').hidden=false;drawFP(fpItems);
+  if(fpItems.length)toast(`${fpItems.length} 位好友來逛過，地上的點點是他們走過的路`)}
+
+// ── 掛到原本的流程 ──
+const _setMode=setMode;
+setMode=function(m){_setMode(m);clearFP();
+  const visit=m==='visit';$('fpBtn').hidden=!visit;$('fpList').hidden=true;
+  if(visit){path=[];if(!fpSent){$('fpBtn').disabled=false;$('fpBtn').textContent='留下足跡'};clearTimeout(fpPulseT);fpPulseT=setTimeout(()=>$('fpBtn').classList.add('pulse'),25000)}
+  else loadMine()};
+$('copy').onclick=()=>{const u=inviteUrl();try{navigator.clipboard.writeText(u).then(()=>toast('已複製邀請連結'),()=>toast(u))}catch(e){toast(u)}};
+if(VISIT_ROOM){
+  const goOld=$('go').onclick;
+  $('go').onclick=()=>{goOld();setMode('visit')};
+  const _ri=renderIntro;renderIntro=function(){_ri();$('introP').innerHTML=`${P().name} 邀你來逛 2026 年度回顧館。<br>逛完可以在館裡留下足跡跟一句話。`;$('chips').hidden=true;$('chipNote').hidden=true};
+  $('proto').hidden=true;
+  $('backMe').hidden=true;
+  renderIntro();
+}
+})();
+</script>
+
