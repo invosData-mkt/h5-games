@@ -680,10 +680,14 @@ const FOOTPRINT_API='https://script.google.com/macros/s/AKfycbyD0tg600Y2cRXGsvIy
 const qs=new URLSearchParams(location.search);
 const VISIT_ROOM=/^[A-Za-z0-9_-]{4,40}$/.test(qs.get('room')||'')?qs.get('room'):null;
 if(VISIT_ROOM&&PERSONAS[qs.get('p')])st.p=qs.get('p');
-function myRid(){let r=null;try{r=localStorage.getItem('amRid')}catch(e){}
-  if(!r){r=Math.random().toString(36).slice(2,10);try{localStorage.setItem('amRid',r)}catch(e){}}return r}
+// 11/20 修：邀請連結一律指向線上版（在 claude.ai 預覽或本機打開時，location 不是可分享的網址，會產生無效連結）；
+// 存不了 localStorage 的瀏覽器（無痕、內嵌頁）房號記在記憶體，同一次瀏覽不會每按一次就換房號
+const SHARE_BASE='https://invosdata-mkt.github.io/h5-games/award-museum.html';
+let _rid=null;
+function myRid(){if(_rid)return _rid;let r=null;try{r=localStorage.getItem('amRid')}catch(e){}
+  if(!r){r=Math.random().toString(36).slice(2,10);try{localStorage.setItem('amRid',r)}catch(e){}}_rid=r;return r}
 function myRoom(){return myRid()+'-'+st.p}
-function inviteUrl(){return location.origin+location.pathname+'?room='+encodeURIComponent(myRoom())+'&p='+st.p}
+function inviteUrl(){return SHARE_BASE+'?room='+encodeURIComponent(myRoom())+'&p='+st.p}
 const COLORS=['#E2B04A','#5EC8F2','#F27BA2','#7EC997','#F6AA5E','#B78ED8'];
 
 // ── 後端（沒設網址就存本機） ──
