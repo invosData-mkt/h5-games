@@ -247,10 +247,23 @@ button { font-family: inherit; cursor: pointer; }
 .row2 .cta { font-size: 16px; padding: 14px 10px; }
 .hint { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; margin: 12px 0 0; font-weight: 500; flex: none; }
 #shareImg { width: 100%; border-radius: 18px; margin-top: 10px; flex: none; -webkit-user-select: auto; user-select: auto; -webkit-touch-callout: default; }
+.ic { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -0.2em; margin-right: 4px; } .ic-w { width: 1.9em; } .vs-b .ic { width: 1.4em; height: 1.4em; vertical-align: -0.3em; }
 /* 指名挑戰、彩蛋收集 */
 .vs-b { margin-top: 16px; background: var(--yellow); color: var(--ink); border: 3px solid var(--ink); border-radius: 18px; padding: 10px 14px; font-size: 15px; font-weight: 700; line-height: 1.55; box-shadow: 0 5px 0 rgba(0, 0, 0, .2); }
 .vs-b b { font-size: 18px; font-weight: 900; } .vs-b .n { font-family: var(--fn); font-size: 21px; font-weight: 800; } .vs-b small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
 #s-start.vs .hero-b { display: none; } #s-start.vs h1 { margin-top: 14px; font-size: 40px; }
+/* 挑戰模式第一屏：只留挑戰卡＋大按鈕（難度已固定、說明收掉） */
+#s-start.vs h1, #s-start.vs .lead, #s-start.vs .diffs, #s-start.vs #diff-t { display: none; }
+#s-start.vs .vs-b { margin-top: 14px; }
+#s-start.vs .reach { margin-top: 12px; font-size: 14px; padding: 8px 10px; }
+.vs-goal { margin-top: 10px; background: #fff; border: 3px solid var(--ink); border-radius: 14px; padding: 8px 10px; text-align: center; font-size: 15px; font-weight: 800; }
+.vs-goal .n { font-size: 26px; color: var(--red, #D93A3F); }
+.ladder { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 24px; }
+.ladder div { position: relative; background: rgba(255,255,255,.55); border-radius: 10px; padding: 6px 2px 5px; text-align: center; font-size: 11px; font-weight: 700; line-height: 1.25; color: var(--ink); }
+.ladder div small { display: block; font-size: 10px; font-weight: 600; color: var(--muted); margin: 0; }
+.ladder div.me { background: var(--ink); color: #fff; } .ladder div.me small { color: #DCE5FF; }
+.ladder div.me::before { content: '朋友在這'; position: absolute; top: -17px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 900; color: var(--ink); white-space: nowrap; }
+.ladder-cap { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--muted); margin-top: 3px; }
 .r-vs { flex: none; margin-bottom: 12px; border-radius: 20px; padding: 12px 16px; font-size: 14px; font-weight: 700; line-height: 1.5; background: #fff; border: 3px solid var(--ink); color: var(--ink); }
 .r-vs.win { background: var(--green-soft); } .r-vs.lose { background: var(--red-soft); }
 .r-vs b { display: block; font-size: 21px; font-weight: 900; }
@@ -281,7 +294,7 @@ button { font-family: inherit; cursor: pointer; }
 
   <div class="top">
     <span class="brand">Barcode Hero 載具英雄</span>
-    <button class="snd" id="b-snd" type="button">🔊 音效開</button>
+    <button class="snd" id="b-snd" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 音效開</button>
   </div>
 
   <div class="scene" id="scene">
@@ -348,7 +361,7 @@ button { font-family: inherit; cursor: pointer; }
     <div class="vs-b" id="vs-b" hidden></div>
     <h1><span class="en">Barcode Hero</span>載具<em>英雄</em></h1>
     <p class="lead">店員一問「載具？」，你要多久才亮得出來？</p>
-    <p class="reach" id="reach" hidden>📱➡️ 條碼打開後，<b>把手機往前伸向掃描器</b>才算刷到</p>
+    <p class="reach" id="reach" hidden><svg class="ic ic-w" viewBox="0 0 40 24" aria-hidden="true"><rect x="2" y="2" width="11" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 9h5M5 12h5M5 15h3" stroke="currentColor" stroke-width="1.6"/><path d="M17 12h14m-4-4 4 4-4 4" fill="none" stroke="#FFDD5E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 6v12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg> 條碼打開後，<b>把手機往前伸向掃描器</b>才算刷到</p>
     <button class="cta go" id="b-start" type="button">開始結帳 ▶</button>
     <p class="s-sub">一局約 30 秒・免下載</p>
     <div class="diffs" id="diffs" role="radiogroup" aria-label="難度">
@@ -396,6 +409,8 @@ const track = (ev, p = {}) => { try { gtag('event', ev, Object.assign({ game: 'b
 const rnd = (a, b) => a + Math.random() * (b - a);
 const fmt = ms => (ms / 1000).toFixed(2);
 
+const FIRE = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2.5c.6 3.1 3.9 5 4.9 8.6 1.1 4-1.6 8.4-5.4 8.4-3.6 0-6.2-3-5.5-6.6.4-2 1.6-3.3 2.6-4.3.1 1.9.8 3.2 2 3.7-.6-3.4.2-6.4 1.4-9.8z" fill="#F0592A"/><path d="M12.2 12.5c1.6 1.3 2.6 2.7 2.4 4.3-.2 1.5-1.3 2.4-2.6 2.4s-2.5-1-2.5-2.5c0-1.4.9-2.4 2.7-4.2z" fill="#FFC53D"/></svg>';
+const SND_ON = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>', SND_OFF = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5m0-5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ROUNDS = 5, PENALTY = 300;
 const DIFF = {
   easy: { name: '簡單', t: [900, 1300, 1800, 2500], to: 5000, idle: '滑到放「載具小工具」的那一頁，點一下就能刷' },
@@ -451,7 +466,7 @@ function say(t) {
   if (!soundOn || !('speechSynthesis' in window)) return;
   try { const u = new SpeechSynthesisUtterance(t); u.lang = 'zh-TW'; u.rate = 1.15; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
 }
-$('b-snd').onclick = () => { soundOn = !soundOn; $('b-snd').textContent = soundOn ? '🔊 音效開' : '🔇 音效關'; };
+$('b-snd').onclick = () => { soundOn = !soundOn; $('b-snd').innerHTML = soundOn ? SND_ON + ' 音效開' : SND_OFF + ' 音效關'; };
 
 /* ---------- 遊戲 ---------- */
 let state = 'off', round = 0, times = [], pens = [], pen = 0, t0 = 0, timers = [], decoyRounds = new Set(), lastPen = 0, scanInt = null, last = null;
@@ -826,10 +841,16 @@ const VS = (() => {
 if (VS) {
   diff = VS.d; [...$('diffs').children].forEach(x => x.classList.toggle('on', x.dataset.d === diff));
   $('s-start').classList.add('vs');
+  const tIdx = (() => { const i = DIFF[VS.d].t.findIndex(x => VS.ms < x); return i < 0 ? 4 : i; })();
+  const lim = DIFF[VS.d].t;
+  const ladder = TITLES.map((t, i) => `<div class="${!VS.k && i === tIdx ? 'me' : ''}">${t[1]}<small>${i < 4 ? '< ' + fmt(lim[i]) + ' 秒' : '更慢'}</small></div>`).join('');
   $('vs-b').innerHTML = (VS.k
-    ? `🔥 <b>朋友來嗆你了</b><br>朋友玩困難模式，撐到第 ${VS.r} 位客人就被店員架走（花了 <span class="n">${fmt(VS.ms)}</span> 秒）。你撐得過嗎？`
-    : `🔥 <b>朋友來嗆你了</b><br>朋友玩${DIFF[VS.d].name}，找載具平均只要 <span class="n">${fmt(VS.ms)}</span> 秒（${titleOf(VS.ms, VS.d)}）。你能贏嗎？`)
-    + `<small>難度已經幫你選好：${DIFF[VS.d].name}</small>`;
+    ? `${FIRE}<b>朋友來嗆你了</b><br>朋友玩困難模式，撐到第 ${VS.r} 位客人就被店員架走。`
+      + `<div class="vs-goal">撐過第 <span class="n">${VS.r}</span> 位客人就算贏</div>`
+    : `${FIRE}<b>朋友來嗆你了</b><br>朋友玩${DIFF[VS.d].name}，找載具平均 <span class="n">${fmt(VS.ms)}</span> 秒，是「${TITLES[tIdx][1]}」。`
+      + `<div class="ladder">${ladder}</div><div class="ladder-cap"><span>← 快</span><span>慢 →</span></div>`
+      + `<div class="vs-goal">比 <span class="n">${fmt(VS.ms)}</span> 秒更快就算贏</div>`)
+    + `<small>難度跟朋友一樣：${DIFF[VS.d].name}</small>`;
   $('vs-b').hidden = false;
   $('b-start').textContent = '接受挑戰 ▶';
   track('vs_open', { diff: VS.d, kicked: VS.k });
