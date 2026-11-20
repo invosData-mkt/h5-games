@@ -1,0 +1,644 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-82LNTS7C14"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-82LNTS7C14');gtag('event','h5_open',{game:'award-museum'});</script>
+<title>年度回顧館 Demo（黑金）</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+  /* Layout: 全螢幕 3D 展廳（同發票博物館原型），上方 HUD、下方靠近按鈕與展品卡 */
+  :root{--b:#3560FF;--bd:#202DA8;--gold:#FFC423;--golddk:#9C6A05;--ink:#1B1F2E;--paper:#FFFFFF;--soft:#EDF4FF}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;background:#E9ECF4;color:var(--ink);font-family:"Noto Sans TC","PingFang TC",sans-serif}
+  canvas{display:block;touch-action:none}
+  #hud{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);display:flex;justify-content:space-between;align-items:center;padding:12px 14px;pointer-events:none;z-index:7;gap:8px}
+  .t{background:rgba(255,255,255,.92);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.08);white-space:nowrap}
+  .t b{color:var(--b)}
+  #vbar{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:7;background:#1B1F2E;color:#fff;border-radius:12px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  [hidden]{display:none!important}
+  #vbar button{border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:999px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+  #act{position:fixed;right:14px;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:7;border:0;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.15);background:var(--b);color:#fff}
+  #act.gold{background:var(--gold);color:#3B2A00}
+  #act.pulse{animation:pulse 1.2s ease-in-out 3}
+  @keyframes pulse{50%{transform:scale(1.08)}}
+  #tip{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:rgba(27,31,46,.85);color:#fff;font-size:13px;padding:8px 14px;border-radius:999px;white-space:nowrap;transition:opacity .4s;z-index:6}
+  #joy{position:fixed;left:50%;top:60%;width:120px;height:120px;border-radius:50%;background:rgba(53,96,255,.07);border:2px dashed rgba(53,96,255,.4);transform:translate(-50%,-50%);pointer-events:none;z-index:5;transition:background .15s,border-color .15s}
+  #joy.on{background:rgba(53,96,255,.15);border:2px solid rgba(53,96,255,.7)}
+  #knob{position:absolute;left:50%;top:50%;width:30px;height:30px;border-radius:50%;background:var(--b);opacity:0;box-shadow:0 3px 10px rgba(0,0,0,.2);transform:translate(-50%,-50%);pointer-events:none;transition:opacity .15s}
+  #joy.on #knob{opacity:.9}
+  #near{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 44px);transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:6;border:0;border-radius:999px;background:var(--b);color:#fff;font-weight:700;font-size:15px;padding:12px 18px;max-width:78vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:.2s;font-family:inherit}
+  #near.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+  #near.gold{background:var(--gold);color:#3B2A00}
+  .ov{position:fixed;inset:0;z-index:20;display:none;align-items:flex-end;justify-content:center;background:rgba(10,14,30,.4)}
+  .ov.on{display:flex}
+  .box{background:var(--paper);width:100%;max-width:460px;border-radius:20px 20px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom,0px) + 24px);animation:up .25s ease-out;max-height:88%;overflow:auto}
+  @media(min-width:700px){.ov{align-items:center}.box{border-radius:20px}}
+  @keyframes up{from{transform:translateY(40px);opacity:0}}
+  .no{font-size:12px;color:var(--b);font-weight:700;letter-spacing:.1em}
+  .box h2{margin:4px 0 10px;font-size:22px}
+  .box p{margin:0 0 10px;line-height:1.7;font-size:15px}
+  .fun{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.6}
+  .fun.gold{background:#FFF1CD;color:#5A3D00}
+  .row{display:flex;gap:10px;margin-top:16px}
+  .btn{flex:1;border:0;border-radius:999px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn.p{background:var(--b);color:#fff}.btn.s{background:#EEF0F5;color:var(--ink)}.btn.g{background:var(--gold);color:#3B2A00}
+  .btn:focus-visible,.chip:focus-visible,.tg:focus-visible,#near:focus-visible,#act:focus-visible{outline:3px solid #00D3F7;outline-offset:2px}
+  #intro{position:fixed;inset:0;z-index:10;background:radial-gradient(120% 70% at 50% 20%,#3560FF 0%,#202DA8 55%,#0E1550 100%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #intro .k{font-size:12px;letter-spacing:.3em;opacity:.8;font-weight:700}
+  #intro h1{font-size:34px;margin:8px 0 6px;font-weight:900}
+  #intro p{margin:0 0 18px;opacity:.92;line-height:1.7}
+  #intro .btn{flex:none;padding:14px 40px;font-size:17px}
+  #intro small{margin-top:14px;opacity:.7}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 20px}
+  .chip{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:#fff;color:var(--bd);border-color:#fff}
+  .chipnote{font-size:12px;opacity:.75;margin:-10px 0 18px;min-height:1.2em}
+  .tg{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:11px 2px;border:0;border-bottom:1px solid #EDEFF3;background:none;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;text-align:left}
+  .sw{width:40px;height:24px;border-radius:999px;background:#BBBBC8;position:relative;flex:none;transition:background .2s}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+  .sw.on{background:var(--b)}.sw.on::after{transform:translateX(16px)}
+  .og{border:1px solid #DCDEE5;border-radius:14px;overflow:hidden;margin:6px 0 4px}
+  .og img{display:block;width:100%;aspect-ratio:1.6;object-fit:cover;background:#EEF2FB}
+  .og div{padding:10px 12px;display:grid;gap:2px}.og b{font-size:14px}.og span{font-size:12px;color:#737380}
+  .note{font-size:13px;color:#5B6275;line-height:1.6}
+  #toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 100px);transform:translateX(-50%);background:#1B1F2E;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;z-index:30;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+  #toast.on{opacity:1}
+  #proto{position:fixed;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);font-size:11px;color:#6C7285;z-index:6;border:0;background:rgba(255,255,255,.75);border-radius:999px;padding:4px 10px;cursor:pointer;font-family:inherit}
+  /* 黑金版（2026-11-20 Sam：館內改黑金，跟 KV／獎狀同一套） */
+  html,body{background:#0A0A0A}
+  #intro{background:radial-gradient(120% 70% at 50% 20%,#2A2214 0%,#0A0A0A 60%)}
+  #intro h1{background:linear-gradient(135deg,#FBE29A,#EEC253 35%,#D8A63A 65%,#F1CB68 82%,#C4922E);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #intro .k{font-family:Anton,sans-serif;font-weight:400;color:#E2B04A;opacity:1;letter-spacing:.2em}
+  .btn.p,#act,#near{background:#E2B04A;color:#0A0A0A}
+  .btn.g,#act.gold,#near.gold{background:linear-gradient(135deg,#FBE29A,#D8A63A);color:#0A0A0A}
+  .no,.t b{color:#B8862A}
+  .sw.on{background:#C4922E}
+  #joy{background:rgba(226,176,74,.07);border-color:rgba(226,176,74,.45)}#joy.on{background:rgba(226,176,74,.15);border-color:rgba(226,176,74,.8)}#knob{background:#E2B04A}
+  .chip[aria-pressed="true"]{color:#0A0A0A;background:#E2B04A;border-color:#E2B04A}
+  .t{background:rgba(20,20,20,.9);color:#F2EFE6}
+  #proto{background:rgba(20,20,20,.8);color:#9A958A}
+  .fun{background:#F5EFE0}
+  #snd{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:6;border:1px solid rgba(226,176,74,.5);background:rgba(20,20,20,.85);border-radius:999px;padding:6px 12px;font:inherit;font-size:12px;font-weight:700;color:#E2B04A;cursor:pointer}
+  #intro .credit{display:block;font-size:11px;opacity:.6;margin-top:6px;max-width:320px;line-height:1.5}
+  /* 展品卡＋獎狀（11/20 Sam：卡片資訊太少、獎狀要完整呈現） */
+  #card .box{background:#0E0E0E;color:#F2EFE6;border:1px solid rgba(255,196,35,.45);max-width:480px}
+  #card .no{font-family:Anton,"Noto Sans TC",sans-serif;font-weight:400;color:#E2B04A;letter-spacing:.12em}
+  #card h2{color:#fff}
+  #card p{color:#DCD7CB}
+  #card .fun{background:#1A1712;color:#BDB6A6;font-size:13px}
+  #card .fun.gold{background:#2A2214;color:#F1CB68}
+  #card .btn.s{background:#222;color:#F2EFE6}
+  .cbig{margin:2px 0 10px;border-bottom:1px solid rgba(255,196,35,.35);padding-bottom:12px}
+  .cbig b{display:block;font-size:44px;font-weight:900;line-height:1.1;background:linear-gradient(135deg,#FBE29A,#EEC253 35%,#D8A63A 65%,#F1CB68 82%,#C4922E);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .cbig span{font-size:17px;font-weight:700;color:#DCD7CB}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+  .stats div{border:1px solid rgba(255,196,35,.3);border-radius:10px;padding:8px 10px}
+  .stats small{display:block;font-size:11px;color:#9A958A;letter-spacing:.04em}
+  .stats b{font-size:17px;color:#F1CB68}
+  .viz{margin:6px 0 12px}
+  .viz h4{margin:0 0 8px;font-size:12px;color:#9A958A;font-weight:700;letter-spacing:.06em}
+  .bars{display:flex;align-items:flex-end;gap:4px;height:96px}
+  .bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;color:#7A756B}
+  .bars i{display:block;width:100%;background:#3A3324;border-radius:3px 3px 0 0}
+  .bars .on i{background:linear-gradient(180deg,#FBE29A,#C4922E)}
+  .bars .on{color:#F1CB68;font-weight:700}
+  .bars em{font-style:normal;font-size:10px;color:#F1CB68;margin-bottom:2px}
+  .hbar{display:grid;grid-template-columns:64px 1fr 48px;align-items:center;gap:8px;margin:6px 0;font-size:13px}
+  .hbar i{display:block;height:12px;border-radius:6px;background:#3A3324}
+  .hbar.on i{background:linear-gradient(90deg,#FBE29A,#C4922E)}
+  .hbar.on{color:#F1CB68;font-weight:700}
+  .hbar b{text-align:right;font-weight:700}
+  .dots{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;text-align:center;font-size:11px;color:#9A958A}
+  .dots i{display:block;margin:0 auto 4px;width:30px;height:30px;border-radius:50%;border:1.5px solid #4A4232;line-height:27px;font-style:normal;font-size:12px;color:#7A756B}
+  .dots .w i{background:linear-gradient(135deg,#FBE29A,#C4922E);border-color:#F1CB68;color:#0A0A0A;font-weight:900}
+  .dots .c i{border-color:#C4922E;color:#C4922E}
+  .demo-n{font-size:11px;color:#6E6A62;text-align:right;margin-top:-4px}
+  /* 獎狀（同 design/certificate.html，縮放進卡片） */
+  .certwrap{position:relative;width:100%;aspect-ratio:4/5;margin:4px 0 12px;overflow:hidden;border-radius:6px}
+  .cert{position:absolute;left:0;top:0;width:1080px;height:1350px;transform-origin:0 0;background:#0A0A0A;color:#fff;font-family:"Noto Sans TC",sans-serif}
+  .cert .frame{position:absolute;inset:36px;border:1.5px solid rgba(255,196,35,.75)}
+  .cert .topbar{position:absolute;left:72px;right:72px;top:72px;display:flex;align-items:center;gap:26px;font-size:26px;color:#FFC423}
+  .cert .topbar .rule{flex:1;height:1.5px;background:rgba(255,196,35,.75)}
+  .cert .topbar .l{font-family:Anton,sans-serif;letter-spacing:.04em}.cert .topbar .r{font-weight:900;letter-spacing:.04em}
+  .cert .mt{background:linear-gradient(135deg,#FBE29A 0%,#EEC253 35%,#D8A63A 65%,#F1CB68 82%,#C4922E 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .cert .mark{position:absolute;left:72px;top:150px;font-size:66px;line-height:.8;font-family:Anton,sans-serif}
+  .cert .lock{display:grid;grid-template-columns:auto auto;column-gap:.07em;row-gap:.06em;align-items:end}
+  .cert .lock .w{grid-column:2;height:.8em}
+  .cert .lock .fig{grid-column:1;grid-row:1/4;align-self:end;display:flex;justify-content:center}
+  .cert .lock .yr{grid-column:1;grid-row:4;font-size:.5em;line-height:.8;text-align:center}.cert .lock .yr span{display:block;height:.8em}
+  .statue{display:flex;flex-direction:column;align-items:center}.statue .logo,.statue .base{display:block;width:auto}
+  .cert .rare{position:absolute;right:92px;top:150px;width:220px;height:220px;transform:rotate(10deg)}
+  .cert .eyebrow{position:absolute;left:72px;top:520px;display:flex;align-items:center;gap:18px;font-size:32px;font-weight:700;letter-spacing:.1em;color:#FFC423}
+  .cert .eyebrow::after{content:'';width:80px;height:1.5px;background:#FFC423}
+  .cert .award{position:absolute;left:66px;right:72px;top:572px;font-weight:900;line-height:1.1;white-space:nowrap;letter-spacing:.02em}
+  .cert .who{position:absolute;left:72px;top:745px;font-size:30px;font-weight:700;color:#A9A49A;letter-spacing:.08em}
+  .cert .who b{font-size:64px;font-weight:900;color:#fff;margin-left:.35em}
+  .cert .body{position:absolute;left:72px;right:72px;top:905px;font-size:34px;line-height:1.85;font-weight:500;color:#DCD7CB;text-align:justify}
+  .cert .body b{font-weight:900;color:#fff;border-bottom:3px solid #FFC423}
+  .cert .seal{position:absolute;right:92px;top:745px;width:130px;height:130px;transform:rotate(-8deg)}
+  .cert .info{position:absolute;left:72px;right:72px;bottom:96px;font-size:28px}
+  .cert .tab{width:110px;height:.9em;clip-path:polygon(0 0,78% 0,100% 100%,0 100%);background:linear-gradient(135deg,#FBE29A,#D8A63A)}
+  .cert .boxes{display:flex;border:1.5px solid #FFC423;color:#FFC423}
+  .cert .boxes div{flex:1;display:flex;align-items:center;justify-content:center;gap:.4em;font-weight:900;white-space:nowrap;padding:.6em .5em}
+  .cert .boxes div+div{border-left:1.5px solid #FFC423}
+  .cert .dm{position:absolute;left:0;right:0;bottom:50px;text-align:center;font-size:18px;color:#6E6A62;letter-spacing:.2em}
+  /* 11/20 Sam：圈圈可點的提示、自動導覽、只看卡片模式 */
+  #tip{white-space:normal;text-align:center;max-width:86vw;line-height:1.5;background:rgba(20,20,20,.9);color:#F1CB68;border:1px solid rgba(226,176,74,.5)}
+  #tourbar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 104px);transform:translateX(-50%);z-index:8;background:rgba(20,20,20,.92);color:#F2EFE6;border:1px solid rgba(226,176,74,.6);border-radius:999px;padding:6px 6px 6px 14px;font-size:13px;display:flex;align-items:center;gap:10px;white-space:nowrap;max-width:92vw}
+  #tourbar b{color:#F1CB68}
+  #tourbar button{border:0;border-radius:999px;background:#E2B04A;color:#0A0A0A;font:inherit;font-size:12px;font-weight:700;padding:5px 12px;cursor:pointer}
+  #intro .btn.lite{margin-top:10px;background:transparent;color:#F1CB68;border:1px solid rgba(226,176,74,.7);font-size:15px;padding:11px 26px}
+  #intro .glnote{font-size:12px;color:#F1CB68;margin-top:8px;max-width:300px;line-height:1.5}
+  body.cm canvas,body.cm #hud,body.cm #act,body.cm #tip,body.cm #near,body.cm #joy,body.cm #tourbar,body.cm #vbar{display:none!important}
+  #cm{position:fixed;inset:0;z-index:9;background:radial-gradient(120% 60% at 50% 0%,#2A2214 0%,#0A0A0A 55%);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 60px) max(16px,env(safe-area-inset-left,0px))}
+  #cm .cmhead{max-width:480px;margin:0 auto 10px;display:flex;justify-content:space-between;align-items:center;color:#F2EFE6;font-weight:700;font-size:14px;gap:8px}
+  #cm .cmhead span{color:#B8862A;font-family:Anton,"Noto Sans TC",sans-serif;font-weight:400;letter-spacing:.08em}
+  #cm .cmc{max-width:480px;margin:0 auto;background:#0E0E0E;color:#F2EFE6;border:1px solid rgba(255,196,35,.45);border-radius:20px;padding:22px 20px}
+  #cm .cmc .no{font-family:Anton,"Noto Sans TC",sans-serif;font-weight:400;color:#E2B04A;letter-spacing:.12em}
+  #cm .cmc h2{margin:4px 0 10px;font-size:22px;color:#fff}
+  #cm .cmc p{margin:0 0 10px;line-height:1.7;font-size:15px;color:#DCD7CB}
+  #cm .cmc .fun{background:#1A1712;color:#BDB6A6;font-size:13px}
+  #cm .cmc .fun.gold{background:#2A2214;color:#F1CB68}
+  #cm .dotsnav{display:flex;justify-content:center;gap:6px;margin:12px 0 0}
+  #cm .dotsnav i{width:8px;height:8px;border-radius:50%;background:#3A3324}
+  #cm .dotsnav i.on{background:#E2B04A}
+  #cm .cmnav{max-width:480px;margin:14px auto 0;display:flex;gap:10px}
+  #cm .cmnav .btn.s{background:#222;color:#F2EFE6}
+  #cm .cm3d{display:block;margin:14px auto 0;border:0;background:none;color:#9A958A;font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
+  @media (prefers-reduced-motion:reduce){.box{animation:none}#act.pulse{animation:none}}
+</style>
+
+<div id="intro">
+  <div class="k">INVOICE OF THE YEAR ・ 2026</div>
+  <h1>年度回顧館</h1>
+  <p id="introP"></p>
+  <div class="chips" id="chips"></div>
+  <div class="chipnote" id="chipNote"></div>
+  <button class="btn g" id="go" type="button">入館（3D 走走看）</button>
+  <button class="btn lite" id="goCards" type="button">只看卡片（舊手機適用）</button>
+  <div class="glnote" id="glNote" hidden></div>
+  <small>免下載・手機直接逛・DEMO 數字都是示意・有配樂</small>
+  <span class="credit">配樂：Elgar《威風凜凜進行曲》第一號中段，1931 年作曲家親自指揮的錄音（公有領域，來源 Wikimedia Commons）</span>
+</div>
+<audio id="bgm" src="audio/pomp_1931.mp4" preload="auto" loop></audio>
+<button id="snd" type="button" hidden>♪ 配樂：開</button>
+<div id="hud"><span class="t" id="hudName"></span><span class="t" id="prog">已看 <b id="seen">0</b> / 6</span></div>
+<div id="vbar" hidden><span>好友視角・不用登入、不用裝 App</span><button id="backMe" type="button">回到我的視角</button></div>
+<button id="act" type="button">邀請好友來逛</button>
+<div id="tip">點地上的金色圈圈，小人會自己走過去看展品<br>也可以按住畫面拖曳走路</div>
+<div id="tourbar" hidden><span id="tourTxt">導覽中</span><button id="tourSkip" type="button">我自己逛</button></div>
+<div id="cm" hidden><div class="cmhead"><b id="cmName"></b><span id="cmProg"></span></div><div class="cmc" id="cmBody"></div><div class="dotsnav" id="cmDots"></div>
+  <div class="cmnav"><button class="btn s" id="cmPrev" type="button">上一張</button><button class="btn p" id="cmNext" type="button">下一張</button></div>
+  <button class="cm3d" id="cm3d" type="button">改用 3D 走走看</button></div>
+<button id="near" type="button"></button>
+<div id="joy"><div id="knob"></div></div>
+<button id="proto" type="button">DEMO・數字示意｜換範例</button>
+<div id="toast"></div>
+
+<div class="ov" id="card"><div class="box">
+  <div class="no" id="cNo"></div><h2 id="cT"></h2><div id="cCert"></div><div class="cbig" id="cBig"></div><p id="cP"></p><div id="cStats"></div><div id="cViz"></div><div class="fun" id="cF"></div>
+  <div class="row"><button class="btn s" id="cClose" type="button">繼續逛</button><button class="btn p" id="cCta" type="button" hidden></button></div>
+</div></div>
+
+<div class="ov" id="invite"><div class="box">
+  <div class="no">邀請好友來逛</div><h2>選要展出的內容</h2>
+  <p class="note">獎座一定會展出。其他展品你可以收起來，好友只會看到「沒有公開」。整個回顧館都不顯示消費金額；次數等數字預設也不公開。</p>
+  <div id="tgList"></div>
+  <p class="note" style="margin-top:12px">貼到 LINE 時，好友會看到這張預覽：</p>
+  <div class="og"><img id="ogImg" alt="展廳預覽"><div><b id="ogT"></b><span>discovery.invos.com.tw</span></div></div>
+  <div class="row"><button class="btn s" id="copy" type="button">複製連結</button><button class="btn p" id="asFriend" type="button">看好友看到的畫面</button></div>
+  <div class="row" style="margin-top:8px"><button class="btn s" id="invClose" type="button">關閉</button></div>
+</div></div>
+
+<div class="ov" id="mine"><div class="box">
+  <div class="no">看看你自己的回顧館</div><h2 id="mineT"></h2>
+  <p class="note" id="mineP"></p>
+  <div class="row"><button class="btn p" data-fake="打開發票存摺 App" type="button">我已經有發票存摺</button></div>
+  <div class="row" style="margin-top:8px"><button class="btn g" data-fake="前往下載（OneLink）" type="button">還沒有，下載發票存摺</button></div>
+  <div class="row" style="margin-top:8px"><button class="btn s" id="mineClose" type="button">關閉</button></div>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/SVGLoader.js"></script>
+<script>
+// ================= 範例資料（全部示意） =================
+const PARTICIPANTS=340000;
+const fmt=n=>n.toLocaleString('en-US');
+const AWARDS={
+  rich:{name:'年度財神爺',rate:.008,cert:d=>`中獎合計 ${fmt(d.amt)} 元，運氣好到財神爺都記得。`,certSafe:'好運連連，財神爺都記得。',line:d=>`今年中了 ${fmt(d.amt)} 元，財神爺應該有你的電話。`,safe:'今年的運氣很好。'},
+  deliv:{name:'外送平台 VIP',rate:.05,cert:d=>`讓外送員跑了 ${d.n} 趟，堪稱外送平台貴賓。`,certSafe:'堪稱外送平台貴賓。',line:d=>`外送員跑了 ${d.n} 趟，只為了你。`,safe:'外送平台的熟客。'},
+  full:{name:'發票全勤獎',rate:.35,cert:()=>'一至十一月每月皆有發票紀錄，全勤無缺。',certSafe:'一至十一月全勤無缺。',line:()=>'1 到 11 月，每個月都有你的發票，一個月都沒缺席。',safe:'一個月都沒缺席。'},
+};
+const PERSONAS={
+  a:{name:'Kirk',note:'全聯常客、早起，今年中過獎（拿到年度財神爺）',
+     count:{n:612},month:{m:7,n:53},place:{name:'全聯',n:68},
+     time:{label:'早上 8 點前',n:42,line:'比城市早起'},lottery:{periods:6,wins:2,amt:2200},award:['rich',{amt:2200}]},
+  b:{name:'Jeremy',note:'夜貓子、外送常客，6 期都沒中',
+     count:{n:884},month:{m:10,n:101},place:{name:'7-11',n:186},
+     time:{label:'晚上 10 點後',n:73,line:'城市的夜晚有你'},lottery:{periods:6,wins:0,amt:0},award:['deliv',{n:48}]},
+  c:{name:'Sam',note:'發票不多的新手，每個月都有存',
+     count:{n:38},month:{m:3,n:9},place:{name:'全家',n:12},
+     time:{label:'中午 12 點到 2 點',n:15,line:'午餐時間最常出手'},lottery:{periods:4,wins:0,amt:0},award:['full',{}]},
+};
+const EX_KEYS=['count','month','place','time','lottery'];
+const EX_NAMES={count:'這一年的發票',month:'最忙的月份',place:'最常去的地方',time:'你的消費時段',lottery:'今年的對獎紀錄'};
+// 展品文字：mine＝自己看；nums＝好友看且公開數字；否則好友看不含數字的版本
+function exhibitText(k,P,full){
+  const no='展品 0'+(EX_KEYS.indexOf(k)+1);
+  if(k==='count')return{no,t:'這一年的發票',big:full?`${fmt(P.count.n)} 張`:'一整年',sub:full?`平均每月 ${fmt(Math.round(P.count.n/11))} 張`:'',p:full?`這一年你存了 ${fmt(P.count.n)} 張發票，每一張都是生活的紀錄。`:'一整年的發票都存在這裡。',f:'統計 2026/1/1–11/30 存進發票存摺的發票。',color:'#3560FF'};
+  if(k==='month')return{no,t:'最忙的月份',big:`${P.month.m} 月`,sub:full?`${P.month.n} 張`:'',p:full?`${P.month.m} 月存了 ${P.month.n} 張發票，是你最忙的一個月。`:`${P.month.m} 月是最忙的一個月。`,f:'發票張數最多的月份。',color:'#00B3D6'};
+  if(k==='place')return{no,t:'最常去的地方',big:P.place.name,sub:full?`${P.place.n} 次`:'',p:full?`今年去了 ${P.place.name} ${P.place.n} 次，是你最常報到的地方。`:`最常去的地方是 ${P.place.name}。`,f:'只算量販、超市、超商。',color:'#F6AA5E'};
+  if(k==='time')return{no,t:'你的消費時段',big:P.time.label,sub:full?`${P.time.n} 次`:'',p:full?`${P.time.n} 次在${P.time.label}消費，${P.time.line}。`:`最常在${P.time.label}消費，${P.time.line}。`,f:'看發票上的時間。',color:'#7A9BE4'};
+  const L=P.lottery;const won=L.wins>0;
+  return{no,t:'今年的對獎紀錄',big:won?(full?`中 ${L.wins} 次`:'中過獎'):`${L.periods} 期都對`,sub:won&&full?`共 ${fmt(L.amt)} 元`:'',
+    p:won?(full?`${L.periods} 期對獎，中了 ${L.wins} 次、共 ${fmt(L.amt)} 元。`:'今年有中過獎。'):`${L.periods} 期都有對獎，今年還沒中，下一期一起加油。`,
+    f:'2026 年六次開獎（1/25–11/25）。11–12 月的發票 1/25 才開獎，不算進今年。',color:won?'#FFC423':'#00B185'};
+}
+
+// ================= 狀態 =================
+const st={p:'a',mode:'me',shown:{},nums:false};
+function resetShown(){st.shown={};EX_KEYS.forEach(k=>st.shown[k]=true);st.nums=false}
+resetShown();
+function P(){return PERSONAS[st.p]}
+function award(){const [id,d]=P().award;return Object.assign({id,d},AWARDS[id])}
+
+// ================= 場景（沿用發票博物館原型的做法） =================
+const W=16,D=24,WH=2.2;
+// 不支援 WebGL 的手機：換成假的 renderer，只開放「只看卡片」
+let noGL=false;
+const renderer=(()=>{try{return new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true})}catch(e){noGL=true;return{setPixelRatio(){},setSize(){},render(){},domElement:document.createElement('canvas'),shadowMap:{},outputEncoding:0}}})();
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);
+renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+document.body.prepend(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#050505');scene.fog=new THREE.Fog('#050505',18,40);
+const fovFor=()=>innerWidth<innerHeight?52:40;
+const cam=new THREE.PerspectiveCamera(fovFor(),innerWidth/innerHeight,0.1,200);
+scene.add(new THREE.HemisphereLight(0xfff4dc,0x1a1a1a,0.75));
+const sun=new THREE.DirectionalLight(0xffffff,0.55);sun.position.set(6,18,10);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-14,right:14,top:16,bottom:-16,near:1,far:60});scene.add(sun);
+function mat(c,opt={}){return new THREE.MeshLambertMaterial(Object.assign({color:c},opt))}
+function tex(draw,w=256,h=256,rx=1,ry=1){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=4;return t}
+const FONT='"Noto Sans TC","PingFang TC",sans-serif';
+const woodT=(rx,ry)=>tex((x,w,h)=>{x.fillStyle='#D8C3A0';x.fillRect(0,0,w,h);for(let i=0;i<8;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#CDB590':'#E0CBA8';x.save();x.translate(j*64+((i%2)?32:0),i*32);x.fillRect(0,0,62,30);x.restore()}},256,256,rx,ry);
+const tileT=(c1,c2,rx,ry)=>tex((x,w,h)=>{x.fillStyle=c1;x.fillRect(0,0,w,h);x.strokeStyle=c2;x.lineWidth=3;for(let i=0;i<=4;i++){x.beginPath();x.moveTo(i*64,0);x.lineTo(i*64,h);x.stroke();x.beginPath();x.moveTo(0,i*64);x.lineTo(w,i*64);x.stroke()}},256,256,rx,ry);
+function floorZone(x0,x1,z0,z1,t){const m=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),mat(0xffffff,{map:t}));m.rotation.x=-Math.PI/2;m.position.set((x0+x1)/2,0,(z0+z1)/2);m.receiveShadow=true;scene.add(m);return m}
+const floors=[
+  floorZone(-W/2,W/2,4,D/2,tileT('#141414','#2A2416',4,2)),
+  floorZone(-W/2,0,-6,4,tileT('#121212','#262014',4,5)),
+  floorZone(0,W/2,-6,4,tileT('#121212','#262014',4,5)),
+  floorZone(-W/2,W/2,-D/2,-6,tileT('#0C0C0C','#3A2E14',8,3)),
+];
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,80),mat('#050505'));ground.rotation.x=-Math.PI/2;ground.position.y=-0.02;scene.add(ground);
+const solids=[],fadeWalls=[];let exSolids=[];
+function box(w,h,d,x,y,z,m,solid=true,shadow=true,parent=scene,list=solids){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=shadow;o.receiveShadow=true;parent.add(o);if(solid)list.push({x0:x-w/2,x1:x+w/2,z0:z-d/2,z1:z+d/2});return o}
+const trimM=mat('#C4922E');
+function wallSeg(a,b,fixed,alongX,fade=false){const len=b-a,c=(a+b)/2,t=0.25;const m=mat('#161616',{transparent:true,opacity:1});let o;
+  if(alongX){o=box(len,WH,t,c,WH/2,fixed,m);box(len,0.08,t+0.02,c,WH+0.04,fixed,trimM,false,false)}
+  else{o=box(t,WH,len,fixed,WH/2,c,m);box(t+0.02,0.08,len,fixed,WH+0.04,c,trimM,false,false)}
+  if(fade){o.userData.z=fixed;fadeWalls.push(o)}return o}
+wallSeg(-W/2,W/2,-D/2,true);wallSeg(-W/2,W/2,D/2,true,true);wallSeg(-D/2,D/2,-W/2,false);wallSeg(-D/2,D/2,W/2,false);
+function crossWall(z,DOOR){wallSeg(-W/2,DOOR[0][0],z,true,true);wallSeg(DOOR[0][1],DOOR[1][0],z,true,true);wallSeg(DOOR[1][1],W/2,z,true,true)}
+crossWall(4,[[-5.5,-2.5],[2.5,5.5]]);// 頒獎區入口：中間開一個 2.4 寬的門；Ⅰ／Ⅱ 中間不放隔牆（Sam），紅毯從展區入口一路延伸到頒獎台
+wallSeg(-W/2,-1.2,-6,true,true);wallSeg(1.2,W/2,-6,true,true);
+
+function label(s,sub,{w=4,bg=null,fg='#EEC253',size=88,subc='#B8862A'}={}){const t=tex((x,cw,ch)=>{if(bg){x.fillStyle=bg;x.fillRect(0,0,cw,ch)}x.fillStyle=fg;x.textAlign='center';x.font=`900 ${size}px ${FONT}`;x.fillText(s,cw/2,sub?110:130);if(sub){x.font=`700 40px ${FONT}`;x.fillStyle=subc;x.fillText(sub,cw/2,175)}},768,200);
+  return new THREE.Mesh(new THREE.PlaneGeometry(w,w*200/768),new THREE.MeshBasicMaterial({map:t,transparent:!bg}))}
+function floorText(s,x,z,w=2.6,parent=scene){const m=label(s,null,{w,fg:'#D8A63A',size:72});m.rotation.x=-Math.PI/2;m.position.set(x,0.01,z);parent.add(m)}
+const wl=label('Ⅲ 頒獎台','2026 年度風格大賞',{w:6,subc:'#9C6A05'});wl.position.set(0,WH*0.62,-D/2+0.14);scene.add(wl);
+floorText('← 你的這一年',-4,5.2,2.8);floorText('習慣與運氣 →',4,5.2,2.8);floorText('↑ 頒獎台',-2.4,-4.2,1.7);floorText('↑ 頒獎台',2.4,-4.2,1.7);
+floorText('Ⅰ 你的這一年',-4,2.7,3.6);floorText('Ⅱ 習慣與運氣',4,2.7,3.6);
+
+function rr(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()}
+function wrap(x,s,X,Y,maxW,lh){let line='';for(const ch of s){if(x.measureText(line+ch).width>maxW){x.fillText(line,X,Y);line=ch;Y+=lh}else line+=ch}x.fillText(line,X,Y)}
+function fitFont(x,s,max,weight,size){let f=size;x.font=`${weight} ${f}px ${FONT}`;while(x.measureText(s).width>max&&f>40){f-=6;x.font=`${weight} ${f}px ${FONT}`}}
+// 展品立牌
+function goldG(x,x0,y0,x1,y1){const g=x.createLinearGradient(x0,y0,x1,y1);[[0,'#FBE29A'],[.35,'#EEC253'],[.65,'#D8A63A'],[.82,'#F1CB68'],[1,'#C4922E']].forEach(([o,c])=>g.addColorStop(o,c));return g}
+function boardTex(e,hidden){return tex((x)=>{
+  x.fillStyle='#0A0A0A';x.fillRect(0,0,640,800);
+  x.strokeStyle='rgba(255,196,35,.75)';x.lineWidth=2;x.strokeRect(18,18,604,764);
+  x.textAlign='left';x.fillStyle='#E2B04A';x.font=`400 26px Anton, ${FONT}`;x.fillText(e.no.replace('展品 ','EXHIBIT '),44,66);
+  x.fillStyle='rgba(255,196,35,.75)';x.fillRect(200,56,396,2);
+  if(hidden){x.fillStyle='#5E5A52';x.font=`900 64px ${FONT}`;x.fillText('沒有公開',44,330)}
+  else{fitFont(x,e.big,552,900,150);x.fillStyle=goldG(x,44,180,500,380);x.fillText(e.big,44,330);
+    if(e.sub){x.font=`700 44px ${FONT}`;x.fillStyle='#DCD7CB';x.fillText(e.sub,44,410)}}
+  x.fillStyle='rgba(255,196,35,.75)';x.fillRect(44,540,552,2);
+  x.fillStyle='#FFFFFF';x.font=`900 58px ${FONT}`;wrap(x,e.t,44,630,552,70);
+  x.fillStyle='#6E6A62';x.font=`500 20px ${FONT}`;x.fillText('2026 年度回顧館',44,750);x.textAlign='right';x.fillText('示意',596,750)},640,800)}
+// 獎座立牌
+function awardTex(a,full){return tex((x)=>{
+  x.fillStyle='#0A0A0A';x.fillRect(0,0,640,800);
+  x.strokeStyle='rgba(255,196,35,.75)';x.lineWidth=2;x.strokeRect(18,18,604,764);
+  x.textAlign='left';x.fillStyle='#E2B04A';x.font=`400 26px Anton, ${FONT}`;x.fillText('INVOICE OF THE YEAR',44,66);x.fillStyle='rgba(255,196,35,.75)';x.fillRect(330,56,266,2);
+  x.fillStyle='#E2B04A';x.font=`700 30px ${FONT}`;x.fillText('年度風格大賞得主 ——',44,190);
+  fitFont(x,a.name,552,900,104);x.fillStyle=goldG(x,44,200,500,320);x.fillText(a.name,44,310);
+  x.font=`700 34px ${FONT}`;x.fillStyle='#DCD7CB';wrap(x,full?a.line(a.d):a.safe,44,400,552,54);
+  x.fillStyle='rgba(255,196,35,.75)';x.fillRect(44,640,552,2);
+  x.fillStyle='#A9A49A';x.font=`700 28px ${FONT}`;x.fillText('得主',44,712);x.fillStyle='#FFFFFF';x.font=`900 48px ${FONT}`;x.fillText(P().name,120,716)},640,800)}
+
+// ================= 展品與獎座（換人／換視角時重建） =================
+const SPOTS=[[-6.8,-4.4],[-4.4,-4.4],[-6.8,0],[4.4,-4.4],[6.8,-4.4]];
+const AW={x:0,z:-10.2};
+let exGroup=null,exhibits=[],pickables=[],sparkle=null,trophyG=null,inv=null;
+function disposeGroup(g){g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose();m.dispose()})}})}
+function buildExhibits(){
+  if(exGroup){scene.remove(exGroup);disposeGroup(exGroup)}
+  exGroup=new THREE.Group();scene.add(exGroup);exhibits=[];pickables=[];exSolids=[];
+  const mine=st.mode==='me';
+  EX_KEYS.forEach((k,i)=>{
+    const hidden=!mine&&!st.shown[k],full=mine||st.nums;const e=exhibitText(k,P(),full);
+    const [px,pz]=SPOTS[i];const g=new THREE.Group();g.position.set(px,0,pz);exGroup.add(g);
+    const ped=new THREE.Mesh(new THREE.BoxGeometry(1.1,0.7,0.7),mat('#181818'));ped.position.y=0.35;ped.castShadow=ped.receiveShadow=true;g.add(ped);
+    const band=new THREE.Mesh(new THREE.BoxGeometry(1.12,0.08,0.72),mat(hidden?'#3A3A3A':'#C4922E'));band.position.y=0.66;g.add(band);
+    const board=new THREE.Mesh(new THREE.BoxGeometry(1.05,1.31,0.05),mat('#0A0A0A'));board.position.set(0,1.36,0);board.rotation.x=-0.12;board.castShadow=true;g.add(board);
+    const pic=new THREE.Mesh(new THREE.PlaneGeometry(0.96,1.2),new THREE.MeshBasicMaterial({map:boardTex(e,hidden)}));pic.position.z=0.03;board.add(pic);
+    const ok=new THREE.Mesh(new THREE.CircleGeometry(0.13,24),new THREE.MeshBasicMaterial({color:'#E2B04A'}));ok.position.set(0.5,0.62,0.04);ok.visible=false;board.add(ok);
+    const ring=new THREE.Mesh(new THREE.RingGeometry(0.75,0.9,40),new THREE.MeshBasicMaterial({color:'#E2B04A',transparent:true,opacity:0.25}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,0.9);g.add(ring);
+    exSolids.push({x0:px-0.6,x1:px+0.6,z0:pz-0.4,z1:pz+0.4});
+    [ped,board,pic,ring].forEach(o=>{o.userData.ex=i;pickables.push(o)});
+    exhibits.push({key:k,e,hidden,g,ok,ring,x:px,z:pz+0.9,i,title:e.t});
+  });
+  // 頒獎台：一座獎座
+  const a=award(),full=mine||st.nums,rare=false; // 11/20 Sam：稀有度標章拿掉
+  const g=new THREE.Group();g.position.set(AW.x,0,AW.z);exGroup.add(g);
+  const step=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.8,0.2,48),mat('#141414'));step.position.y=0.1;step.receiveShadow=true;g.add(step);
+  const pod=new THREE.Mesh(new THREE.CylinderGeometry(0.75,0.85,1.0,40),mat('#0E0E0E'));pod.position.y=0.7;pod.castShadow=pod.receiveShadow=true;g.add(pod);
+  const podBand=new THREE.Mesh(new THREE.CylinderGeometry(0.86,0.86,0.1,40),mat('#FFC423'));podBand.position.y=1.15;g.add(podBand);
+  trophyG=new THREE.Group();trophyG.position.y=1.2;g.add(trophyG);
+  // 發票獎座：發票存摺 logo 擠成立體＋三層圓柱底座（同 design/brand.js；光從左上 45 度）
+  const gM=new THREE.MeshStandardMaterial({color:'#E2B04A',metalness:.55,roughness:.35}),gD=new THREE.MeshStandardMaterial({color:'#A87A24',metalness:.55,roughness:.45});
+  [[0.07,0.07,0.19],[0.17,0.21,0.15],[0.28,0.28,0.19]].reduce((y,[rt,rb,h],i)=>{const c=new THREE.Mesh(new THREE.CylinderGeometry([0.07,0.17,0.28][i],[0.07,0.21,0.28][i],h,40),gM);c.position.y=y-h/2;trophyG.add(c);return y-h},0.53);
+  if(THREE.SVGLoader){const LOGO=`<svg viewBox="0 0 20 20"><path fill="#A87A24" d="M11.464,13.344C11.45,13.387 10.129,17.715 10.731,19.362C10.933,19.913 11.384,19.999 11.391,20H5.708C5.329,20 5.06,19.786 4.906,19.362H4.905C4.31,17.712 5.623,13.387 5.637,13.344H11.464Z"/><path fill="#A87A24" d="M15.042,0C15.421,0 15.69,0.214 15.844,0.638H15.845C16.44,2.288 15.127,6.611 15.113,6.656H9.286C9.3,6.612 10.621,2.284 10.019,0.638C9.816,0.084 9.362,0.001 9.359,0H15.042Z"/><path fill="#E2B04A" d="M20,5.537C19.99,5.572 19.124,9.079 17.563,12.593C16.646,14.658 15.723,16.323 14.815,17.54C13.68,19.066 12.571,19.89 11.519,19.994C11.481,19.998 11.437,20 11.423,20H5.646C5.682,20 5.719,19.998 5.758,19.994C6.811,19.89 7.921,19.064 9.055,17.54C9.962,16.323 10.885,14.658 11.803,12.593C13.365,9.077 14.375,5.572 14.386,5.537H20ZM15.104,0C15.068,0 15.031,0.002 14.992,0.006C13.939,0.11 12.829,0.936 11.695,2.46C10.788,3.677 9.865,5.342 8.947,7.407C7.385,10.923 6.375,14.428 6.364,14.463H0.75C0.761,14.428 1.626,10.921 3.187,7.407C4.104,5.342 5.027,3.677 5.935,2.46C7.07,0.934 8.179,0.11 9.231,0.006C9.27,0.002 9.313,0 9.327,0H15.104ZM2.357,0.105C2.358,1.055 3.093,1.824 4,1.824V2.128C3.093,2.128 2.357,2.898 2.357,3.848V5.632H2.067V3.848C2.067,2.898 1.332,2.128 0.425,2.128H0V1.824H0.425C1.332,1.824 2.067,1.055 2.067,0.105H2.357Z"/></svg>`;
+    const logo=new THREE.Group(),data=new THREE.SVGLoader().parse(LOGO);
+    data.paths.forEach(p=>{const m=p.color.getHexString().toUpperCase()==='A87A24'?gD:gM;THREE.SVGLoader.createShapes(p).forEach(sh=>{const ge=new THREE.ExtrudeGeometry(sh,{depth:1.2,bevelEnabled:true,bevelThickness:.15,bevelSize:.12,bevelSegments:2});logo.add(new THREE.Mesh(ge,m))})});
+    logo.scale.set(0.045,-0.045,0.045);logo.position.set(-0.45,0.53+0.9,-0.03);trophyG.add(logo)}
+  const key=new THREE.PointLight(0xffe2a0,1.1,6);key.position.set(-1.6,3.2,1.6);g.add(key);
+  trophyG.traverse(o=>{if(o.isMesh)o.castShadow=true});
+  // 立牌在獎座後面
+  const bd=new THREE.Mesh(new THREE.BoxGeometry(1.9,2.37,0.06),mat('#2A2F40'));bd.position.set(0,1.9,-1.35);bd.rotation.x=-0.08;g.add(bd);
+  const bp=new THREE.Mesh(new THREE.PlaneGeometry(1.8,2.25),new THREE.MeshBasicMaterial({map:awardTex(a,full)}));bp.position.z=0.035;bd.add(bp);
+  // 聚光燈
+  const cone=new THREE.Mesh(new THREE.ConeGeometry(1.6,5,40,1,true),new THREE.MeshBasicMaterial({color:'#FFE9A8',transparent:true,opacity:0.18,depthWrite:false,side:THREE.DoubleSide}));cone.position.set(0,2.6,0);g.add(cone);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(1.95,2.15,48),new THREE.MeshBasicMaterial({color:'#FFC423',transparent:true,opacity:0.35}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,0.2);g.add(ring);
+  sparkle=null;
+  if(rare){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex((x,w,h)=>{x.fillStyle='#FFC423';x.beginPath();const c=w/2;for(let k=0;k<8;k++){const r=k%2?18:60,ang=k*Math.PI/4-Math.PI/2;x.lineTo(c+Math.cos(ang)*r,c+Math.sin(ang)*r)}x.closePath();x.fill();x.fillStyle='#3B2A00';x.font=`900 34px ${FONT}`;x.textAlign='center'},128,128),transparent:true}));sp.scale.set(0.5,0.5,1);sp.position.set(0.7,2.6,0.2);g.add(sp);sparkle=sp;
+    const tag=label('稀有',null,{w:1.1,bg:'#FFC423',fg:'#3B2A00',size:120});tag.position.set(0,2.45,0.05);tag.scale.set(0.7,0.7,1);g.add(tag);tag.userData.ex=5;pickables.push(tag)}
+  exSolids.push({x0:AW.x-1.8,x1:AW.x+1.8,z0:AW.z-1.6,z1:AW.z+1.5});
+  [pod,bp,bd,ring,...trophyG.children].forEach(o=>{o.userData.ex=5;pickables.push(o)});
+  exhibits.push({key:'award',g,ok:{visible:false},ring,x:AW.x,z:AW.z+2.4,i:5,title:a.name,award:a,full,rare});
+  // 大廳中央：寫著名字的巨型發票
+  const invT=tex((x)=>{x.fillStyle='#fff';x.fillRect(0,0,400,720);x.fillStyle='#1B1F2E';x.textAlign='center';x.font=`900 34px ${FONT}`;x.fillText('2026 年度回顧',200,70);x.font=`700 30px ${FONT}`;x.fillText(P().name+' 的回顧館',200,120);
+    x.font='bold 50px monospace';x.fillText('INV-2026',200,200);x.font=`24px ${FONT}`;x.fillText('統計到 2026-11-30',200,250);
+    for(let k=0;k<40;k++){const w=[2,4,6][(k*5)%3];x.fillRect(40+k*8,300,w,80)}x.fillStyle='#E4E7EF';x.fillRect(60,420,120,120);x.fillRect(220,420,120,120);
+    x.fillStyle='#B8862A';x.font=`900 30px ${FONT}`;x.fillText('入館紀念',200,620)},400,720);
+  inv=new THREE.Mesh(new THREE.BoxGeometry(1,1.8,0.03),[mat('#fff'),mat('#fff'),mat('#fff'),mat('#fff'),new THREE.MeshBasicMaterial({map:invT}),new THREE.MeshBasicMaterial({map:invT})]);inv.position.set(0,1.65,8);inv.castShadow=true;exGroup.add(inv);
+  const lobby=label(P().name+' 的 2026 年度回顧館',null,{w:5.6,size:70});lobby.position.set(0,WH*0.62,4.14);exGroup.add(lobby);
+  seen.clear();document.getElementById('seen').textContent=0;
+}
+// 固定的大廳中央台與擺設
+const PED={x:0,z:8};
+const pedM=new THREE.Mesh(new THREE.CylinderGeometry(0.9,1,0.6,40),mat('#141414'));pedM.position.set(PED.x,0.3,PED.z);pedM.castShadow=pedM.receiveShadow=true;scene.add(pedM);
+const pedR=new THREE.Mesh(new THREE.CylinderGeometry(1.01,1.01,0.06,40),trimM);pedR.position.set(PED.x,0.6,PED.z);scene.add(pedR);
+solids.push({x0:PED.x-1,x1:PED.x+1,z0:PED.z-1,z1:PED.z+1});
+function bench(x,z){const g=new THREE.Group();const s=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.12,0.55),mat('#1E1E1E'));s.position.y=0.45;s.castShadow=true;g.add(s);
+  [-0.75,0.75].forEach(dx=>{const l=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.45,0.5),mat('#C4922E'));l.position.set(dx,0.22,0);g.add(l)});g.position.set(x,0,z);scene.add(g);solids.push({x0:x-0.95,x1:x+0.95,z0:z-0.3,z1:z+0.3})}
+function plant(x,z){box(0.5,0.5,0.5,x,0.25,z,mat('#1A1A1A'));const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.42,16,12),mat('#5C4A22'));leaf.position.set(x,0.9,z);leaf.scale.y=1.3;leaf.castShadow=true;scene.add(leaf)}
+bench(-4.5,9.5);bench(4.5,9.5);
+plant(-7.3,11.3);plant(7.3,11.3);plant(-7.3,4.7);plant(7.3,4.7);plant(-7.3,-11.3);plant(7.3,-11.3);plant(-4.4,-0.2);plant(4.4,0.2);plant(6.8,0);
+// 頒獎台前的紅毯（Sam：最後頒獎前走一段紅毯）
+const carpetT=tex((x,w,h)=>{const g=x.createRadialGradient(w/2,h/2,10,w/2,h/2,w);g.addColorStop(0,'#B4141E');g.addColorStop(1,'#7E0A12');x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle='#C4922E';x.fillRect(0,0,14,h);x.fillRect(w-14,0,14,h);x.fillStyle='#0A0A0A';x.fillRect(14,0,8,h);x.fillRect(w-22,0,8,h)},256,512,1,5);
+const carpet=new THREE.Mesh(new THREE.PlaneGeometry(1.6,12.0),mat(0xffffff,{map:carpetT}));carpet.rotation.x=-Math.PI/2;carpet.position.set(0,0.012,-2.4);carpet.receiveShadow=true;scene.add(carpet);
+[-1.2,1.2].forEach(sx=>{for(let z=-5.2;z>=-8.21;z-=1.0){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.8,8),mat('#C9A24A'));p.position.set(sx,0.4,z);scene.add(p)}
+  const rope=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,3.0,8),mat('#FFC423'));rope.rotation.x=Math.PI/2;rope.position.set(sx,0.72,-6.7);scene.add(rope)});
+
+// 玩家
+const player=new THREE.Group();
+const skin=mat('#F5D3B3'),shirt=mat('#3560FF'),pants=mat('#2A2F40'),hair=mat('#2A211C');
+const bodyM=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.26,0.5,16),shirt);bodyM.position.y=0.55;
+const head=new THREE.Mesh(new THREE.SphereGeometry(0.3,20,16),skin);head.position.y=1.05;
+const hairM=new THREE.Mesh(new THREE.SphereGeometry(0.31,20,16,0,Math.PI*2,0,Math.PI*0.55),hair);hairM.position.y=1.07;hairM.rotation.x=-0.25;
+const legL=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.32,0.12),pants),legR=legL.clone();legL.position.set(-0.1,0.16,0);legR.position.set(0.1,0.16,0);
+const eyeM=new THREE.MeshBasicMaterial({color:'#1B1F2E'});const eL=new THREE.Mesh(new THREE.SphereGeometry(0.035,8,8),eyeM),eR=eL.clone();eL.position.set(-0.1,1.06,0.27);eR.position.set(0.1,1.06,0.27);
+const cardM=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.24,0.02),mat('#FFFFFF'));cardM.position.set(0.27,0.6,0.12);cardM.rotation.z=-0.3;
+[bodyM,head,hairM,legL,legR,eL,eR,cardM].forEach(o=>{o.castShadow=true;player.add(o)});
+player.scale.setScalar(1.3);scene.add(player);
+let heading=Math.PI;
+function resetPlayer(){player.position.set(0,0,10.8);heading=Math.PI;player.rotation.y=heading;placeCam(true)}
+
+function camOffset(){return innerWidth<innerHeight?new THREE.Vector3(0,16,11):new THREE.Vector3(0,11,9)}
+const camLook=new THREE.Vector3();
+function placeCam(snap){const want=new THREE.Vector3(player.position.x*0.7,0,player.position.z-1.2);if(snap)camLook.copy(want);else camLook.lerp(want,0.08);cam.position.copy(camLook).add(camOffset());cam.lookAt(camLook)}
+
+// ================= 操作（同原型） =================
+let jx=0,jy=0,target=null,pendingOpen=null,stuckT=0;
+const ray=new THREE.Raycaster(),v2=new THREE.Vector2(),el=renderer.domElement;
+const joy=document.getElementById('joy'),knob=document.getElementById('knob');const JR=46;
+let pid=null,sx=0,sy=0,dragging=false;
+el.addEventListener('pointerdown',e=>{if(touring)endTour(false);pid=e.pointerId;sx=e.clientX;sy=e.clientY;if(dragging){dragging=false;jx=jy=0;joy.classList.remove('on')}try{el.setPointerCapture(e.pointerId)}catch(_){}});
+el.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;let dx=e.clientX-sx,dy=e.clientY-sy;const d=Math.hypot(dx,dy);
+  if(!dragging&&d>10){dragging=true;target=null;pendingOpen=null;joy.classList.add('on');hideTip()}
+  if(!dragging)return;if(d>JR){dx*=JR/d;dy*=JR/d}jx=dx/JR;jy=dy/JR;knob.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`});
+['pointerup','pointercancel'].forEach(t=>el.addEventListener(t,e=>{if(e.pointerId!==pid)return;pid=null;
+  if(dragging){dragging=false;jx=jy=0;knob.style.transform='translate(-50%,-50%)';joy.classList.remove('on');return}
+  if(t==='pointercancel')return;tapAt(e)}));
+function tapAt(e){v2.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(v2,cam);
+  const hit=ray.intersectObjects([...pickables,...floors],false)[0];if(!hit)return;hideTip();
+  if(hit.object.userData.ex!==undefined){const ex=exhibits[hit.object.userData.ex];
+    if(Math.hypot(ex.x-player.position.x,ex.z-player.position.z)<1.8){openCard(ex.i);return}
+    target=new THREE.Vector3(ex.x,0,ex.z);pendingOpen=ex.i;return}
+  // 點到圈圈中間（圈圈是空心的，會打到地板）也算點圈圈
+  const p=hit.point,exr=exhibits.find(ex=>Math.hypot(ex.x-p.x,ex.z-p.z)<(ex.award?2.2:1.0));
+  if(exr){if(Math.hypot(exr.x-player.position.x,exr.z-player.position.z)<1.8){openCard(exr.i);return}target=new THREE.Vector3(exr.x,0,exr.z);pendingOpen=exr.i;return}
+  target=hit.point.clone();target.y=0;pendingOpen=null}
+const keys={};addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(touring&&/^(w|a|s|d|arrow)/.test(k))endTour(false);keys[k]=1});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+const _pv=new THREE.Vector3();
+function placeJoy(){_pv.set(player.position.x,0,player.position.z).project(cam);joy.style.left=((_pv.x+1)/2*innerWidth)+'px';joy.style.top=((1-_pv.y)/2*innerHeight)+'px'}
+
+// ================= 卡片、分享、好友視角 =================
+const $=id=>document.getElementById(id);
+const seen=new Set();let near=null;
+function toast(s){const t=$('toast');t.textContent=s;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2000)}
+// ================= 展品卡細節（數字全部示意） =================
+function statue(hPx){return `<div class="statue" style="height:${hPx}" aria-label="發票獎座">
+ <svg class="logo" viewBox="0 0 20 20" style="height:66%">
+  <defs>
+   <linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBE29A"/><stop offset=".45" stop-color="#EEC253"/><stop offset="1" stop-color="#C4922E"/></linearGradient>
+   <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9993A"/><stop offset="1" stop-color="#94681E"/></linearGradient>
+  </defs>
+  <path d="M11.464,13.344C11.45,13.387 10.129,17.715 10.731,19.362C10.933,19.913 11.384,19.999 11.391,20H5.708C5.329,20 5.06,19.786 4.906,19.362H4.905C4.31,17.712 5.623,13.387 5.637,13.344H11.464Z" fill="url(#gd)"/>
+  <path d="M15.042,0C15.421,0 15.69,0.214 15.844,0.638H15.845C16.44,2.288 15.127,6.611 15.113,6.656H9.286C9.3,6.612 10.621,2.284 10.019,0.638C9.816,0.084 9.362,0.001 9.359,0H15.042Z" fill="url(#gd)"/>
+  <path d="M20,5.537C19.99,5.572 19.124,9.079 17.563,12.593C16.646,14.658 15.723,16.323 14.815,17.54C13.68,19.066 12.571,19.89 11.519,19.994C11.481,19.998 11.437,20 11.423,20H5.646C5.682,20 5.719,19.998 5.758,19.994C6.811,19.89 7.921,19.064 9.055,17.54C9.962,16.323 10.885,14.658 11.803,12.593C13.365,9.077 14.375,5.572 14.386,5.537H20ZM15.104,0C15.068,0 15.031,0.002 14.992,0.006C13.939,0.11 12.829,0.936 11.695,2.46C10.788,3.677 9.865,5.342 8.947,7.407C7.385,10.923 6.375,14.428 6.364,14.463H0.75C0.761,14.428 1.626,10.921 3.187,7.407C4.104,5.342 5.027,3.677 5.935,2.46C7.07,0.934 8.179,0.11 9.231,0.006C9.27,0.002 9.313,0 9.327,0H15.104ZM2.357,0.105C2.358,1.055 3.093,1.824 4,1.824V2.128C3.093,2.128 2.357,2.898 2.357,3.848V5.632H2.067V3.848C2.067,2.898 1.332,2.128 0.425,2.128H0V1.824H0.425C1.332,1.824 2.067,1.055 2.067,0.105H2.357Z" fill="url(#gm)"/>
+ </svg>
+ <svg class="base" viewBox="3.5 0 13 12" style="height:34%">
+  <defs>
+   <linearGradient id="gc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A9781F"/><stop offset=".35" stop-color="#F1CB68"/><stop offset=".6" stop-color="#E2B04A"/><stop offset="1" stop-color="#9C6E1C"/></linearGradient>
+  </defs>
+  <rect x="8.6" y="0" width="2.8" height="3.8" fill="url(#gc)"/>
+  <ellipse cx="10" cy="3.8" rx="3.4" ry=".8" fill="#F4D27A"/>
+  <path d="M6.6 3.8H13.4L14.2 6.8H5.8Z" fill="url(#gc)"/>
+  <ellipse cx="10" cy="6.8" rx="5.6" ry="1.1" fill="#F1CB68"/>
+  <path d="M4.4 6.8H15.6V10.6A5.6 1.1 0 0 1 4.4 10.6Z" fill="url(#gc)"/>
+ </svg>
+</div>`}
+
+
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function exDetail(k,P,full){
+  const st3=a=>full?`<div class="stats">${a.map(([l,v])=>`<div><small>${l}</small><b>${v}</b></div>`).join('')}</div>`:'';
+  if(k==='count'){const c=P.count;
+    return {stats:st3([['平均每月',fmt(Math.round(c.n/11))+' 張'],['最忙月份',P.month.m+' 月'],['平均每天',(c.n/334).toFixed(1)+' 張']]),viz:monthBars(P,full,'每個月存了幾張')}}
+  if(k==='month')return {stats:st3([['最忙',P.month.m+' 月'],['那個月',P.month.n+' 張'],['占全年',Math.round(P.month.n/P.count.n*100)+'%']]),viz:monthBars(P,full,'1–11 月發票張數')};
+  if(k==='place'){const p=P.place,o=['全聯','7-11','全家','好市多'].filter(x=>x!==p.name);
+    const rows=[[p.name,p.n,1],[o[0],Math.max(1,Math.round(p.n*.46)),0],[o[1],Math.max(1,Math.round(p.n*.21)),0]];
+    return {stats:st3([['去了',p.n+' 次'],['平均每月',Math.max(1,Math.round(p.n/11))+' 次'],['占全年發票',Math.round(p.n/P.count.n*100)+'%']]),
+      viz:`<div class="viz"><h4>量販／超市／超商 前三名</h4>${rows.map(([n,v,on])=>`<div class="hbar${on?' on':''}"><span>${esc(n)}</span><i style="width:${Math.round(v/p.n*100)}%"></i><b>${full?v+' 次':''}</b></div>`).join('')}<div class="demo-n">示意</div></div>`}}
+  if(k==='time'){const t=P.time,L=['8 點前','8–12','12–14','14–18','18–22','22 點後'];
+    const hi=/8 點前/.test(t.label)?0:/12/.test(t.label)?2:/10 點後|22/.test(t.label)?5:4,base=[.35,.55,.7,.5,.8,.45];
+    const v=L.map((_,i)=>i===hi?t.n:Math.max(1,Math.round(t.n*base[i]*(i===hi?1:.85))));
+    return {stats:st3([['最常在',t.label],['次數',t.n+' 次'],['占全年',Math.round(t.n/P.count.n*100)+'%']]),viz:bars(L,v,hi,full,'一天裡什麼時候最常消費')}}
+  const Lo=P.lottery,D=['1/25','3/25','5/25','7/25','9/25','11/25'],start=6-Lo.periods,win=[4,1,5,2,3,0].filter(i=>i>=start).slice(0,Lo.wins);
+  return {stats:st3([['對獎',Lo.periods+' 期'],['中獎',Lo.wins+' 次'],['獎金',Lo.amt?fmt(Lo.amt)+' 元':'下期加油']]),
+    viz:`<div class="viz"><h4>2026 六次開獎</h4><div class="dots">${D.map((d,i)=>{const w=win.includes(i),c=i>=start;return `<div class="${w?'w':c?'c':''}"><i>${w?'中':c?'✓':'–'}</i>${d}</div>`}).join('')}</div><div class="demo-n" style="margin-top:6px">✓ 有對獎　中＝中獎　–＝還沒開始用</div></div>`};
+}
+function bars(L,v,hi,full,title){const mx=Math.max(...v);return `<div class="viz"><h4>${title}</h4><div class="bars">${L.map((l,i)=>`<div class="${i===hi?'on':''}">${full&&i===hi?`<em>${v[i]}</em>`:''}<i style="height:${Math.round(v[i]/mx*78)+4}%"></i>${l}</div>`).join('')}</div><div class="demo-n">示意</div></div>`}
+function monthBars(P,full,title){const w=[.8,.72,.9,.84,.95,.88,1,1.04,.9,.98,1.08],m=P.month.m-1;
+  const v=w.map((x,i)=>i===m?P.month.n:Math.min(P.month.n-1,Math.max(1,Math.round(P.month.n*x*.72))));return bars(w.map((_,i)=>(i+1)+''),v,m,full,title)}
+function certHTML(a,full,name,no,rare){
+  let d='';for(let i=0;i<32;i++){const g=i*Math.PI/16-Math.PI/2,r=i%2?80:96;d+=(i?'L':'M')+(100+Math.cos(g)*r).toFixed(1)+' '+(100+Math.sin(g)*r).toFixed(1)}
+  const reason=full?a.cert(a.d):a.certSafe;
+  return `<div class="certwrap"><div class="cert"><div class="frame"></div>
+  <div class="topbar"><span class="l">INVOICE OF THE YEAR</span><span class="rule"></span><span class="r">2026 發票存摺 年度風格大賞</span></div>
+  <div class="mark"><div class="lock"><div class="w mt">INVOICE</div><div class="w mt">OF</div><div class="w mt">THE</div><div class="w mt">YEAR</div><div class="fig">${statue('1.8em')}</div><div class="yr mt"><span>20</span><span>26</span></div></div></div>
+  ${rare?`<svg class="rare" viewBox="0 0 200 200"><defs><linearGradient id="crg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBE29A"/><stop offset=".35" stop-color="#EEC253"/><stop offset=".65" stop-color="#D8A63A"/><stop offset=".82" stop-color="#F1CB68"/><stop offset="1" stop-color="#C4922E"/></linearGradient></defs><path d="${d}Z" fill="url(#crg)"/><circle cx="100" cy="100" r="64" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="3 5" opacity=".6"/><text x="100" y="100" text-anchor="middle" font-family="Noto Sans TC" font-weight="900" font-size="48" fill="#0A0A0A">稀有</text><text x="100" y="134" text-anchor="middle" font-family="Anton" font-size="22" fill="#0A0A0A" letter-spacing="2">RARE &lt;1%</text></svg>`:''}
+  <div class="eyebrow">年度風格大賞得主</div><div class="award mt">${esc(a.name)}</div><div class="who">得主<b>${esc(name)}</b></div>
+  <div class="body">茲因 <b>${esc(name)}</b> 於 2026 年度${esc(reason)}經本屆評審一致通過，特頒「${esc(a.name)}」，以資鼓勵。</div>
+  <svg class="seal" viewBox="0 0 200 200"><defs><linearGradient id="csg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBE29A"/><stop offset=".5" stop-color="#D8A63A"/><stop offset="1" stop-color="#F1CB68"/></linearGradient></defs><circle cx="100" cy="100" r="92" fill="none" stroke="url(#csg)" stroke-width="6"/><circle cx="100" cy="100" r="78" fill="none" stroke="url(#csg)" stroke-width="1.5"/><text x="100" y="92" text-anchor="middle" font-family="Noto Sans TC" font-weight="900" font-size="42" fill="url(#csg)" letter-spacing="4">發票</text><text x="100" y="140" text-anchor="middle" font-family="Noto Sans TC" font-weight="900" font-size="42" fill="url(#csg)" letter-spacing="4">存摺</text></svg>
+  <div class="info"><div class="tab"></div><div class="boxes"><div>本屆第 ${fmt(no)} 位得主</div><div>發票存摺・2026.12</div></div></div><div class="dm">示意</div></div></div>`}
+function fitCert(){document.querySelectorAll('.certwrap').forEach(w=>{if(!w.clientWidth)return;const c=w.firstElementChild;c.style.transform=`scale(${w.clientWidth/1080})`;
+  const a=c.querySelector('.award');if(a){let f=150;a.style.fontSize=f+'px';while(a.scrollWidth>a.clientWidth&&f>60){f-=4;a.style.fontSize=f+'px'}}})}
+addEventListener('resize',fitCert);
+function openCard(i){const ex=exhibits[i];target=null;pendingOpen=null;const mine=st.mode==='me',name=P().name;
+  const fun=$('cF');fun.className='fun';$('cCta').hidden=true;['cCert','cBig','cStats','cViz'].forEach(id=>$(id).innerHTML='');$('cP').hidden=false;$('cBig').hidden=true;
+  if(ex.award){const a=ex.award,n=Math.round(a.rate*PARTICIPANTS);swell();
+    $('cNo').textContent=mine?'2026 年度風格大賞・你的獎座':`${name} 的 2026 年度風格大賞`;$('cT').textContent=a.name;$('cP').textContent=ex.full?a.line(a.d):a.safe;
+    $('cCert').innerHTML=certHTML(a,ex.full,name,Math.max(1,Math.round(n*.62)),ex.rare);
+    fun.className='fun gold';fun.textContent=`已頒出 ${fmt(n)} 座（${(a.rate*100).toFixed(1)}%）`+(ex.rare?'・稀有：發出比例不到 1%':'');
+    $('cCta').hidden=false;$('cCta').textContent=mine?'邀請好友來逛':'看看你自己的';$('cCta').className=mine?'btn p':'btn g'}
+  else if(ex.hidden){$('cNo').textContent=ex.e.no;$('cT').textContent=ex.e.t;$('cP').textContent=`${name} 沒有公開這件展品。`;fun.textContent='主人可以自己決定要展出哪些內容。'}
+  else{const full=mine||st.nums,dt=exDetail(ex.key,P(),full);$('cNo').textContent=ex.e.no.replace('展品 ','EXHIBIT ');$('cT').textContent=ex.e.t;
+    $('cBig').hidden=false;$('cBig').innerHTML=`<b>${esc(ex.e.big)}</b>${ex.e.sub?`<span>${esc(ex.e.sub)}</span>`:''}`;
+    $('cP').textContent=ex.e.p;$('cStats').innerHTML=dt.stats;$('cViz').innerHTML=dt.viz;
+    fun.textContent=(!mine&&!st.nums)?`${name} 沒有公開數字。`:ex.e.f}
+  $('card').classList.add('on');requestAnimationFrame(fitCert);
+  if(!seen.has(i)){seen.add(i);$('seen').textContent=seen.size;if(ex.ok)ex.ok.visible=true;
+    if(seen.size===exhibits.length&&mine){setTimeout(()=>{toast('全部看完了！邀請好友來逛你的回顧館');$('act').classList.add('pulse')},400)}}}
+$('cClose').onclick=()=>$('card').classList.remove('on');
+$('cCta').onclick=()=>{$('card').classList.remove('on');st.mode==='me'?openInvite():openMine()};
+$('card').onclick=e=>{if(e.target===$('card'))$('card').classList.remove('on')};
+$('near').onclick=()=>{if(near!==null)openCard(near)};
+let tipHidden=false;function hideTip(){if(tipHidden)return;tipHidden=true;$('tip').style.opacity=0}
+
+function snapshot(){renderer.render(scene,cam);try{return renderer.domElement.toDataURL('image/jpeg',0.7)}catch(e){return ''}}
+function renderToggles(){const L=$('tgList');L.innerHTML='';
+  EX_KEYS.forEach(k=>{const b=document.createElement('button');b.type='button';b.className='tg';b.innerHTML=`<span>${EX_NAMES[k]}</span><span class="sw${st.shown[k]?' on':''}"></span>`;b.onclick=()=>{st.shown[k]=!st.shown[k];renderToggles()};L.appendChild(b)});
+  const n=document.createElement('button');n.type='button';n.className='tg';n.style.borderBottom='0';n.innerHTML=`<span><b>公開次數等數字</b></span><span class="sw${st.nums?' on':''}"></span>`;n.onclick=()=>{st.nums=!st.nums;renderToggles()};L.appendChild(n);
+  const cnt=EX_KEYS.filter(k=>st.shown[k]).length;$('ogT').textContent=`來逛 ${P().name} 的 2026 年度回顧館（展出 ${cnt+1} 件）`}
+function openInvite(){$('act').classList.remove('pulse');$('ogImg').src=snapshot();renderToggles();$('invite').classList.add('on')}
+$('invClose').onclick=()=>$('invite').classList.remove('on');
+$('copy').onclick=()=>{const u='https://discovery.invos.com.tw/review/visit?t=示意連結';try{navigator.clipboard.writeText(u).then(()=>toast('已複製（示意連結）'),()=>toast('示意連結：'+u))}catch(e){toast('示意連結')}};
+$('asFriend').onclick=()=>{$('invite').classList.remove('on');setMode('visit')};
+function openMine(){$('mineT').textContent='看看你自己的回顧館';$('mineP').textContent=`下載時會帶 ${P().name} 的好友邀請碼，算得出是誰邀來的。`;$('mine').classList.add('on')}
+$('mineClose').onclick=()=>$('mine').classList.remove('on');
+document.querySelectorAll('[data-fake]').forEach(b=>b.onclick=()=>toast(b.dataset.fake+'（示意）'));
+$('act').onclick=()=>st.mode==='me'?openInvite():openMine();
+$('backMe').onclick=()=>setMode('me');
+function setMode(m){st.mode=m;const mine=m==='me';$('vbar').hidden=mine;$('act').textContent=mine?'邀請好友來逛':'看看你自己的';$('act').className=mine?'':'gold';
+  $('act').style.top=mine?'':'calc(env(safe-area-inset-top,0px) + 100px)';
+  $('hudName').textContent=mine?`${P().name} 的回顧館`:`${P().name} 的 2026 回顧館`;buildExhibits();resetPlayer()}
+
+// 開場與換範例
+function renderIntro(){const c=$('chips');c.innerHTML='';
+  Object.keys(PERSONAS).forEach(k=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=PERSONAS[k].name;b.setAttribute('aria-pressed',String(k===st.p));b.onclick=()=>{st.p=k;resetShown();renderIntro()};c.appendChild(b)});
+  $('chipNote').textContent='範例：'+P().note;
+  $('introP').innerHTML=`${P().name}，你的 2026 年度回顧館開館了。<br>逛完 5 件展品，最後一間有你的獎座。`}
+// 配樂：入館時開始（瀏覽器規定要點了才能出聲），左下角可關；看獎座時音量拉高
+const bgm=$('bgm');let musicOn=true;
+function playMusic(){if(!musicOn)return;bgm.volume=0.55;const p=bgm.play();if(p&&p.catch)p.catch(()=>{musicOn=false;syncSnd()})}
+function syncSnd(){$('snd').hidden=false;$('snd').textContent=musicOn?'♪ 配樂：開':'♪ 配樂：關'}
+$('snd').onclick=()=>{musicOn=!musicOn;if(musicOn)playMusic();else bgm.pause();syncSnd()};
+function swell(){if(!musicOn||bgm.paused)return;bgm.volume=0.9;clearTimeout(swell._t);swell._t=setTimeout(()=>{bgm.volume=0.55},6000)}
+$('go').onclick=()=>{exitCardMode();$('intro').style.display='none';setMode('me');playMusic();syncSnd();setTimeout(startTour,700)};
+$('proto').onclick=()=>{endTour(false,true);exitCardMode();['card','invite','mine'].forEach(id=>$(id).classList.remove('on'));renderIntro();$('intro').style.display='flex'};
+
+// ================= 自動導覽：入館先帶著走一遍（展品 01→05，最後頒獎台）；碰畫面或按鍵就交還給你 =================
+// 路線加了幾個轉折點，避免直線穿過展台或牆
+const TOUR=[{p:[-4,5]},{ex:2},{p:[-5.5,0.5]},{ex:0},{ex:1},{ex:3},{ex:4},{p:[2,-3.5]},{p:[0,-5]},{ex:5}];
+let touring=false,tourStep=0,tourWait=0;
+function tourLabel(){let n=0,ex=null;for(let k=0;k<=tourStep&&k<TOUR.length;k++)if(TOUR[k].ex!==undefined){n++;ex=exhibits[TOUR[k].ex]}
+  if(!ex)return '導覽中：往展區走';return `導覽中（${n}/6）：<b>${esc(ex.award?'頒獎台':ex.title)}</b>`}
+function goTourStep(){if(!touring)return;if(tourStep>=TOUR.length){endTour(true);return}
+  const s=TOUR[tourStep];const pt=s.ex!==undefined?[exhibits[s.ex].x,exhibits[s.ex].z]:s.p;target=new THREE.Vector3(pt[0],0,pt[1]);pendingOpen=null;$('tourTxt').innerHTML=tourLabel()}
+function tourOnArrive(){if(!touring)return;const s=TOUR[tourStep];tourStep++;tourWait=s.ex!==undefined?(s.ex===5?2.2:1.3):0.01}
+function startTour(){if(cardMode||noGL||$('intro').style.display!=='none')return;touring=true;tourStep=0;tourWait=0;$('tourbar').hidden=false;hideTip();goTourStep()}
+function endTour(done,silent){if(!touring)return;touring=false;target=null;tourWait=0;$('tourbar').hidden=true;
+  if(silent)return;toast(done?'導覽完畢！點地上的金色圈圈，小人會自己走過去':'換你自己逛：點地上的金色圈圈就會走過去');showTipAgain()}
+function showTipAgain(){const t=$('tip');tipHidden=false;t.style.opacity=1;clearTimeout(showTipAgain._t);showTipAgain._t=setTimeout(()=>{tipHidden=false;hideTip()},6000)}
+$('tourSkip').onclick=()=>endTour(false);
+
+// ================= 只看卡片（舊手機、不支援 3D 的手機用；不跑 3D 也比較省電） =================
+let cardMode=false,cmIdx=0;
+const CM_ITEMS=['count','month','place','time','lottery','award'];
+function renderCM(){const name=P().name,k=CM_ITEMS[cmIdx];$('cmName').textContent=`${name} 的 2026 年度回顧`;$('cmProg').textContent=`${cmIdx+1} / ${CM_ITEMS.length}`;
+  let h='';
+  if(k==='award'){const a=award(),n=Math.round(a.rate*PARTICIPANTS);swell();
+    h=`<div class="no">INVOICE OF THE YEAR・你的獎座</div><h2>${esc(a.name)}</h2>${certHTML(a,true,name,Math.max(1,Math.round(n*.62)),false)}<p>${esc(a.line(a.d))}</p><div class="fun gold">已頒出 ${fmt(n)} 座（${(a.rate*100).toFixed(1)}%）</div>`}
+  else{const e=exhibitText(k,P(),true),dt=exDetail(k,P(),true);
+    h=`<div class="no">${esc(e.no.replace('展品 ','EXHIBIT '))}</div><h2>${esc(e.t)}</h2><div class="cbig"><b>${esc(e.big)}</b>${e.sub?`<span>${esc(e.sub)}</span>`:''}</div><p>${esc(e.p)}</p>${dt.stats}${dt.viz}<div class="fun">${esc(e.f)}</div>`}
+  $('cmBody').innerHTML=h;$('cmDots').innerHTML=CM_ITEMS.map((_,i)=>`<i class="${i===cmIdx?'on':''}"></i>`).join('');
+  $('cmPrev').disabled=cmIdx===0;$('cmPrev').style.opacity=cmIdx===0?.4:1;
+  $('cmNext').textContent=cmIdx===CM_ITEMS.length-2?'揭曉我的獎座':cmIdx===CM_ITEMS.length-1?'邀請好友來看':'下一張';
+  $('cm').scrollTop=0;requestAnimationFrame(fitCert)}
+function openCardMode(){endTour(false,true);cardMode=true;st.mode='me';cmIdx=0;document.body.classList.add('cm');$('intro').style.display='none';$('cm').hidden=false;$('cm3d').hidden=noGL;renderCM()}
+function exitCardMode(){if(!cardMode)return;cardMode=false;document.body.classList.remove('cm');$('cm').hidden=true}
+$('goCards').onclick=()=>{openCardMode();playMusic();syncSnd()};
+$('cmPrev').onclick=()=>{if(cmIdx>0){cmIdx--;renderCM()}};
+$('cmNext').onclick=()=>{if(cmIdx<CM_ITEMS.length-1){cmIdx++;renderCM()}else{buildExhibits();openInvite()}};
+$('cm3d').onclick=()=>{exitCardMode();setMode('me');setTimeout(startTour,700)};
+// 偵測：不支援 3D 就只留卡片；記憶體或核心數很少的手機建議用卡片
+(function(){const lowEnd=(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2);
+  if(noGL){$('go').hidden=true;$('goCards').className='btn g';$('glNote').hidden=false;$('glNote').textContent='這支手機不支援 3D 展廳，用卡片一張一張看。'}
+  else if(lowEnd){$('glNote').hidden=false;$('glNote').textContent='這支手機比較舊，建議用「只看卡片」，比較順。'}})();
+
+// 碰撞
+const R=0.3;
+function collide(p){for(const b of solids.concat(exSolids)){const cx=Math.max(b.x0,Math.min(p.x,b.x1)),cz=Math.max(b.z0,Math.min(p.z,b.z1));const dx=p.x-cx,dz=p.z-cz,d=Math.hypot(dx,dz);
+  if(d<R){if(d>1e-6){p.x=cx+dx/d*R;p.z=cz+dz/d*R}else{const o=[p.x-b.x0,b.x1-p.x,p.z-b.z0,b.z1-p.z],m=Math.min(...o),k=o.indexOf(m);if(k===0)p.x=b.x0-R;if(k===1)p.x=b.x1+R;if(k===2)p.z=b.z0-R;if(k===3)p.z=b.z1+R}}}}
+
+const clock=new THREE.Clock();let walkT=0,tt=0;
+function loop(){
+  const dt=Math.min(clock.getDelta(),0.05);tt+=dt;
+  if(cardMode||noGL){requestAnimationFrame(loop);return}
+  let mx=jx+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0);
+  let mz=jy+((keys['s']||keys['arrowdown'])?1:0)-((keys['w']||keys['arrowup'])?1:0);
+  if(Math.hypot(mx,mz)>0.05){target=null;pendingOpen=null}
+  else if(target){const dx=target.x-player.position.x,dz=target.z-player.position.z,d=Math.hypot(dx,dz);
+    if(d<0.15){target=null;if(touring)tourOnArrive();else if(pendingOpen!==null)openCard(pendingOpen)}else{mx=dx/d;mz=dz/d}}
+  if(touring&&tourWait>0&&!target){tourWait-=dt;if(tourWait<=0){tourWait=0;goTourStep()}}
+  const mag=Math.hypot(mx,mz);
+  if(mag>0.05){if(mag>1){mx/=mag;mz/=mag}hideTip();
+    const before=player.position.clone(),sp=3.2*dt;player.position.x+=mx*sp;player.position.z+=mz*sp;collide(player.position);
+    if(target&&player.position.distanceTo(before)<sp*0.2){stuckT+=dt;if(stuckT>0.4){target=null;pendingOpen=null;stuckT=0;if(touring)tourOnArrive()}}else stuckT=0;
+    const want=Math.atan2(mx,mz);let df=want-heading;df=Math.atan2(Math.sin(df),Math.cos(df));heading+=df*Math.min(1,dt*10);player.rotation.y=heading;
+    walkT+=dt*10;legL.position.z=Math.sin(walkT)*0.08;legR.position.z=-Math.sin(walkT)*0.08;player.position.y=Math.abs(Math.sin(walkT))*0.04}
+  else{legL.position.z=legR.position.z=0;player.position.y=0}
+  let best=null,bd=1.8;const pulse=0.35+0.3*(0.5+0.5*Math.sin(tt*3.2));exhibits.forEach(ex=>{const d=Math.hypot(ex.x-player.position.x,ex.z-player.position.z);if(ex.ring)ex.ring.material.opacity=d<1.8?0.85:pulse;if(d<bd){bd=d;best=ex.i}});
+  if(best!==near){near=best;const nb=$('near');if(near===null)nb.classList.remove('on');else{const ex=exhibits[near];nb.textContent=(ex.award?'看獎座：':'看展品：')+ex.title;nb.className='on'+(ex.award?' gold':'')}}
+  fadeWalls.forEach(w=>{const z=w.userData.z,inFront=z>player.position.z&&z-player.position.z<5;const o=inFront?0.18:1;w.material.opacity+=(o-w.material.opacity)*Math.min(1,dt*8);w.castShadow=w.material.opacity>0.9});
+  if(inv)inv.rotation.y+=dt*0.6;if(trophyG)trophyG.rotation.y+=dt*0.7;if(sparkle)sparkle.position.y=2.6+Math.sin(tt*3)*0.08;
+  placeCam(false);placeJoy();renderer.render(scene,cam);requestAnimationFrame(loop)}
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.fov=fovFor();cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);placeCam(true)});
+
+// 字型載入後再畫立牌（canvas 字才會是思源黑體）
+renderIntro();
+const ready=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load(`900 40px "Noto Sans TC"`),document.fonts.load(`700 40px "Noto Sans TC"`)]),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
+ready.then(()=>{$('hudName').textContent=`${P().name} 的回顧館`;buildExhibits();resetPlayer();loop()});
+</script>
