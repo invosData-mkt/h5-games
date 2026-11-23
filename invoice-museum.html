@@ -2,7 +2,11 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#EDEAE2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>發票博物館｜8 張發票藏在展廳，你幾秒找齊？・發票存摺 invos</title>
 <meta name="robots" content="noindex">
 <meta name="description" content="展廳裡藏了 8 張發票，找齊要幾秒？順便看懂台灣統一發票 75 年的故事。">
@@ -14,16 +18,47 @@
 <style>
   :root{--g:#00B386;--gd:#008F6B;--ink:#1F2A30;--paper:#FFFDF7}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;overflow:hidden;background:#EDEAE2;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;color:var(--ink)}
+  html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:#EDEAE2;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;color:var(--ink)}
   canvas{display:block;touch-action:none}
-  #hud{position:fixed;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;pointer-events:none}
+  #hud{position:fixed;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding:max(12px,env(safe-area-inset-top)) 14px 12px;pointer-events:none}
   #hud .t{background:rgba(255,255,255,.9);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
   #hud .t b{color:var(--g)}
   #prog{pointer-events:none}
   #tip{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:rgba(31,42,48,.85);color:#fff;font-size:13px;padding:8px 14px;border-radius:999px;white-space:nowrap;transition:opacity .4s}
   #card{position:fixed;inset:0;z-index:20;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.35)}
   #card.on{display:flex}
-  #card .box{background:var(--paper);width:100%;max-width:460px;border-radius:20px 20px 0 0;padding:22px 20px 26px;animation:up .25s ease-out}
+  #card .box{position:relative;background:var(--paper);width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;border-radius:20px 20px 0 0;padding:0 0 max(14px,env(safe-area-inset-bottom));animation:up .25s ease-out}
+  #card .sc{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px 4px;overscroll-behavior:contain}
+  #card .row{padding:0 20px}
+  #card .x{position:absolute;right:10px;top:10px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer}
+  #card .x svg{width:18px;height:18px}
+  #card img{display:block;width:100%;aspect-ratio:640/520;max-height:28vh;object-fit:cover;border-radius:14px;margin-bottom:12px}
+  #card .seenl{font-size:12px;color:#899;float:right;margin-top:1px}
+  #card .lead{font-size:15.5px;line-height:1.8;margin:0 0 12px}
+  #card .nums{display:flex;gap:8px;margin:0 0 14px}
+  #card .nums div{flex:1;background:#fff;border:2px solid #EFEAE0;border-radius:14px;padding:8px 6px;text-align:center}
+  #card .nums b{display:block;font-size:22px;font-weight:900;color:var(--gd);font-family:ui-monospace,Menlo,monospace;letter-spacing:-.02em}
+  #card .nums span{font-size:12px;color:#566;line-height:1.35;display:block;margin-top:2px}
+  #card h4{margin:14px 0 6px;font-size:14px;color:var(--gd);letter-spacing:.08em}
+  #card ul.facts{margin:0;padding:0;list-style:none}
+  #card ul.facts li{position:relative;padding:9px 10px 9px 34px;background:#E8F7F2;border-radius:12px;margin-bottom:6px;font-size:14.5px;line-height:1.65}
+  #card ul.facts li::before{content:'?';position:absolute;left:10px;top:9px;width:17px;height:17px;border-radius:50%;background:var(--g);color:#fff;font-size:12px;font-weight:900;text-align:center;line-height:17px}
+  #card table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 4px}
+  #card td{padding:6px 8px;border-bottom:1px solid #EFEAE0}
+  #card td:last-child{text-align:right;font-weight:800;font-family:ui-monospace,Menlo,monospace}
+  #card tr.hi td{color:#C0262D}
+  #card .src{font-size:11.5px;color:#899;margin:12px 0 6px}
+  #card .pause{font-size:12px;color:#899;text-align:center;margin:8px 0 0}
+  #intro .hours{display:flex;gap:8px;align-items:flex-start;text-align:left;background:#fff;border-radius:14px;padding:10px 14px;margin:0 0 16px;font-size:14px;line-height:1.55;max-width:min(92vw,400px);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  #intro .hours svg{flex:none;width:22px;height:22px;margin-top:1px}
+  #intro .hours small{display:block;color:#788;font-size:12.5px;margin:2px 0 0}
+  body.night #intro{background:radial-gradient(circle at 50% 38%,#24324F 0,#0C1424 62%);color:#fff}
+  body.night #intro p,body.night #intro small{color:#B9C4D8}
+  body.night #intro .k{color:#7EF0C9}
+  body.night #intro .hours{background:rgba(255,255,255,.08);color:#fff;box-shadow:none}
+  body.night #intro .hours small{color:#B9C4D8}
+  body.night #intro .go{background:#FFD866;color:#1F2A30}
+  body.night #tip{background:rgba(255,216,102,.92);color:#1F2A30}
   @media(min-width:700px){#card{align-items:center}#card .box{border-radius:20px}}
   @keyframes up{from{transform:translateY(40px);opacity:0}}
   #card .no{font-size:12px;color:var(--gd);font-weight:700;letter-spacing:.1em}
@@ -88,6 +123,7 @@
 <div id="intro">
   <div class="k">INVOICE MUSEUM</div>
   <h1>發票博物館</h1>
+  <div class="hours" id="hours"></div>
   <div class="vsc" id="vsCard" hidden></div>
   <p id="introP">展廳裡藏了 <b>8 張發票</b>，你要幾秒才找齊？<br>每張發票都藏著一段統一發票的故事。</p>
   <button class="btn p go" id="go" type="button">開始尋寶 ▶</button>
@@ -112,21 +148,42 @@
 <button id="near" type="button"></button>
 <div id="joy"><div id="knob"></div></div>
 <div id="card"><div class="box">
-  <div class="no" id="cNo"></div><h2 id="cT"></h2><p id="cP"></p><div class="fun" id="cF"></div>
+  <button class="x" id="cX" type="button" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#1F2A30" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+  <div class="sc" id="cSc"><img id="cImg" alt=""><div class="no"><span id="cNo"></span><span class="seenl">已看 <b id="seen">0</b> / 6 件展品</span></div><h2 id="cT"></h2><div id="cBody"></div></div>
   <div class="row"><button class="btn s" id="cClose" type="button">繼續逛</button><button class="btn p" id="cCta" type="button" hidden>下載發票存摺</button></div>
+  <p class="pause" id="cPause" hidden>看展品時，尋寶計時會暫停</p>
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ---------- 展品內容（依財政部財政史料陳列室〈統一發票重要史料〉與新聞報導整理，2026-11 查證） ----------
 const EXHIBITS = [
-  {no:'展品 01', t:'1951：統一發票上路', p:'1950 年底，台灣省財政廳長任顯群設計了統一發票，用「對獎」鼓勵大家索取發票，讓店家難逃漏營業稅。1951 年元旦正式上路。', f:'上路第一年，營業稅收就多了 75%。', art:'year', color:'#F4C95D'},
-  {no:'展品 02', t:'借愛國獎券來對獎', p:'早期發票沒有自己的獎號，是用愛國獎券的特獎號碼來對。獎金是發票金額的 50 倍，最高 5 萬元。', f:'1990 年一年就開出 498 萬多筆中獎發票，獎金 25 億多元。', art:'x50', color:'#F6AA5E'},
-  {no:'展品 03', t:'收銀機發票時代', p:'1988 年起，給獎獎金從全年營業稅提撥 3%，加上收銀機發票普及，對獎的人越來越多。', f:'過了領獎期限沒人領的獎金，會全數歸入國庫。', art:'paper', color:'#91DDF0'},
-  {no:'展品 04', t:'千萬特別獎', p:'依賦稅署說明，2011 年起每期開出 1 組 1,000 萬特別獎。每逢奇數月 25 日開獎。', f:'2011 年以來的千萬特別獎，約四分之一沒人領。', art:'prize', color:'#EE716E'},
-  {no:'展品 05', t:'手機條碼載具', p:'2012 年 3 月推出，「/」開頭、共 8 碼。結帳出示條碼，發票直接存進雲端；2013 年起還多了雲端發票專屬獎。', f:'2025 年雲端發票開了 63 億張，使用率約 65%。', art:'barcode', color:'#7EC997'},
-  {no:'展品 06', t:'用 App 對獎、領獎', p:'2019 年起可以用 App 兌獎，不用再跑郵局。發票存摺幫你自動對獎、中獎通知你。', f:'逛完了？把博物館帶回家。', art:'app', color:'#00B386', cta:true},
+  {no:'展品 01', t:'1951：統一發票上路', art:'year', color:'#F4C95D',
+   lead:'1950 年前後，店家不太開發票，政府很難算出該收多少營業稅。台灣省財政廳長任顯群想了一個辦法：讓發票可以「對獎」。大家為了對獎主動跟店家要發票，店家就很難少報營業額。1951 年元旦，統一發票正式上路。',
+   nums:[['1951','元旦上路'],['+75%','第一年營業稅收']],
+   facts:['統一發票的本意不是摸彩，而是讓全民一起幫忙「查稅」：你每要一張發票，店家就多一筆報不掉的營業額。','發票號碼由 2 個英文字軌加 8 位數字組成，對獎看的就是那 8 位數字。']},
+  {no:'展品 02', t:'借愛國獎券來對獎', art:'x50', color:'#F6AA5E',
+   lead:'早期的發票沒有自己的中獎號碼，是借用「愛國獎券」的特獎號碼來對。中了之後，獎金照發票金額算：是發票金額的 50 倍，最高 5 萬元。也就是說，同樣中獎，買得越多、發票金額越大，拿得越多。',
+   nums:[['×50','發票金額的倍數'],['5 萬','獎金上限'],['25 億+','1990 年總獎金']],
+   facts:['1990 年一整年，就開出 498 萬多筆中獎發票，獎金合計 25 億多元。','現在的獎金改成固定金額，買 21 元的飲料跟買 2 萬元的家電，中特別獎都是 1,000 萬。']},
+  {no:'展品 03', t:'收銀機發票時代', art:'paper', color:'#91DDF0',
+   lead:'收銀機開立的發票越來越普及，對獎也變成全民運動。1988 年起，發票獎金改從全年營業稅提撥 3% 來發。中了獎也別高興太早，獎金有期限、也要繳稅。',
+   nums:[['3%','營業稅提撥當獎金'],['3 個月','領獎期限']],
+   facts:['領獎期限是開獎日的次月 6 日起算 3 個月，過了就領不到。','過了期限沒人領的獎金，會全數歸入國庫。','中獎超過 5,000 元，要先扣 20% 所得稅，再貼千分之 4 的印花稅。中 20 萬特獎，實拿 15 萬 9,200 元。']},
+  {no:'展品 04', t:'千萬特別獎', art:'prize', color:'#EE716E', table:true,
+   lead:'依賦稅署說明，2011 年起每期開出 1 組 1,000 萬特別獎。發票每兩個月一期，奇數月 25 日開獎，一年開 6 次。對獎時從最後一碼往前對，對中的位數越多，獎金越大。',
+   nums:[['1,000 萬','特別獎'],['6 次','一年開獎'],['25 日','奇數月開獎']],
+   facts:['2026 年 3–4 月期，有人在超商只花 21 元買飲料，就中了千萬特別獎。','2011 年以來的千萬特別獎，大約四分之一沒有人領。']},
+  {no:'展品 05', t:'手機條碼載具', art:'barcode', color:'#7EC997',
+   lead:'2012 年 3 月推出。手機條碼以「/」開頭、共 8 碼，結帳時出示條碼，發票就直接存進雲端，不用再收一疊紙。2013 年起，雲端發票還多了只有它才能抽的「雲端發票專屬獎」。',
+   nums:[['8 碼','「/」開頭'],['63 億張','2025 年雲端發票'],['約 65%','雲端發票使用率']],
+   facts:['條碼除了「/」，只會出現數字、大寫英文和「+ - .」三種符號。','雲端發票中獎，設定好領獎帳戶後，獎金可以直接匯進戶頭，不用跑去兌獎。']},
+  {no:'展品 06', t:'用 App 對獎、領獎', art:'app', color:'#00B386', cta:true,
+   lead:'2019 年起可以用手機 App 兌獎，不用再跑郵局或超商。發票存摺會幫你歸戶、開獎自動對獎，中獎第一時間通知你。',
+   nums:[['6 次','一年開獎'],['3 個月','每期領獎期限']],
+   facts:['一年 6 次開獎、每次都有 3 個月領獎期限，忘記對獎，獎金就歸國庫了。交給 App 提醒最保險。']},
 ];
+const PRIZES=[['特別獎','8 碼全對','1,000 萬',1],['特獎','8 碼全對','200 萬',1],['頭獎','8 碼全對','20 萬',0],['二獎','末 7 碼','4 萬',0],['三獎','末 6 碼','1 萬',0],['四獎','末 5 碼','4,000',0],['五獎','末 4 碼','1,000',0],['六獎','末 3 碼','200',0]];
 // 藏在展廳的 8 張發票，每張一段冷知識（同上來源）
 const FACTS = [
   '1951 年元旦統一發票上路，第一年營業稅收就多了 75%。',
@@ -151,7 +208,7 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color('#E7E2D8');
 const fovFor=()=>innerWidth<innerHeight?52:40;
 const cam=new THREE.PerspectiveCamera(fovFor(),innerWidth/innerHeight,0.1,200);
-scene.add(new THREE.HemisphereLight(0xffffff,0xd8cfc0,0.85));
+const hemi=new THREE.HemisphereLight(0xffffff,0xd8cfc0,0.85);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffffff,0.55);sun.position.set(6,18,10);sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-14,right:14,top:16,bottom:-16,near:1,far:60});scene.add(sun);scene.add(sun.target);
 
@@ -182,6 +239,7 @@ const trimM=mat('#00B386');
 function wallSeg(a,b,fixed,alongX,fade=false){const len=b-a,c=(a+b)/2,t=0.25;const m=mat('#F7F4EE',{transparent:true,opacity:1});
   let o;if(alongX){o=box(len,WH,t,c,WH/2,fixed,m);box(len,0.08,t+0.02,c,WH+0.04,fixed,trimM,false,false)}
   else{o=box(t,WH,len,fixed,WH/2,c,m);box(t+0.02,0.08,len,fixed,WH+0.04,c,trimM,false,false)}
+  for(let k=solids.length-1;k>=0;k--){const b=solids[k];if(Math.abs((b.x0+b.x1)/2-o.position.x)<1e-6&&Math.abs((b.z0+b.z1)/2-o.position.z)<1e-6){b.wall=true;break}}
   if(fade){o.userData.z=fixed;fadeWalls.push(o)}return o}
 wallSeg(-W/2,W/2,-D/2,true);wallSeg(-W/2,W/2,D/2,true,true);wallSeg(-D/2,D/2,-W/2,false);wallSeg(-D/2,D/2,W/2,false);
 function crossWall(z,DOOR){wallSeg(-W/2,DOOR[0][0],z,true,true);wallSeg(DOOR[0][1],DOOR[1][0],z,true,true);wallSeg(DOOR[1][1],W/2,z,true,true)}
@@ -201,7 +259,7 @@ wallLabel('Ⅳ 把發票帶回家','App 對獎、領獎',6,-D/2,5);
 // 地上的指引
 function floorText(s,x,z,w=2.6,rot=0){const m=label(s,null,{w,fg:'#00B386',size:72});m.rotation.x=-Math.PI/2;m.rotation.z=rot;m.position.set(x,0.01,z);scene.add(m)}
 floorText('↑ Ⅰ 歷史',-6,13.2,2.4);floorText('↑ Ⅱ 千萬',6,13.2,2.4);floorText('↑ Ⅲ 載具',-6,-2.9,2.4);floorText('↑ Ⅳ 帶回家',6,-2.9,2.6);
-floorText('售票閘門',0,15.4,2);
+floorText('售票閘門',0,15.4,2);floorText('開放 09:00–18:00',0,16.7,3.2);
 
 // ---------- 展品：展台＋立牌（面向鏡頭） ----------
 function rr(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()}
@@ -228,9 +286,10 @@ EXHIBITS.forEach((e,i)=>{
   const band=new THREE.Mesh(new THREE.BoxGeometry(1.12*s,0.08,0.72*s),mat(e.color));band.position.y=0.66;g.add(band);
   const board=new THREE.Mesh(new THREE.BoxGeometry(1.05*s,1.31*s,0.05),mat('#2B3A40'));board.position.set(0,0.7+0.66*s,0);board.rotation.x=-0.12;board.castShadow=true;g.add(board);
   const pic=new THREE.Mesh(new THREE.PlaneGeometry(0.96*s,1.2*s),new THREE.MeshBasicMaterial({map:artTex(e)}));pic.position.z=0.03;board.add(pic);
-  const ok=new THREE.Mesh(new THREE.CircleGeometry(0.13,24),new THREE.MeshBasicMaterial({color:'#00B386'}));ok.position.set(0.5*s,0.62*s,0.04);ok.visible=false;board.add(ok);
+  {const c=document.createElement('canvas');c.width=640;c.height=520;c.getContext('2d').drawImage(pic.material.map.image,0,0,640,520,0,0,640,520);e.img=c.toDataURL('image/jpeg',0.86)}
+  const ok=new THREE.Mesh(new THREE.CircleGeometry(0.13,24),new THREE.MeshBasicMaterial({color:'#00B386'}));ok.position.set(0.5*s,0.62*s,0.04);ok.visible=false;ok.userData.keepBasic=1;board.add(ok);
   // 地上的光圈：走近會亮
-  const ring=new THREE.Mesh(new THREE.RingGeometry(0.75*s,0.9*s,40),new THREE.MeshBasicMaterial({color:'#00B386',transparent:true,opacity:0.25}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,0.9*s);g.add(ring);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(0.75*s,0.9*s,40),new THREE.MeshBasicMaterial({color:'#00B386',transparent:true,opacity:0.25}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,0.9*s);ring.userData.keepBasic=1;g.add(ring);
   solids.push({x0:px-0.6*s,x1:px+0.6*s,z0:pz-0.4*s,z1:pz+0.4*s});
   [ped,board,pic].forEach(o=>{o.userData.ex=i;pickables.push(o)});
   exhibits.push({g,board,ok,ring,x:px,z:pz+0.9*s,i});
@@ -298,7 +357,7 @@ const slipTex=tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='
   x.font='bold 26px monospace';x.fillText('AB-'+String(Math.floor(Math.random()*9e7+1e7)),w/2,104);for(let k=0;k<22;k++)x.fillRect(20+k*8,124,[2,4,5][k%3],40);x.fillStyle='#C8CCD0';for(let r=0;r<4;r++)x.fillRect(30,182+r*18,w-60-(r%2)*40,8)},220,260);
 const slips=HIDE.map(([x,z],i)=>{const g=new THREE.Group();
   const paper=new THREE.Mesh(new THREE.BoxGeometry(0.42,0.5,0.015),[mat('#fff'),mat('#fff'),mat('#fff'),mat('#fff'),new THREE.MeshBasicMaterial({map:slipTex}),new THREE.MeshBasicMaterial({map:slipTex})]);paper.position.y=0.75;paper.rotation.x=-0.35;paper.castShadow=true;g.add(paper);
-  const glow=new THREE.Mesh(new THREE.CircleGeometry(0.42,32),new THREE.MeshBasicMaterial({color:'#FFDD5E',transparent:true,opacity:0.55}));glow.rotation.x=-Math.PI/2;glow.position.y=0.02;g.add(glow);
+  const glow=new THREE.Mesh(new THREE.CircleGeometry(0.42,32),new THREE.MeshBasicMaterial({color:'#FFDD5E',transparent:true,opacity:0.55}));glow.rotation.x=-Math.PI/2;glow.position.y=0.02;glow.userData.keepBasic=1;g.add(glow);
   g.position.set(x,0,z);scene.add(g);return {g,paper,glow,x,z,got:false,i}});
 
 // ---------- 玩家角色：Q 版小人 ----------
@@ -342,7 +401,7 @@ stand(-10.3,9.6,FACE_N);stand(-9.6,2.8,FACE_N+0.3);stand(-9.8,-14.2,FACE_N);stan
 stand(11.4,-10.5,-Math.PI/2);   // 紀念品店店員
 // 走動的人
 walker([[-9,6],[-4,10],[-3,3],[-8,0.5]]);walker([[3,-7],[8,-8],[8,-13],[3,-13]]);walker([[-9,-6],[-2.5,-12],[-9,-18]],0.9);walker([[-6.5,19.3],[3.8,19.3]],0.8);
-function updateNPC(dt,t){npcs.forEach(n=>{
+function updateNPC(dt,t){npcs.forEach(n=>{if(n.off)return;
   if(n.kind==='stand'){n.g.position.y=Math.max(0,Math.sin(t*1.3+n.ph))*0.015;n.g.rotation.y=n.face+Math.sin(t*0.4+n.ph)*0.15;return}
   if(n.wait>0){n.wait-=dt;n.l1.position.z=n.l2.position.z=0;return}
   const [tx,tz]=n.path[n.k],dx=tx-n.x,dz=tz-n.z,d=Math.hypot(dx,dz);
@@ -352,6 +411,43 @@ function updateNPC(dt,t){npcs.forEach(n=>{
   const sp=Math.min(d,n.speed*dt);n.x+=dx/d*sp;n.z+=dz/d*sp;n.g.position.set(n.x,0,n.z);
   let df=Math.atan2(dx,dz)-n.g.rotation.y;df=Math.atan2(Math.sin(df),Math.cos(df));n.g.rotation.y+=df*Math.min(1,dt*8);
   const w=t*9+n.ph;n.l1.position.z=Math.sin(w)*0.07;n.l2.position.z=-Math.sin(w)*0.07})}
+
+// ---------- 營業時間：台灣時間 09:00–18:00 開館；閉館後只能拿手電筒偷偷溜進去（?night=1／0 可強制） ----------
+const HOURS=[9,18];
+const NIGHT=(()=>{try{const q=new URLSearchParams(location.search).get('night');if(q==='1')return true;if(q==='0')return false}catch(e){}
+  const h=new Date(Date.now()+8*3600e3).getUTCHours();return h<HOURS[0]||h>=HOURS[1]})();
+const beamT=tex((x,w,h)=>{const g=x.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);g.addColorStop(0,'rgba(255,241,200,.9)');g.addColorStop(.55,'rgba(255,236,180,.45)');g.addColorStop(1,'rgba(255,230,160,0)');x.fillStyle=g;x.fillRect(0,0,w,h)},256,256);
+// 夜間警衛：拿手電筒在展區巡邏（不進大廳），被照到計時 +5 秒
+walker([[7.3,9.5],[2.5,4.5],[-2.5,4.5],[-6,1.2],[-7.5,-7],[-7.5,-12.6],[2.5,-12.6],[7,-12],[7,-5]],1.15);
+const gd=npcs[npcs.length-1];gd.guard=true;gd.cool=0;
+{const navy=mat('#22304A');gd.g.children[0].material=navy;const cap=new THREE.Mesh(new THREE.CylinderGeometry(0.31,0.33,0.13,16),navy);cap.position.y=1.31;gd.g.add(cap);
+  const brim=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.03,0.2),navy);brim.position.set(0,1.27,0.3);gd.g.add(brim);
+  gd.lamp=new THREE.SpotLight(0xdfe8ff,3,9,0.45,0.5,1);gd.lamp.position.set(0.18,1.5,0.45);const tg=new THREE.Object3D();tg.position.set(0,0,2.8);gd.g.add(gd.lamp,tg);gd.lamp.target=tg;
+  const gb=new THREE.Mesh(new THREE.CircleGeometry(3.4,28,-Math.PI/2-0.36,0.72),new THREE.MeshBasicMaterial({map:beamT,color:'#BFD4FF',transparent:true,opacity:0.6,blending:THREE.AdditiveBlending,depthWrite:false}));gb.rotation.x=-Math.PI/2;gb.position.y=0.035;gb.userData.keepBasic=1;gd.g.add(gb)}
+// 玩家手電筒＋身邊一點微光
+const flash=new THREE.SpotLight(0xfff1d0,4,11,0.62,0.4,1);flash.position.set(0.2,1.55,0.45);flash.shadow.bias=-0.002;
+const flT=new THREE.Object3D();flT.position.set(0,0,2.6);player.add(flash,flT);flash.target=flT;flash.castShadow=true;flash.shadow.mapSize.set(1024,1024);
+// 地上的光束（俯瞰看得出手電筒照哪裡）
+const beam=new THREE.Mesh(new THREE.CircleGeometry(3.4,28,-Math.PI/2-0.5,1.0),new THREE.MeshBasicMaterial({map:beamT,transparent:true,opacity:0.55,blending:THREE.AdditiveBlending,depthWrite:false}));
+beam.rotation.x=-Math.PI/2;beam.position.y=0.03;beam.userData.keepBasic=1;player.add(beam);
+const aura=new THREE.PointLight(0xffe7b0,0.7,3.2,1.5);aura.position.set(0,1.4,0);player.add(aura);
+const torch=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.07,0.28,12),mat('#3A3F45'));torch.rotation.x=Math.PI/2;torch.position.set(0.27,0.6,0.22);player.add(torch);
+function applyMode(){
+  if(!NIGHT){gd.g.visible=false;gd.off=true;flash.visible=aura.visible=torch.visible=beam.visible=false;return}
+  document.body.classList.add('night');
+  scene.background=new THREE.Color('#0C1424');hemi.color.set('#8FA3C8');hemi.groundColor.set('#141B29');hemi.intensity=0.045;sun.intensity=0.02;sun.castShadow=false;
+  npcs.forEach(n=>{if(!n.guard){n.g.visible=false;n.off=true}});card.visible=false;
+  const sw=m=>m&&m.isMeshBasicMaterial?new THREE.MeshLambertMaterial({map:m.map,color:m.color,transparent:m.transparent,opacity:m.opacity}):m;
+  scene.traverse(o=>{if(!o.isMesh||o.userData.keepBasic)return;o.material=Array.isArray(o.material)?o.material.map(sw):sw(o.material)});
+  slips.forEach(s=>s.glow.material.opacity=0.5)}
+applyMode();
+// 警衛視線：距離 4.5 內、手電筒角度內、中間沒有牆
+function blocked(x0,z0,x1,z1){const dx=x1-x0,dz=z1-z0;
+  for(const b of solids){if(!b.wall)continue;let t0=0,t1=1,miss=false;
+    for(const [p,d,lo,hi] of [[x0,dx,b.x0,b.x1],[z0,dz,b.z0,b.z1]]){if(Math.abs(d)<1e-9){if(p<lo||p>hi){miss=true;break}}else{let a=(lo-p)/d,c=(hi-p)/d;if(a>c)[a,c]=[c,a];t0=Math.max(t0,a);t1=Math.min(t1,c);if(t0>t1){miss=true;break}}}
+    if(!miss)return true}return false}
+function seenByGuard(){const dx=player.position.x-gd.x,dz=player.position.z-gd.z,d=Math.hypot(dx,dz);if(d>4.5||d<0.01)return false;
+  let a=Math.atan2(dx,dz)-gd.g.rotation.y;a=Math.atan2(Math.sin(a),Math.cos(a));return Math.abs(a)<0.45&&!blocked(gd.x,gd.z,player.position.x,player.position.z)}
 
 // ---------- 鏡頭：俯瞰跟拍 ----------
 function camOffset(){const portrait=innerWidth<innerHeight;return portrait?new THREE.Vector3(0,16,11):new THREE.Vector3(0,11,9)}
@@ -387,13 +483,22 @@ function placeJoy(){_pv.set(player.position.x,0,player.position.z).project(cam);
 
 // ---------- 展品卡、靠近提示 ----------
 const seen=new Set();let near=null;
+let cardOn=false,pauseAt=0;
 function openCard(i){const e=EXHIBITS[i];target=null;pendingOpen=null;
-  cNo.textContent=e.no;cT.textContent=e.t;cP.textContent=e.p;cF.textContent=e.f;cCta.hidden=!e.cta;cardEl.classList.add('on');
-  seen.add(i);document.getElementById('seen').textContent=seen.size;exhibits[i].ok.visible=true;
+  $('cImg').src=e.img;$('cImg').style.background=e.color;$('cNo').textContent=e.no;$('cT').textContent=e.t;
+  let h=`<p class="lead">${e.lead}</p>`;
+  if(e.nums)h+=`<div class="nums">${e.nums.map(([b,l])=>`<div><b>${b}</b><span>${l}</span></div>`).join('')}</div>`;
+  if(e.table)h+=`<h4>怎麼對獎</h4><table>${PRIZES.map(([n,r,m,hi])=>`<tr class="${hi?'hi':''}"><td>${n}</td><td>${r}</td><td>${m}</td></tr>`).join('')}</table><p class="src" style="margin-top:4px">二獎到六獎都是對頭獎號碼的末幾碼。</p>`;
+  h+=`<h4>冷知識</h4><ul class="facts">${e.facts.map(f=>`<li>${f}</li>`).join('')}</ul>`;
+  h+=`<p class="src">資料來源：財政部財政史料陳列室、財政部賦稅署與新聞報導（2025–2026）整理</p>`;
+  $('cBody').innerHTML=h;$('cSc').scrollTop=0;cCta.hidden=!e.cta;$('cPause').hidden=state!=='play';
+  if(!cardOn&&state==='play')pauseAt=performance.now();cardOn=true;cardEl.classList.add('on');
+  seen.add(i);$('seen').textContent=seen.size;exhibits[i].ok.visible=true;
   track('exhibit_open',{exhibit:i+1});if(seen.size===EXHIBITS.length)track('museum_complete')}
 const cardEl=document.getElementById('card');
-cClose.onclick=()=>cardEl.classList.remove('on');
-cardEl.onclick=e=>{if(e.target===cardEl)cardEl.classList.remove('on')};
+function closeCard(){if(!cardOn)return;cardOn=false;cardEl.classList.remove('on');if(state==='play'&&pauseAt){t0+=performance.now()-pauseAt;pauseAt=0}}
+cClose.onclick=closeCard;document.getElementById('cX').onclick=closeCard;
+cardEl.onclick=e=>{if(e.target===cardEl)closeCard()};
 cCta.onclick=()=>{track('store_click',{where:'exhibit'});open('https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&af_sub2=exhibit','_blank')};
 const nearBtn=document.getElementById('near');nearBtn.onclick=()=>{if(near!==null)openCard(near)};
 let tipHidden=false;function hideTip(){if(tipHidden)return;tipHidden=true;tip.style.opacity=0}
@@ -413,11 +518,17 @@ const VS=(()=>{try{const v=Math.round(+new URLSearchParams(location.search).get(
 if(VS){$('vsCard').innerHTML=`<div class="h">${FIRE}朋友來嗆你了</div>朋友只花 <span class="n">${fmt(VS)}</span>就找齊 8 張發票，是「${RANKS[rankOf(VS)][1]}」。<div class="ladder">${ladderHTML(VS,'朋友在這')}</div><div class="goal">比 <span class="n">${fmt(VS)}</span> 更快就算贏</div>`;
   $('vsCard').hidden=false;$('introP').hidden=true;go.textContent='接受挑戰 ▶';track('vs_open',{vs:VS})}
 let state='intro',t0=0,elapsed=0,found=0,toastT,lastMs=0;
+const MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="#FFD866"/></svg>';
+const SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.6" fill="#F6AA5E"/><g stroke="#F6AA5E" stroke-width="2" stroke-linecap="round"><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"/></g></svg>';
+$('hours').innerHTML=NIGHT?`${MOON}<div><b>已閉館</b>・開放時間 09:00–18:00<small>警衛在巡邏，只能拿手電筒偷偷溜進去。被照到計時 +5 秒。</small></div>`
+  :`${SUN}<div><b>開館中</b>・開放時間 09:00–18:00<small>晚上 6 點閉館後再來，博物館會不一樣。</small></div>`;
+if(NIGHT){go.textContent=VS?'溜進去接受挑戰 ▶':'拿手電筒溜進去 ▶';tip.textContent='按住拖曳走路・手電筒照得到才看得清楚・小心警衛'}
 function toast(h,b){$('toast').innerHTML=`<b>${h}</b>${b}`;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3200)}
 function startHunt(){state='play';found=0;$('found').textContent=0;slips.forEach(s=>{s.got=false;s.g.visible=true});
   player.position.set(0,0,18.6);heading=Math.PI;player.rotation.y=heading;placeCam(true);t0=performance.now();elapsed=0;
-  intro.style.display='none';$('res').classList.remove('on');track('museum_enter',{vs:VS?1:0})}
-go.onclick=startHunt;
+  intro.style.display='none';$('res').classList.remove('on');track('museum_enter',{vs:VS?1:0,mode:NIGHT?'night':'day'})}
+function goFull(){try{const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;if(f&&!document.fullscreenElement&&!document.webkitFullscreenElement){const r=f.call(d,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{})}}catch(e){}}
+go.onclick=()=>{goFull();startHunt()};
 function pickUp(s){s.got=true;s.g.visible=false;found++;$('found').textContent=found;
   track('invoice_found',{n:found,ms:Math.round(elapsed)});toast(`第 ${found} 張發票`,FACTS[s.i]);if(found===slips.length)finish()}
 function finish(){state='done';lastMs=Math.round(elapsed);const k=rankOf(lastMs);
@@ -427,19 +538,19 @@ function finish(){state='done';lastMs=Math.round(elapsed);const k=rankOf(lastMs)
     v.innerHTML=res==='win'?`<b>你贏朋友 ${fmt(-gap)}！</b>你 ${fmt(lastMs)}，朋友 ${fmt(VS)}。`:res==='lose'?`<b>輸朋友 ${fmt(gap)}</b>你 ${fmt(lastMs)}，朋友 ${fmt(VS)}。`:`<b>平手</b>你們都是 ${fmt(VS)}。`;
     v.hidden=false;track('vs_result',{result:res})}else v.hidden=true;
   $('bShare').innerHTML=SHARE_IC+(res==='win'?'贏了！傳回去嗆朋友':res==='lose'?'不服，換我出題嗆別人':'嗆朋友來比');$('rHint').textContent='';
-  setTimeout(()=>$('res').classList.add('on'),900);track('museum_finish',{ms:lastMs,rank:RANKS[k][1],vs:res})}
+  setTimeout(()=>$('res').classList.add('on'),900);track('museum_finish',{ms:lastMs,rank:RANKS[k][1],vs:res,mode:NIGHT?'night':'day'})}
 function shareUrl(){return location.origin+location.pathname+'?'+new URLSearchParams({vs:lastMs,utm_source:'friend',utm_medium:'share',utm_campaign:'invoice_museum_vs'})}
-const shareText=()=>`我在發票博物館只花 ${fmt(lastMs)}就找齊 8 張發票，點連結跟我比，你能更快嗎？`;
+const shareText=()=>NIGHT?`我半夜拿手電筒溜進發票博物館，只花 ${fmt(lastMs)}就找齊 8 張發票，你敢來比嗎？`:`我在發票博物館只花 ${fmt(lastMs)}就找齊 8 張發票，點連結跟我比，你能更快嗎？`;
 $('bShare').onclick=async()=>{const url=shareUrl(),text=shareText();
   if(navigator.share){track('share',{method:'native',ms:lastMs});try{await navigator.share({title:'發票博物館',text,url});return}catch(e){if(e&&e.name==='AbortError'){track('share_cancel');return}}}
   track('share',{method:'copy',ms:lastMs});try{await navigator.clipboard.writeText(text+'\n'+url);$('rHint').textContent='挑戰連結已複製，貼給朋友就好。'}catch(e){$('rHint').textContent='複製這個連結傳給朋友：'+url}};
-$('bAgain').onclick=()=>{track('replay');startHunt()};
+$('bAgain').onclick=()=>{goFull();track('replay');startHunt()};
 $('bLook').onclick=()=>{$('res').classList.remove('on');state='look';track('stay_look')};
 $('aStore').onclick=()=>track('store_click',{where:'result'});
 
 // ---------- 碰撞 ----------
 const R=0.3;
-function collide(p){for(const n of npcs){const dx=p.x-n.x,dz=p.z-n.z,d=Math.hypot(dx,dz),m=R+0.32;if(d<m&&d>1e-6){p.x=n.x+dx/d*m;p.z=n.z+dz/d*m}}
+function collide(p){for(const n of npcs){if(n.off)continue;const dx=p.x-n.x,dz=p.z-n.z,d=Math.hypot(dx,dz),m=R+0.32;if(d<m&&d>1e-6){p.x=n.x+dx/d*m;p.z=n.z+dz/d*m}}
   for(const b of solids){const cx=Math.max(b.x0,Math.min(p.x,b.x1)),cz=Math.max(b.z0,Math.min(p.z,b.z1));const dx=p.x-cx,dz=p.z-cz,d=Math.hypot(dx,dz);
   if(d<R){if(d>1e-6){p.x=cx+dx/d*R;p.z=cz+dz/d*R}else{const o=[p.x-b.x0,b.x1-p.x,p.z-b.z0,b.z1-p.z],m=Math.min(...o),k=o.indexOf(m);if(k===0)p.x=b.x0-R;if(k===1)p.x=b.x1+R;if(k===2)p.z=b.z0-R;if(k===3)p.z=b.z1+R}}}}
 
@@ -466,8 +577,10 @@ function loop(){
   if(best!==near){near=best;if(near===null)nearBtn.classList.remove('on');else{nearBtn.textContent='看展品：'+EXHIBITS[near].t;nearBtn.classList.add('on')}}
   // 擋住小人的牆變半透明
   fadeWalls.forEach(w=>{const z=w.userData.z,inFront=z>player.position.z&&z-player.position.z<5;const o=inFront?0.18:1;w.material.opacity+=(o-w.material.opacity)*Math.min(1,dt*8);w.castShadow=w.material.opacity>0.9});
-  if(state==='play'){elapsed=performance.now()-t0;$('clock').textContent=fmtClock(elapsed);
+  if(state==='play'&&!cardOn){elapsed=performance.now()-t0;$('clock').textContent=fmtClock(elapsed);
     slips.forEach(s=>{if(!s.got&&Math.hypot(s.x-player.position.x,s.z-player.position.z)<0.85)pickUp(s)})}
+  if(NIGHT&&!cardOn&&state!=='intro'){gd.cool-=dt;if(gd.cool<=0&&seenByGuard()){gd.cool=5;
+    if(state==='play'){t0-=5000;toast('被警衛照到了！','計時 +5 秒，快躲到牆後面。')}else toast('噓——','警衛在巡邏，別被照到。');track('guard_caught',{state})}}
   const tt=performance.now()/1000;slips.forEach(s=>{s.paper.position.y=0.75+Math.sin(tt*2.4+s.i)*0.08;s.paper.rotation.y=tt*1.2+s.i;s.glow.material.opacity=0.35+0.25*Math.sin(tt*3+s.i)});
   updateNPC(dt,tt);coin.rotation.y+=dt*0.5;sun.position.set(player.position.x+6,18,player.position.z+10);sun.target.position.set(player.position.x,0,player.position.z);
   inv.rotation.y+=dt*0.6;placeCam(false);placeJoy();
