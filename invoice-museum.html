@@ -33,6 +33,9 @@
   #card .x{position:absolute;right:10px;top:10px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer}
   #card .x svg{width:18px;height:18px}
   #card img{display:block;width:100%;aspect-ratio:640/520;max-height:28vh;object-fit:cover;border-radius:14px;margin-bottom:12px}
+  #card img.ph{object-fit:contain;aspect-ratio:auto;height:30vh;max-height:30vh;padding:6px}
+  #card .cap{font-size:12px;color:#677;line-height:1.5;margin:-6px 0 12px}
+  #card .cap a{color:#899}
   #card .seenl{font-size:12px;color:#899;float:right;margin-top:1px}
   #card .lead{font-size:15.5px;line-height:1.8;margin:0 0 12px}
   #card .nums{display:flex;gap:8px;margin:0 0 14px}
@@ -149,7 +152,7 @@
 <div id="joy"><div id="knob"></div></div>
 <div id="card"><div class="box">
   <button class="x" id="cX" type="button" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#1F2A30" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-  <div class="sc" id="cSc"><img id="cImg" alt=""><div class="no"><span id="cNo"></span><span class="seenl">已看 <b id="seen">0</b> / 6 件展品</span></div><h2 id="cT"></h2><div id="cBody"></div></div>
+  <div class="sc" id="cSc"><img id="cImg" alt=""><p class="cap" id="cCap" hidden></p><div class="no"><span id="cNo"></span><span class="seenl">已看 <b id="seen">0</b> / 6 件展品</span></div><h2 id="cT"></h2><div id="cBody"></div></div>
   <div class="row"><button class="btn s" id="cClose" type="button">繼續逛</button><button class="btn p" id="cCta" type="button" hidden>下載發票存摺</button></div>
   <p class="pause" id="cPause" hidden>看展品時，尋寶計時會暫停</p>
 </div></div>
@@ -158,23 +161,23 @@
 <script>
 // ---------- 展品內容（依財政部財政史料陳列室〈統一發票重要史料〉與新聞報導整理，2026-11 查證） ----------
 const EXHIBITS = [
-  {no:'展品 01', t:'1951：統一發票上路', art:'year', color:'#F4C95D',
+  {no:'展品 01', photo:{src:'img/museum/ren-xianqun-1933.jpg',cap:'任顯群（1933 年的照片）。1950 年擔任台灣省財政廳長時，設計了統一發票。',credit:'作者不詳，1933 年出版，公有領域',url:'https://commons.wikimedia.org/wiki/File:%E6%94%BF%E6%B2%BB%E5%AD%B8%E5%A3%AB%E4%BB%BB%E9%A1%AF%E7%BE%A3%EF%BC%9A%E6%B1%9F%E8%98%87%E5%AE%9C%E8%88%88.jpg'}, t:'1951：統一發票上路', art:'year', color:'#F4C95D',
    lead:'1950 年前後，店家不太開發票，政府很難算出該收多少營業稅。台灣省財政廳長任顯群想了一個辦法：讓發票可以「對獎」。大家為了對獎主動跟店家要發票，店家就很難少報營業額。1951 年元旦，統一發票正式上路。',
    nums:[['1951','元旦上路'],['+75%','第一年營業稅收']],
    facts:['統一發票的本意不是摸彩，而是讓全民一起幫忙「查稅」：你每要一張發票，店家就多一筆報不掉的營業額。','發票號碼由 2 個英文字軌加 8 位數字組成，對獎看的就是那 8 位數字。']},
-  {no:'展品 02', t:'借愛國獎券來對獎', art:'x50', color:'#F6AA5E',
+  {no:'展品 02', photo:{src:'img/museum/aiguo-lottery-1950.jpg',cap:'1950 年發行的第三期愛國獎券，票面印著「新台幣伍圓」。早期發票就是借這種獎券的特獎號碼來對獎。',credit:'臺灣省政府、臺灣銀行，1950，公有領域',url:'https://commons.wikimedia.org/wiki/File:Aiguojiangquan7.jpg'}, t:'借愛國獎券來對獎', art:'x50', color:'#F6AA5E',
    lead:'早期的發票沒有自己的中獎號碼，是借用「愛國獎券」的特獎號碼來對。中了之後，獎金照發票金額算：是發票金額的 50 倍，最高 5 萬元。也就是說，同樣中獎，買得越多、發票金額越大，拿得越多。',
    nums:[['×50','發票金額的倍數'],['5 萬','獎金上限'],['25 億+','1990 年總獎金']],
    facts:['1990 年一整年，就開出 498 萬多筆中獎發票，獎金合計 25 億多元。','現在的獎金改成固定金額，買 21 元的飲料跟買 2 萬元的家電，中特別獎都是 1,000 萬。']},
-  {no:'展品 03', t:'收銀機發票時代', art:'paper', color:'#91DDF0',
+  {no:'展品 03', photo:{src:'img/museum/cash-register-invoice-2016.jpg',cap:'收銀機開立的統一發票（2016 年，台北艋舺龍山寺）。上方是字軌號碼，下方列出品項與金額。',credit:'Solomon203，CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Mengjia_Longshan_Temple_uniform_invoice_20160430.jpg'}, t:'收銀機發票時代', art:'paper', color:'#91DDF0',
    lead:'收銀機開立的發票越來越普及，對獎也變成全民運動。1988 年起，發票獎金改從全年營業稅提撥 3% 來發。中了獎也別高興太早，獎金有期限、也要繳稅。',
    nums:[['3%','營業稅提撥當獎金'],['3 個月','領獎期限']],
    facts:['領獎期限是開獎日的次月 6 日起算 3 個月，過了就領不到。','過了期限沒人領的獎金，會全數歸入國庫。','中獎超過 5,000 元，要先扣 20% 所得稅，再貼千分之 4 的印花稅。中 20 萬特獎，實拿 15 萬 9,200 元。']},
-  {no:'展品 04', t:'千萬特別獎', art:'prize', color:'#EE716E', table:true,
+  {no:'展品 04', photo:{src:'img/museum/prize-notice-2024.jpg',cap:'電子發票中獎後寄來的中獎通知（2024 年，台灣自來水公司的水費發票）。',credit:'Solomon203，CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:%E5%8F%B0%E6%B0%B4%E9%9B%BB%E5%AD%90%E7%99%BC%E7%A5%A8%E4%B8%AD%E7%8D%8E%E9%80%9A%E7%9F%A5_CK53741901.jpg'}, t:'千萬特別獎', art:'prize', color:'#EE716E', table:true,
    lead:'依賦稅署說明，2011 年起每期開出 1 組 1,000 萬特別獎。發票每兩個月一期，奇數月 25 日開獎，一年開 6 次。對獎時從最後一碼往前對，對中的位數越多，獎金越大。',
    nums:[['1,000 萬','特別獎'],['6 次','一年開獎'],['25 日','奇數月開獎']],
    facts:['2026 年 3–4 月期，有人在超商只花 21 元買飲料，就中了千萬特別獎。','2011 年以來的千萬特別獎，大約四分之一沒有人領。']},
-  {no:'展品 05', t:'手機條碼載具', art:'barcode', color:'#7EC997',
+  {no:'展品 05', photo:{src:'img/museum/mobile-barcode-2014.jpg',cap:'2014 年手機上的手機條碼（條碼已打馬賽克）。結帳時給店員掃，發票就存進雲端。',credit:'OnionBulb，公有領域',url:'https://commons.wikimedia.org/wiki/File:E_invoice_general_carrier_20140702084534.jpg'}, t:'手機條碼載具', art:'barcode', color:'#7EC997',
    lead:'2012 年 3 月推出。手機條碼以「/」開頭、共 8 碼，結帳時出示條碼，發票就直接存進雲端，不用再收一疊紙。2013 年起，雲端發票還多了只有它才能抽的「雲端發票專屬獎」。',
    nums:[['8 碼','「/」開頭'],['63 億張','2025 年雲端發票'],['約 65%','雲端發票使用率']],
    facts:['條碼除了「/」，只會出現數字、大寫英文和「+ - .」三種符號。','雲端發票中獎，設定好領獎帳戶後，獎金可以直接匯進戶頭，不用跑去兌獎。']},
@@ -279,20 +282,73 @@ function artTex(e){return tex((x)=>{
 // 位置：左廳 01–03、右廳 04–05、後廳 06（都面向 +z，也就是鏡頭）
 const SPOTS=[[-10.3,8.2],[-10.3,1.4],[-2.2,-2.2],[10.3,-1.8],[-9.4,-15.6],[6.4,-15.4]];
 const exhibits=[],pickables=[];
+// 每件展品是不同的 3D 物件（書桌、開獎搖籃、收銀機、開獎看板、超商結帳台、大手機），前面一塊小說明牌
+function addM(g,geo,m,x,y,z,rx=0,ry=0,rz=0){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.rotation.set(rx,ry,rz);o.castShadow=o.receiveShadow=true;g.add(o);return o}
+const B=(w,h,d)=>new THREE.BoxGeometry(w,h,d),CY=(a,b,h,n=16)=>new THREE.CylinderGeometry(a,b,h,n);
+const topTex=(draw,w,h)=>{const t=tex(draw,w,h);return [mat('#F2ECDD'),mat('#F2ECDD'),mat(0xffffff,{map:t}),mat('#F2ECDD'),mat('#F2ECDD'),mat('#F2ECDD')]};
+const DIG=[...'0123456789'].map(d=>tex((x,w,h)=>{x.fillStyle='#111821';x.fillRect(0,0,w,h);x.fillStyle='#FFD866';x.font='900 96px ui-monospace,Menlo,monospace';x.textAlign='center';x.fillText(d,w/2,100);x.fillStyle='rgba(255,255,255,.08)';x.fillRect(0,h/2-2,w,4)},80,128));
+const digTiles=[];let drum=null,cloud=null,bubble=null;
+const BUILD=[
+  // 01 1951：老書桌＋發票簿＋算盤＋墨水
+  g=>{const wood=mat('#8B5A3C'),dk=mat('#5E3B26');addM(g,B(1.6,0.08,0.85),wood,0,0.78,0);[[-.72,-.36],[.72,-.36],[-.72,.36],[.72,.36]].forEach(([x,z])=>addM(g,B(0.08,0.78,0.08),dk,x,0.39,z));
+    addM(g,B(0.6,0.07,0.42),topTex((x,w,h)=>{x.fillStyle='#F5EBD3';x.fillRect(0,0,w,h);x.strokeStyle='#C0392B';x.lineWidth=3;x.strokeRect(10,10,w-20,h-20);x.fillStyle='#7A2E22';x.font='bold 30px serif';x.textAlign='center';x.fillText('統一發票',w/2,52);x.fillStyle='#C9B79A';for(let r=0;r<6;r++)x.fillRect(30,80+r*24,w-60,3);x.strokeStyle='#C0392B';x.beginPath();x.arc(w-60,h-50,26,0,7);x.stroke()},300,210),-0.25,0.855,0.02,0,0.12,0);
+    const ab=new THREE.Group();ab.position.set(0.42,0.83,0.12);ab.rotation.y=-0.25;g.add(ab);addM(ab,B(0.5,0.035,0.05),dk,0,0,-0.13);addM(ab,B(0.5,0.035,0.05),dk,0,0,0.13);addM(ab,B(0.5,0.035,0.02),dk,0,0,0.04);
+    for(let k=0;k<7;k++){const x=-0.21+k*0.07;addM(ab,CY(0.006,0.006,0.26,6),dk,x,0,0,Math.PI/2);for(let j=0;j<5;j++)addM(ab,CY(0.026,0.026,0.03,10),mat('#3B2A20'),x,0,(j===0?-0.09:0.07+j*0.0)+(j>0?(j-1)*0.03:0),Math.PI/2)}
+    addM(g,CY(0.06,0.07,0.12,14),mat('#1F2A30'),0.55,0.88,-0.26);addM(g,CY(0.012,0.012,0.36,8),mat('#C9A46A'),0.25,0.83,-0.25,0,0.3,Math.PI/2);
+    return {w:1.7,d:0.95}},
+  // 02 愛國獎券：會轉的開獎搖籃
+  g=>{const wood=mat('#A9713F'),gold=mat('#E8B84A');[-0.62,0.62].forEach(x=>{addM(g,B(0.08,1.25,0.08),wood,x,0.62,-0.2,0.28,0,0);addM(g,B(0.08,1.25,0.08),wood,x,0.62,0.2,-0.28,0,0)});
+    const geo=CY(0.42,0.42,1.0,8);geo.rotateZ(Math.PI/2);drum=addM(g,geo,mat('#C9893E'),0,1.15,0);
+    const bandG=CY(0.435,0.435,0.06,8);bandG.rotateZ(Math.PI/2);[-0.42,0,0.42].forEach(x=>{const b=new THREE.Mesh(bandG,gold);b.position.x=x;drum.add(b)});
+    const lid=new THREE.Mesh(B(0.3,0.02,0.2),mat('#7A4E2D'));lid.position.set(0,0.4,0);drum.add(lid);
+    addM(g,B(0.06,0.06,0.3),wood,0.72,1.15,0.12);addM(g,CY(0.03,0.03,0.14,8),mat('#1F2A30'),0.72,1.15,0.3,Math.PI/2);
+    addM(g,B(0.9,0.06,0.42),mat('#7A4E2D'),0,0.5,0.45);for(let k=0;k<7;k++)addM(g,new THREE.SphereGeometry(0.055,12,10),mat(['#FFFFFF','#FFDD5E','#EE716E'][k%3]),-0.3+k*0.1,0.56,0.45+((k*37)%5-2)*0.03);
+    return {w:1.45,d:0.9}},
+  // 03 收銀機：櫃台上的收銀機，吐出一張發票
+  g=>{addM(g,B(1.6,0.9,0.7),mat('#FFFFFF'),0,0.45,0);addM(g,B(1.62,0.1,0.72),mat('#91DDF0'),0,0.82,0);
+    const dg=mat('#4A5056');addM(g,B(0.72,0.24,0.56),dg,0,1.0,0);addM(g,B(0.74,0.1,0.58),mat('#3A3F45'),0,0.93,0.01);
+    addM(g,B(0.62,0.05,0.3),[dg,dg,mat(0xffffff,{map:tex((x,w,h)=>{x.fillStyle='#2B3036';x.fillRect(0,0,w,h);for(let r=0;r<4;r++)for(let c=0;c<6;c++){x.fillStyle=c>3?(r===3?'#00B386':'#E8E2D4'):'#F5F1E8';x.fillRect(12+c*40,10+r*30,32,22)}},256,132)}),dg,dg,dg],0,1.16,0.12,-0.38,0,0);
+    addM(g,B(0.08,0.26,0.08),dg,-0.2,1.3,-0.18);addM(g,B(0.4,0.15,0.05),[dg,dg,dg,dg,mat(0xffffff,{map:tex((x,w,h)=>{x.fillStyle='#0E2A22';x.fillRect(0,0,w,h);x.fillStyle='#7EF0C9';x.font='bold 44px ui-monospace,Menlo,monospace';x.textAlign='right';x.fillText('NT$  25',w-14,60)},256,96)}),dg],-0.2,1.48,-0.18);
+    addM(g,CY(0.075,0.075,0.2,14),mat('#FFFFFF'),0.22,1.17,-0.16,0,0,Math.PI/2);
+    addM(g,B(0.15,0.004,0.42),mat(0xffffff,{map:tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#1F2A30';x.font='bold 14px sans-serif';x.textAlign='center';x.fillText('統一發票',w/2,22);x.fillStyle='#9AA';for(let r=0;r<8;r++)x.fillRect(10,36+r*16,w-20-(r%3)*12,4)},96,200)}),0.22,1.32,0.0,-0.85,0,0);
+    return {w:1.7,d:0.8}},
+  // 04 千萬特別獎：會滾動的開獎看板
+  g=>{const nv=mat('#1F2A30');[-0.88,0.88].forEach(x=>addM(g,B(0.1,1.95,0.1),nv,x,0.97,0));addM(g,B(1.95,1.0,0.1),nv,0,1.45,0);
+    const head=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.28),new THREE.MeshBasicMaterial({map:tex((x,w,h)=>{x.fillStyle='#C0262D';x.fillRect(0,0,w,h);x.fillStyle='#FFE9A8';x.font='900 52px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('特別獎 1,000 萬',w/2,62)},512,80)}));head.position.set(0,1.78,0.056);head.userData.keepBasic=1;g.add(head);
+    for(let k=0;k<8;k++){const t=new THREE.Mesh(new THREE.PlaneGeometry(0.19,0.3),new THREE.MeshBasicMaterial({map:DIG[k]}));t.position.set(-0.77+k*0.22,1.33,0.056);t.userData.keepBasic=1;g.add(t);digTiles.push({t,d:k,sp:0.06+k*0.012,acc:0})}
+    addM(g,B(1.2,0.12,0.5),mat('#B8323A'),0,0.06,0.45);
+    return {w:2.0,d:0.5}},
+  // 05 手機條碼：超商結帳台＋掃描器＋手機＋頭上的雲
+  g=>{addM(g,B(1.4,0.85,0.6),mat('#FFFFFF'),0,0.425,0);addM(g,B(1.42,0.1,0.62),mat('#7EC997'),0,0.78,0);
+    addM(g,B(0.3,0.06,0.24),mat('#1F2A30'),0.38,0.88,0.05);const red=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.02),new THREE.MeshBasicMaterial({color:'#FF3B30'}));red.rotation.x=-Math.PI/2;red.position.set(0.38,0.915,0.05);red.userData.keepBasic=1;g.add(red);
+    const scrT=tex((x)=>{x.fillStyle='#fff';x.fillRect(0,0,260,500);x.fillStyle='#1F2A30';x.font='bold 24px sans-serif';x.textAlign='center';x.fillText('手機條碼',130,120);for(let k=0;k<22;k++)x.fillRect(20+k*10,180,[2,5,7][k%3],110);x.font='bold 26px monospace';x.fillText('/ABC+123',130,340)},260,500);
+    const ph=new THREE.Group();ph.position.set(-0.15,0.88,0.06);ph.rotation.y=0.2;g.add(ph);addM(ph,B(0.26,0.025,0.48),mat('#1F2A30'),0,0,0);const sc=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.43),new THREE.MeshBasicMaterial({map:scrT}));sc.rotation.x=-Math.PI/2;sc.position.y=0.014;ph.add(sc);
+    addM(g,B(0.62,1.15,0.06),mat('#1F2A30'),0,1.45,-0.22);const big=new THREE.Mesh(new THREE.PlaneGeometry(0.54,1.04),new THREE.MeshBasicMaterial({map:scrT}));big.position.set(0,1.45,-0.188);g.add(big);
+    cloud=new THREE.Group();cloud.position.set(0,2.45,-0.2);g.add(cloud);[[0,0,0,0.3],[0.3,-0.05,0,0.22],[-0.3,-0.06,0,0.22],[0.12,0.14,0,0.22]].forEach(([x,y,z,r])=>addM(cloud,new THREE.SphereGeometry(r,16,12),mat('#FFFFFF'),x,y,z));
+    return {w:1.5,d:0.7}},
+  // 06 用 App 對獎：巨大手機＋飄著的中獎通知
+  g=>{addM(g,B(1.3,0.1,0.6),mat('#E6F4EE'),0,0.05,0);addM(g,B(1.0,1.9,0.12),mat('#1F2A30'),0,1.05,0);
+    const appT=tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#00B386';x.fillRect(0,0,w,150);x.fillStyle='#fff';x.font='900 52px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('發票存摺',w/2,95);
+      x.fillStyle='#E8F7F2';rr(x,30,190,w-60,150,24);x.fill();x.fillStyle='#008F6B';x.font='900 46px "PingFang TC",sans-serif';x.fillText('自動對獎完成',w/2,285);x.fillStyle='#C8CCD0';for(let r=0;r<5;r++){rr(x,30,380+r*95,w-60,70,16);x.fill()}},400,860);
+    const scr=new THREE.Mesh(new THREE.PlaneGeometry(0.88,1.76),new THREE.MeshBasicMaterial({map:appT}));scr.position.set(0,1.05,0.062);g.add(scr);
+    bubble=new THREE.Mesh(new THREE.PlaneGeometry(1.1,0.36),new THREE.MeshBasicMaterial({transparent:true,map:tex((x,w,h)=>{x.fillStyle='#FFDD5E';rr(x,4,4,w-8,h-8,40);x.fill();x.fillStyle='#1F2A30';x.font='900 52px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('叮！開獎囉，幫你對好了',w/2,98)},640,150)}));
+    bubble.position.set(0.25,2.25,0.25);bubble.userData.keepBasic=1;g.add(bubble);
+    return {w:1.3,d:0.6}},
+];
+function plaqueTex(e){return tex((x,w,h)=>{x.fillStyle='#FFFDF7';x.fillRect(0,0,w,h);x.fillStyle=e.color;x.fillRect(0,0,16,h);x.fillStyle='#008F6B';x.font='bold 30px sans-serif';x.fillText(e.no,36,52);x.fillStyle='#1F2A30';x.font='900 40px "PingFang TC",sans-serif';wrap(x,e.t,36,104,w-60,46)},512,200)}
 EXHIBITS.forEach((e,i)=>{
-  const [px,pz]=SPOTS[i],big=i===5,s=big?1.4:1;
+  const [px,pz]=SPOTS[i];
   const g=new THREE.Group();g.position.set(px,0,pz);scene.add(g);
-  const ped=new THREE.Mesh(new THREE.BoxGeometry(1.1*s,0.7,0.7*s),mat('#FFFFFF'));ped.position.y=0.35;ped.castShadow=ped.receiveShadow=true;g.add(ped);
-  const band=new THREE.Mesh(new THREE.BoxGeometry(1.12*s,0.08,0.72*s),mat(e.color));band.position.y=0.66;g.add(band);
-  const board=new THREE.Mesh(new THREE.BoxGeometry(1.05*s,1.31*s,0.05),mat('#2B3A40'));board.position.set(0,0.7+0.66*s,0);board.rotation.x=-0.12;board.castShadow=true;g.add(board);
-  const pic=new THREE.Mesh(new THREE.PlaneGeometry(0.96*s,1.2*s),new THREE.MeshBasicMaterial({map:artTex(e)}));pic.position.z=0.03;board.add(pic);
-  {const c=document.createElement('canvas');c.width=640;c.height=520;c.getContext('2d').drawImage(pic.material.map.image,0,0,640,520,0,0,640,520);e.img=c.toDataURL('image/jpeg',0.86)}
-  const ok=new THREE.Mesh(new THREE.CircleGeometry(0.13,24),new THREE.MeshBasicMaterial({color:'#00B386'}));ok.position.set(0.5*s,0.62*s,0.04);ok.visible=false;ok.userData.keepBasic=1;board.add(ok);
-  // 地上的光圈：走近會亮
-  const ring=new THREE.Mesh(new THREE.RingGeometry(0.75*s,0.9*s,40),new THREE.MeshBasicMaterial({color:'#00B386',transparent:true,opacity:0.25}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,0.9*s);ring.userData.keepBasic=1;g.add(ring);
-  solids.push({x0:px-0.6*s,x1:px+0.6*s,z0:pz-0.4*s,z1:pz+0.4*s});
-  [ped,board,pic].forEach(o=>{o.userData.ex=i;pickables.push(o)});
-  exhibits.push({g,board,ok,ring,x:px,z:pz+0.9*s,i});
+  const {w,d}=BUILD[i](g),SC=1.35;g.scale.setScalar(SC);
+  // 說明牌（小立牌，斜放在展品前面）
+  const fz=d/2+0.32;addM(g,CY(0.025,0.025,0.6,8),mat('#2B3A40'),0.55,0.3,fz);
+  const pl=new THREE.Mesh(new THREE.PlaneGeometry(0.62,0.24),new THREE.MeshBasicMaterial({map:plaqueTex(e)}));pl.position.set(0.55,0.66,fz+0.02);pl.rotation.x=-0.7;g.add(pl);
+  const ok=new THREE.Mesh(new THREE.CircleGeometry(0.06,20),new THREE.MeshBasicMaterial({color:'#00B386'}));ok.position.set(0.27,0.09,0.002);ok.visible=false;ok.userData.keepBasic=1;pl.add(ok);
+  {const pic=artTex(e);const c=document.createElement('canvas');c.width=640;c.height=520;c.getContext('2d').drawImage(pic.image,0,0,640,520,0,0,640,520);e.img=c.toDataURL('image/jpeg',0.86)}
+  const ring=new THREE.Mesh(new THREE.RingGeometry(0.75,0.9,40),new THREE.MeshBasicMaterial({color:'#00B386',transparent:true,opacity:0.25}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,d/2+0.75);ring.userData.keepBasic=1;g.add(ring);
+  solids.push({x0:px-w*SC/2,x1:px+w*SC/2,z0:pz-d*SC/2,z1:pz+(d/2+0.05)*SC});
+  g.traverse(o=>{if(o.isMesh&&o!==ring){o.userData.ex=i;pickables.push(o)}});
+  exhibits.push({g,ok,ring,x:px,z:pz+(d/2+0.75)*SC,i});
 });
 
 // 大廳中央：會轉的巨型發票
@@ -397,7 +453,7 @@ stand(-8.5,17.4,FACE_N+Math.PI);
 [[9.5,5.3],[9.5,6.2],[9.5,7.1],[9.5,8.0],[9.5,8.9],[9.5,9.8]].forEach(([x,z])=>stand(x,z,FACE_N));
 stand(6.6,4.6,Math.atan2(COIN.x-6.6,COIN.z-4.6));   // 正在拍照的人
 // 看展的人
-stand(-10.3,9.6,FACE_N);stand(-9.6,2.8,FACE_N+0.3);stand(-9.8,-14.2,FACE_N);stand(7.4,-13.8,FACE_N-0.3);stand(-4.2,-8.2,FACE_N);
+stand(-11.2,10.4,FACE_N+0.4);stand(-11.2,3.6,FACE_N+0.3);stand(-11.1,-13.2,FACE_N+0.4);stand(8.4,-13.1,FACE_N-0.4);stand(-4.2,-8.2,FACE_N);
 stand(11.4,-10.5,-Math.PI/2);   // 紀念品店店員
 // 走動的人
 walker([[-9,6],[-4,10],[-3,3],[-8,0.5]]);walker([[3,-7],[8,-8],[8,-13],[3,-13]]);walker([[-9,-6],[-2.5,-12],[-9,-18]],0.9);walker([[-6.5,19.3],[3.8,19.3]],0.8);
@@ -485,12 +541,13 @@ function placeJoy(){_pv.set(player.position.x,0,player.position.z).project(cam);
 const seen=new Set();let near=null;
 let cardOn=false,pauseAt=0;
 function openCard(i){const e=EXHIBITS[i];target=null;pendingOpen=null;
-  $('cImg').src=e.img;$('cImg').style.background=e.color;$('cNo').textContent=e.no;$('cT').textContent=e.t;
+  $('cImg').src=e.photo?e.photo.src:e.img;$('cImg').classList.toggle('ph',!!e.photo);$('cImg').style.background=e.photo?'#EFEAE0':e.color;
+  $('cCap').innerHTML=e.photo?`${e.photo.cap}<br><a href="${e.photo.url}" target="_blank" rel="noopener">照片：${e.photo.credit}</a>`:'';$('cCap').hidden=!e.photo;$('cNo').textContent=e.no;$('cT').textContent=e.t;
   let h=`<p class="lead">${e.lead}</p>`;
   if(e.nums)h+=`<div class="nums">${e.nums.map(([b,l])=>`<div><b>${b}</b><span>${l}</span></div>`).join('')}</div>`;
   if(e.table)h+=`<h4>怎麼對獎</h4><table>${PRIZES.map(([n,r,m,hi])=>`<tr class="${hi?'hi':''}"><td>${n}</td><td>${r}</td><td>${m}</td></tr>`).join('')}</table><p class="src" style="margin-top:4px">二獎到六獎都是對頭獎號碼的末幾碼。</p>`;
   h+=`<h4>冷知識</h4><ul class="facts">${e.facts.map(f=>`<li>${f}</li>`).join('')}</ul>`;
-  h+=`<p class="src">資料來源：財政部財政史料陳列室、財政部賦稅署與新聞報導（2025–2026）整理</p>`;
+  h+=`<p class="src">資料來源：財政部財政史料陳列室、財政部賦稅署與新聞報導（2025–2026）整理；照片取自維基共享資源</p>`;
   $('cBody').innerHTML=h;$('cSc').scrollTop=0;cCta.hidden=!e.cta;$('cPause').hidden=state!=='play';
   if(!cardOn&&state==='play')pauseAt=performance.now();cardOn=true;cardEl.classList.add('on');
   seen.add(i);$('seen').textContent=seen.size;exhibits[i].ok.visible=true;
@@ -582,7 +639,8 @@ function loop(){
   if(NIGHT&&!cardOn&&state!=='intro'){gd.cool-=dt;if(gd.cool<=0&&seenByGuard()){gd.cool=5;
     if(state==='play'){t0-=5000;toast('被警衛照到了！','計時 +5 秒，快躲到牆後面。')}else toast('噓——','警衛在巡邏，別被照到。');track('guard_caught',{state})}}
   const tt=performance.now()/1000;slips.forEach(s=>{s.paper.position.y=0.75+Math.sin(tt*2.4+s.i)*0.08;s.paper.rotation.y=tt*1.2+s.i;s.glow.material.opacity=0.35+0.25*Math.sin(tt*3+s.i)});
-  updateNPC(dt,tt);coin.rotation.y+=dt*0.5;sun.position.set(player.position.x+6,18,player.position.z+10);sun.target.position.set(player.position.x,0,player.position.z);
+  updateNPC(dt,tt);coin.rotation.y+=dt*0.5;if(drum)drum.rotation.x+=dt*0.9;if(cloud)cloud.position.y=2.45+Math.sin(tt*1.3)*0.08;if(bubble){bubble.position.y=2.25+Math.sin(tt*2)*0.06;bubble.quaternion.copy(cam.quaternion)}
+  digTiles.forEach(o=>{o.acc+=dt;if(o.acc>o.sp){o.acc=0;o.d=(o.d+1)%10;o.t.material.map=DIG[o.d]}});sun.position.set(player.position.x+6,18,player.position.z+10);sun.target.position.set(player.position.x,0,player.position.z);
   inv.rotation.y+=dt*0.6;placeCam(false);placeJoy();
   renderer.render(scene,cam);requestAnimationFrame(loop)}
 loop();
