@@ -91,7 +91,7 @@
   <div class="vsc" id="vsCard" hidden></div>
   <p id="introP">展廳裡藏了 <b>8 張發票</b>，你要幾秒才找齊？<br>每張發票都藏著一段統一發票的故事。</p>
   <button class="btn p go" id="go" type="button">開始尋寶 ▶</button>
-  <small>一局約 1 分鐘・免下載</small>
+  <small>四個展區・一局約 1–2 分鐘・免下載</small>
 </div>
 <div id="hud"><span class="t" id="prog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 22z" fill="#00B386"/><path d="M9 7h6M9 11h6M9 15h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>找到 <b id="found">0</b> / 8</span><span class="t time" id="clock">00.0</span></div>
 <div id="toast"></div>
@@ -140,7 +140,7 @@ const FACTS = [
 ];
 
 // ---------- 基本場景：俯瞰跟拍、均勻光（不做聚光燈） ----------
-const W=16, D=24, WH=2.2;          // 展廳寬、深、牆高（牆矮，俯瞰才看得到人）
+const W=24, D=40, WH=2.2;          // 展廳寬、深、牆高（牆矮，俯瞰才看得到人）
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
@@ -153,7 +153,7 @@ const fovFor=()=>innerWidth<innerHeight?52:40;
 const cam=new THREE.PerspectiveCamera(fovFor(),innerWidth/innerHeight,0.1,200);
 scene.add(new THREE.HemisphereLight(0xffffff,0xd8cfc0,0.85));
 const sun=new THREE.DirectionalLight(0xffffff,0.55);sun.position.set(6,18,10);sun.castShadow=true;
-sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-14,right:14,top:16,bottom:-16,near:1,far:60});scene.add(sun);
+sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-14,right:14,top:16,bottom:-16,near:1,far:60});scene.add(sun);scene.add(sun.target);
 
 function mat(c,opt={}){return new THREE.MeshLambertMaterial(Object.assign({color:c},opt))}
 function tex(draw,w=256,h=256,rx=1,ry=1){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=4;return t}
@@ -161,12 +161,16 @@ function tex(draw,w=256,h=256,rx=1,ry=1){const c=document.createElement('canvas'
 const woodT=(rx,ry)=>tex((x,w,h)=>{x.fillStyle='#D8BE95';x.fillRect(0,0,w,h);for(let i=0;i<8;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#CFB287':'#DEC59D';x.save();x.translate(j*64+((i%2)?32:0),i*32);x.fillRect(0,0,62,30);x.restore()}},256,256,rx,ry);
 const tileT=(c1,c2,rx,ry)=>tex((x,w,h)=>{x.fillStyle=c1;x.fillRect(0,0,w,h);x.strokeStyle=c2;x.lineWidth=3;for(let i=0;i<=4;i++){x.beginPath();x.moveTo(i*64,0);x.lineTo(i*64,h);x.stroke();x.beginPath();x.moveTo(0,i*64);x.lineTo(w,i*64);x.stroke()}},256,256,rx,ry);
 function floorZone(x0,x1,z0,z1,t){const m=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),mat(0xffffff,{map:t}));m.rotation.x=-Math.PI/2;m.position.set((x0+x1)/2,0,(z0+z1)/2);m.receiveShadow=true;m.userData.floor=1;scene.add(m);return m}
+const carpetT=tex((x,w,h)=>{x.fillStyle='#B8323A';x.fillRect(0,0,w,h);x.fillStyle='#E8B84A';x.fillRect(0,0,10,h);x.fillRect(w-10,0,10,h)},128,128,1,1);
 const floors=[
-  floorZone(-W/2,W/2,4,D/2,tileT('#EEE9DF','#DCD4C4',4,2)),      // 大廳
-  floorZone(-W/2,0,-6,4,woodT(4,5)),                             // 左廳：發票的歷史
-  floorZone(0,W/2,-6,4,tileT('#E3EEF0','#C9DCE0',4,5)),           // 右廳：載具時代
-  floorZone(-W/2,W/2,-D/2,-6,tileT('#E6F4EE','#C6E6D8',8,3)),     // 後廳：帶回家
+  floorZone(-W/2,W/2,12,D/2,tileT('#F1ECE2','#DCD4C4',6,2)),       // 大廳（售票閘門）
+  floorZone(-W/2,0,-4,12,woodT(6,8)),                              // Ⅰ 發票的歷史
+  floorZone(0,W/2,-4,12,tileT('#F4EDE0','#E2D5BF',6,8)),            // Ⅱ 千萬特別獎
+  floorZone(-W/2,0,-D/2,-4,tileT('#E3EEF0','#C9DCE0',6,8)),         // Ⅲ 載具時代
+  floorZone(0,W/2,-D/2,-4,tileT('#E6F4EE','#C6E6D8',6,8)),          // Ⅳ 把發票帶回家
 ];
+// Ⅱ 廳紅地毯（裝飾）
+{const c=new THREE.Mesh(new THREE.PlaneGeometry(3,15),mat(0xffffff,{map:carpetT}));c.rotation.x=-Math.PI/2;c.position.set(6,0.008,4.2);c.receiveShadow=true;scene.add(c)}
 // 外圍地面（展廳外）
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,80),mat('#DDD6C8'));ground.rotation.x=-Math.PI/2;ground.position.y=-0.02;scene.add(ground);
 
@@ -181,19 +185,23 @@ function wallSeg(a,b,fixed,alongX,fade=false){const len=b-a,c=(a+b)/2,t=0.25;con
   if(fade){o.userData.z=fixed;fadeWalls.push(o)}return o}
 wallSeg(-W/2,W/2,-D/2,true);wallSeg(-W/2,W/2,D/2,true,true);wallSeg(-D/2,D/2,-W/2,false);wallSeg(-D/2,D/2,W/2,false);
 function crossWall(z,DOOR){wallSeg(-W/2,DOOR[0][0],z,true,true);wallSeg(DOOR[0][1],DOOR[1][0],z,true,true);wallSeg(DOOR[1][1],W/2,z,true,true)}
-crossWall(4,[[-5.5,-2.5],[2.5,5.5]]);crossWall(-6,[[-2.7,-0.5],[0.5,2.7]]);
-wallSeg(-6,4,0,false);
+crossWall(12,[[-8,-4],[4,8]]);crossWall(-4,[[-8,-4],[4,8]]);
+// 中間牆：Ⅰ↔Ⅱ、Ⅲ↔Ⅳ 各開一道門
+wallSeg(-D/2,-13,0,false);wallSeg(-10,-4,0,false);wallSeg(-4,3,0,false);wallSeg(6,12,0,false);
 
 // ---------- 文字貼牆／地上 ----------
 function label(s,sub,{w=4,bg=null,fg='#1F2A30',size=88}={}){const t=tex((x,cw,ch)=>{if(bg){x.fillStyle=bg;x.fillRect(0,0,cw,ch)}x.fillStyle=fg;x.textAlign='center';x.font=`900 ${size}px "PingFang TC","Noto Sans TC",sans-serif`;x.fillText(s,cw/2,sub?110:130);if(sub){x.font='600 40px "PingFang TC",sans-serif';x.fillStyle=bg?fg:'#00B386';x.fillText(sub,cw/2,175)}},768,200);
   return new THREE.Mesh(new THREE.PlaneGeometry(w,w*200/768),new THREE.MeshBasicMaterial({map:t,transparent:!bg}))}
 function wallLabel(s,sub,x,z,w){const m=label(s,sub,{w});m.position.set(x,WH*0.62,z+0.14);scene.add(m)}
-wallLabel('Ⅲ 把發票帶回家','App 對獎、領獎',0,-D/2,6);
-wallLabel('發票博物館','INVOICE MUSEUM',0,4,4.4);
+wallLabel('發票博物館','INVOICE MUSEUM',0,12,5);
+wallLabel('Ⅰ 發票的歷史','1951 → 今天',-2.1,-4,3.6);
+wallLabel('Ⅱ 千萬特別獎','2011 起每期 1 組',2.1,-4,3.6);
+wallLabel('Ⅲ 載具時代','發票不再是紙',-6,-D/2,5);
+wallLabel('Ⅳ 把發票帶回家','App 對獎、領獎',6,-D/2,5);
 // 地上的指引
 function floorText(s,x,z,w=2.6,rot=0){const m=label(s,null,{w,fg:'#00B386',size:72});m.rotation.x=-Math.PI/2;m.rotation.z=rot;m.position.set(x,0.01,z);scene.add(m)}
-floorText('← 歷史',-4,5.2,2.2);floorText('千萬 →',4,5.2,2.2);floorText('↑ 帶回家',-1.6,-5.1,1.7);floorText('↑ 帶回家',1.6,-5.1,1.7);
-floorText('Ⅰ 發票的歷史',-4,2.7,3.6);floorText('Ⅱ 千萬與載具',4,2.7,3.6);
+floorText('↑ Ⅰ 歷史',-6,13.2,2.4);floorText('↑ Ⅱ 千萬',6,13.2,2.4);floorText('↑ Ⅲ 載具',-6,-2.9,2.4);floorText('↑ Ⅳ 帶回家',6,-2.9,2.6);
+floorText('售票閘門',0,15.4,2);
 
 // ---------- 展品：展台＋立牌（面向鏡頭） ----------
 function rr(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()}
@@ -211,7 +219,7 @@ function artTex(e){return tex((x)=>{
   if(e.art==='app'){x.fillStyle=wh;rr(x,-130,-220,260,440,36);x.fill();x.fillStyle=e.color;rr(x,-95,-170,190,120,18);x.fill();x.fillStyle=wh;x.font='bold 34px sans-serif';x.textAlign='center';x.fillText('中獎了！',0,-100);x.fillStyle='#C8CCD0';for(let r=0;r<4;r++){rr(x,-95,-20+r*55,190,38,10);x.fill()}}
   x.restore()},640,800)}
 // 位置：左廳 01–03、右廳 04–05、後廳 06（都面向 +z，也就是鏡頭）
-const SPOTS=[[-6.8,-4.4],[-4.4,-4.4],[-6.8,0],[4.4,-4.4],[6.8,-4.4],[0,-10.4]];
+const SPOTS=[[-10.3,8.2],[-10.3,1.4],[-2.2,-2.2],[10.3,-1.8],[-9.4,-15.6],[6.4,-15.4]];
 const exhibits=[],pickables=[];
 EXHIBITS.forEach((e,i)=>{
   const [px,pz]=SPOTS[i],big=i===5,s=big?1.4:1;
@@ -236,7 +244,7 @@ function bigInvoiceTex(){return tex((x)=>{
   for(let k=0;k<40;k++){const w=[2,4,6][(k*5)%3];x.fillRect(40+k*8,300,w,80)}
   x.fillStyle='#ddd';x.fillRect(60,420,120,120);x.fillRect(220,420,120,120);
   x.fillStyle='#00B386';x.font='bold 30px sans-serif';x.fillText('發票博物館 入館紀念',200,620)},400,720)}
-const PED={x:0,z:8};
+const PED={x:-6,z:4.6};
 const pedM=new THREE.Mesh(new THREE.CylinderGeometry(0.9,1,0.6,40),mat('#FFFFFF'));pedM.position.set(PED.x,0.3,PED.z);pedM.castShadow=pedM.receiveShadow=true;scene.add(pedM);
 const pedR=new THREE.Mesh(new THREE.CylinderGeometry(1.01,1.01,0.06,40),trimM);pedR.position.set(PED.x,0.6,PED.z);scene.add(pedR);
 solids.push({x0:PED.x-1,x1:PED.x+1,z0:PED.z-1,z1:PED.z+1});
@@ -252,18 +260,40 @@ function plant(x,z){box(0.5,0.5,0.5,x,0.25,z,mat('#E9E2D3'));const leaf=new THRE
 function vitrine(x,z,obj){box(0.9,0.8,0.7,x,0.4,z,mat('#FFFFFF'));const glass=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.6,0.7),new THREE.MeshLambertMaterial({color:'#DFF3EE',transparent:true,opacity:0.35}));glass.position.set(x,1.1,z);scene.add(glass);obj.position.set(x,0.95,z);scene.add(obj);return obj}
 function stanchions(x0,x1,z){for(let x=x0;x<=x1+0.01;x+=(x1-x0)/4){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.8,8),mat('#B8A07A'));p.position.set(x,0.4,z);scene.add(p)}
   const rope=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,x1-x0,8),trimM);rope.rotation.z=Math.PI/2;rope.position.set((x0+x1)/2,0.72,z);scene.add(rope)}
-bench(-4.5,9.5);bench(4.5,9.5);bench(-4.5,-8.6);bench(4.5,-8.6);
-plant(-7.3,11.3);plant(7.3,11.3);plant(-7.3,4.7);plant(7.3,4.7);plant(-7.3,-11.3);plant(7.3,-11.3);plant(-0.6,3.4);plant(0.6,3.4);
+// 裝飾畫（掛在面向鏡頭的牆上）
+function wallFrame(x,z,w,h,draw,cw=512,ch=384){const f=box(w+0.12,h+0.12,0.05,x,1.25,z+0.16,mat('#2B3A40'),false);
+  const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex(draw,cw,ch)}));p.position.set(x,1.25,z+0.195);scene.add(p)}
+wallFrame(-10,-4,2.2,1.2,(x,w,h)=>{x.fillStyle='#F3E7C9';x.fillRect(0,0,w,h);x.fillStyle='#7A4E2D';x.font='bold 40px serif';x.textAlign='center';x.fillText('臺灣省營利事業',w/2,90);x.fillText('統一發貨票',w/2,145);x.font='28px serif';x.fillText('民國四十年',w/2,200);for(let i=0;i<6;i++)x.fillRect(60,240+i*20,w-120,6)});
+wallFrame(10,-4,2.2,1.2,(x,w,h)=>{x.fillStyle='#FFDD5E';x.fillRect(0,0,w,h);x.fillStyle='#1F2A30';x.textAlign='center';x.font='900 120px sans-serif';x.fillText('21 元',w/2,170);x.font='bold 40px sans-serif';x.fillText('買飲料中千萬',w/2,250);x.font='26px sans-serif';x.fillText('2026 年 3–4 月期',w/2,310)});
+wallFrame(-10.4,-D/2,2.4,1.2,(x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#1F2A30';for(let k=0;k<44;k++)x.fillRect(40+k*10,60,[3,6,8][(k*7)%3],200);x.font='bold 44px monospace';x.textAlign='center';x.fillText('/ABC+123',w/2,320)});
+wallFrame(10.4,-D/2,2.2,1.2,(x,w,h)=>{x.fillStyle='#00B386';x.fillRect(0,0,w,h);x.fillStyle='#fff';x.textAlign='center';x.font='900 72px sans-serif';x.fillText('中獎了！',w/2,170);x.font='bold 34px sans-serif';x.fillText('發票存摺 自動對獎通知',w/2,250)});
+// 大廳：售票閘門、詢問台、柱子
+for(const gx of [-3.6,-1.2,1.2,3.6]){box(0.3,0.95,1.3,gx,0.475,14.3,mat('#D7DCE0'));box(0.32,0.06,1.32,gx,0.98,14.3,trimM,false,false)}
+box(W/2-3.75,0.9,0.12,-(W/2+3.75)/2,0.45,14.3,mat('#C9B48F'));box(W/2-3.75,0.9,0.12,(W/2+3.75)/2,0.45,14.3,mat('#C9B48F'));
+box(2.6,0.95,0.9,-8.5,0.475,16.6,mat('#FFFFFF'));box(2.62,0.06,0.92,-8.5,0.98,16.6,trimM,false,false);
+{const s=label('詢問台',null,{w:1.6,fg:'#00B386',size:80});s.position.set(-8.5,1.5,16.15);scene.add(s)}
+for(const [cx,cz] of [[-10.9,12.9],[10.9,12.9],[-10.9,19.2],[10.9,19.2]]){const c=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.4,WH,20),mat('#FFFFFF'));c.position.set(cx,WH/2,cz);c.castShadow=true;scene.add(c);solids.push({x0:cx-.4,x1:cx+.4,z0:cz-.4,z1:cz+.4})}
+// Ⅱ 廳中央：千萬金幣（拍照點）
+const COIN={x:5.2,z:3.2};
+box(1.8,0.6,1.8,COIN.x,0.3,COIN.z,mat('#FFFFFF'));box(1.84,0.06,1.84,COIN.x,0.62,COIN.z,mat('#E8B84A'),false,false);
+const coinT=tex((x,w,h)=>{x.fillStyle='#F2C94C';x.beginPath();x.arc(w/2,h/2,w/2,0,7);x.fill();x.strokeStyle='#C99A1E';x.lineWidth=18;x.beginPath();x.arc(w/2,h/2,w/2-24,0,7);x.stroke();x.fillStyle='#8A5A00';x.textAlign='center';x.font='900 120px sans-serif';x.fillText('1,000',w/2,h/2+10);x.font='900 64px sans-serif';x.fillText('萬',w/2,h/2+90)},512,512);
+const coin=new THREE.Mesh(new THREE.CylinderGeometry(1,1,0.18,48),[mat('#E0B33A'),new THREE.MeshBasicMaterial({map:coinT}),new THREE.MeshBasicMaterial({map:coinT})]);
+coin.rotation.order='YXZ';coin.rotation.x=Math.PI/2;coin.position.set(COIN.x,1.75,COIN.z);coin.castShadow=true;scene.add(coin);
+
+// Ⅳ 廳：紀念品店
+box(1.1,0.95,3.2,10.6,0.475,-10.5,mat('#FFFFFF'));box(1.12,0.06,3.22,10.6,0.98,-10.5,trimM,false,false);
+{const s=label('紀念品店',null,{w:2,fg:'#00B386',size:80});s.rotation.y=-Math.PI/2;s.position.set(10.0,1.55,-10.5);scene.add(s)}
+for(let k=0;k<5;k++){const b=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.22,0.22),mat(['#EE716E','#7A9BE4','#FFDD5E','#7EC997','#B78ED8'][k]));b.position.set(10.6,1.1,-11.7+k*0.6);scene.add(b)}
+bench(-4.5,18.4);bench(5.5,18.4);bench(-6,-11.5);bench(5.5,-9);
+plant(-11.3,13);plant(11.3,13.2);plant(-11.3,11.3);plant(11.3,11.3);plant(-11.3,-4.7);plant(11.3,-4.7);plant(-11.3,-19.3);plant(11.3,-19.3);plant(-0.7,11.3);plant(0.7,11.3);
 const stack=new THREE.Group();for(let k=0;k<8;k++){const p=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.012,0.5),mat(k%2?'#FFFFFF':'#F2EFE6'));p.position.y=k*0.014;p.rotation.y=(k*37%10-5)*0.04;stack.add(p)}
-vitrine(-4,0.2,stack);
+vitrine(-2.2,8.8,stack);
 const phone=new THREE.Group();phone.add(new THREE.Mesh(new THREE.BoxGeometry(0.28,0.03,0.52),mat('#1F2A30')));
 const scr=new THREE.Mesh(new THREE.PlaneGeometry(0.24,0.46),new THREE.MeshBasicMaterial({map:tex((x)=>{x.fillStyle='#fff';x.fillRect(0,0,260,500);x.fillStyle='#1F2A30';for(let k=0;k<22;k++)x.fillRect(20+k*10,180,[2,5,7][k%3],110);x.font='bold 26px monospace';x.textAlign='center';x.fillText('/ABC+123',130,340)},260,500)}));scr.rotation.x=-Math.PI/2;scr.position.y=0.016;phone.add(scr);
-vitrine(4.6,0.2,phone);
-const winRug=new THREE.Mesh(new THREE.PlaneGeometry(4,1.04),new THREE.MeshBasicMaterial({map:tex((x,w,h)=>{x.fillStyle='#FFDD5E';rr(x,0,0,w,h,40);x.fill();x.fillStyle='#1F2A30';x.font='900 96px sans-serif';x.textAlign='center';x.fillText('中獎了！',w/2,135)},768,200),transparent:true}));
-winRug.rotation.x=-Math.PI/2;winRug.position.set(0,0.012,-7.6);scene.add(winRug);
+vitrine(-4.2,-9.2,phone);
 
 // ---------- 藏起來的 8 張發票 ----------
-const HIDE=[[0,6.5],[6.6,6.3],[-7.1,2.6],[-1.2,-2.8],[7.1,2.4],[1.5,-4.7],[-6.8,-10.9],[6.9,-9.6]];
+const HIDE=[[-11.1,17.4],[-11.2,-3.1],[-1.0,10.6],[11.2,-3.1],[1.0,0.6],[-11.2,-19.1],[-1.0,-6.0],[11.2,-19.1]];
 const slipTex=tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#00B386';x.fillRect(0,0,w,26);x.fillStyle='#1F2A30';x.font='bold 22px sans-serif';x.textAlign='center';x.fillText('統一發票',w/2,62);
   x.font='bold 26px monospace';x.fillText('AB-'+String(Math.floor(Math.random()*9e7+1e7)),w/2,104);for(let k=0;k<22;k++)x.fillRect(20+k*8,124,[2,4,5][k%3],40);x.fillStyle='#C8CCD0';for(let r=0;r<4;r++)x.fillRect(30,182+r*18,w-60-(r%2)*40,8)},220,260);
 const slips=HIDE.map(([x,z],i)=>{const g=new THREE.Group();
@@ -281,13 +311,52 @@ const legL=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.32,0.12),pants),legR=legL
 const eyeM=new THREE.MeshBasicMaterial({color:'#1F2A30'});const eL=new THREE.Mesh(new THREE.SphereGeometry(0.035,8,8),eyeM),eR=eL.clone();eL.position.set(-0.1,1.06,0.27);eR.position.set(0.1,1.06,0.27);
 const card=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.24,0.02),mat('#FFFFFF'));card.position.set(0.27,0.6,0.12);card.rotation.z=-0.3;   // 手上拿張發票
 [bodyM,head,hairM,legL,legR,eL,eR,card].forEach(o=>{o.castShadow=true;player.add(o)});
-player.position.set(0,0,10.8);player.scale.setScalar(1.3);scene.add(player);
+player.position.set(0,0,18.6);player.scale.setScalar(1.3);scene.add(player);
 let heading=Math.PI;player.rotation.y=heading;
+
+// ---------- 其他參觀者：排隊、看展、走動 ----------
+function stanchionsZ(x,z0,z1){const n=4;for(let i=0;i<=n;i++){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.8,8),mat('#B8A07A'));p.position.set(x,0.4,z0+(z1-z0)*i/n);scene.add(p)}
+  const rope=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,Math.abs(z1-z0),8),mat('#B8323A'));rope.rotation.x=Math.PI/2;rope.position.set(x,0.72,(z0+z1)/2);scene.add(rope);
+  solids.push({x0:x-0.05,x1:x+0.05,z0:Math.min(z0,z1),z1:Math.max(z0,z1)})}
+// Ⅱ 廳：排隊跟千萬金幣拍照（紅龍圍出一條隊伍）
+stanchionsZ(8.6,4.6,10.4);stanchionsZ(10.4,4.6,10.4);
+const SHIRTS=['#7A9BE4','#EE716E','#F6AA5E','#B78ED8','#91DDF0','#FA88C5','#C6D86A','#FFDD5E','#8C9AA6'],HAIRS=['#2A211C','#5B3A26','#1B1B1B','#8A6A4A'];
+function person(i){const g=new THREE.Group();const sh=mat(SHIRTS[i%SHIRTS.length]),hr=mat(HAIRS[i%HAIRS.length]);
+  const b=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.26,0.5,14),sh);b.position.y=0.55;
+  const h=new THREE.Mesh(new THREE.SphereGeometry(0.3,16,12),skin);h.position.y=1.05;
+  const hh=new THREE.Mesh(new THREE.SphereGeometry(0.31,16,12,0,Math.PI*2,0,Math.PI*0.55),hr);hh.position.y=1.07;hh.rotation.x=-0.25;
+  const l1=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.32,0.12),pants),l2=l1.clone();l1.position.set(-0.1,0.16,0);l2.position.set(0.1,0.16,0);
+  [b,h,hh,l1,l2].forEach(o=>{o.castShadow=true;g.add(o)});g.scale.setScalar(1.25+((i*37)%10)/60);scene.add(g);return {g,l1,l2}}
+const npcs=[];let nid=0;
+function stand(x,z,face){const p=person(nid++);p.g.position.set(x,0,z);p.g.rotation.y=face;npcs.push(Object.assign(p,{x,z,face,kind:'stand',ph:Math.random()*6}))}
+function walker(path,speed=1.1){const p=person(nid++);const [x,z]=path[0];p.g.position.set(x,0,z);npcs.push(Object.assign(p,{x,z,path,k:1,speed,kind:'walk',wait:0,ph:Math.random()*6}))}
+const FACE_N=Math.PI;  // 面向展廳深處（-z）
+// 大廳：閘門前排隊（左、右兩道）、詢問台服務員
+[[ -2.4,15.4],[-2.4,16.3],[-2.4,17.2],[-2.4,18.1],[2.4,15.5],[2.4,16.5]].forEach(([x,z])=>stand(x,z,FACE_N));
+stand(-8.5,17.4,FACE_N+Math.PI);
+// Ⅱ 廳：排隊拍千萬金幣
+[[9.5,5.3],[9.5,6.2],[9.5,7.1],[9.5,8.0],[9.5,8.9],[9.5,9.8]].forEach(([x,z])=>stand(x,z,FACE_N));
+stand(6.6,4.6,Math.atan2(COIN.x-6.6,COIN.z-4.6));   // 正在拍照的人
+// 看展的人
+stand(-10.3,9.6,FACE_N);stand(-9.6,2.8,FACE_N+0.3);stand(-9.8,-14.2,FACE_N);stand(7.4,-13.8,FACE_N-0.3);stand(-4.2,-8.2,FACE_N);
+stand(11.4,-10.5,-Math.PI/2);   // 紀念品店店員
+// 走動的人
+walker([[-9,6],[-4,10],[-3,3],[-8,0.5]]);walker([[3,-7],[8,-8],[8,-13],[3,-13]]);walker([[-9,-6],[-2.5,-12],[-9,-18]],0.9);walker([[-6.5,19.3],[3.8,19.3]],0.8);
+function updateNPC(dt,t){npcs.forEach(n=>{
+  if(n.kind==='stand'){n.g.position.y=Math.max(0,Math.sin(t*1.3+n.ph))*0.015;n.g.rotation.y=n.face+Math.sin(t*0.4+n.ph)*0.15;return}
+  if(n.wait>0){n.wait-=dt;n.l1.position.z=n.l2.position.z=0;return}
+  const [tx,tz]=n.path[n.k],dx=tx-n.x,dz=tz-n.z,d=Math.hypot(dx,dz);
+  if(d<0.1){n.k=(n.k+1)%n.path.length;n.wait=1.5+Math.random()*2;return}
+  // 小人擋路就停一下
+  if(Math.hypot(player.position.x-n.x,player.position.z-n.z)<0.9){n.l1.position.z=n.l2.position.z=0;return}
+  const sp=Math.min(d,n.speed*dt);n.x+=dx/d*sp;n.z+=dz/d*sp;n.g.position.set(n.x,0,n.z);
+  let df=Math.atan2(dx,dz)-n.g.rotation.y;df=Math.atan2(Math.sin(df),Math.cos(df));n.g.rotation.y+=df*Math.min(1,dt*8);
+  const w=t*9+n.ph;n.l1.position.z=Math.sin(w)*0.07;n.l2.position.z=-Math.sin(w)*0.07})}
 
 // ---------- 鏡頭：俯瞰跟拍 ----------
 function camOffset(){const portrait=innerWidth<innerHeight;return portrait?new THREE.Vector3(0,16,11):new THREE.Vector3(0,11,9)}
 const camLook=new THREE.Vector3();
-function placeCam(snap){const off=camOffset();const want=new THREE.Vector3(player.position.x*0.7,0,player.position.z-1.2);
+function placeCam(snap){const off=camOffset();const want=new THREE.Vector3(player.position.x*0.7,0,player.position.z-2.6);
   if(snap)camLook.copy(want);else camLook.lerp(want,0.08);cam.position.copy(camLook).add(off);cam.lookAt(camLook)}
 placeCam(true);
 
@@ -334,7 +403,7 @@ const $=id=>document.getElementById(id);
 const FIRE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2.5c.6 3.1 3.9 5 4.9 8.6 1.1 4-1.6 8.4-5.4 8.4-3.6 0-6.2-3-5.5-6.6.4-2 1.6-3.3 2.6-4.3.1 1.9.8 3.2 2 3.7-.6-3.4.2-6.4 1.4-9.8z" fill="#F0592A"/><path d="M12.2 12.5c1.6 1.3 2.6 2.7 2.4 4.3-.2 1.5-1.3 2.4-2.6 2.4s-2.5-1-2.5-2.5c0-1.4.9-2.4 2.7-4.2z" fill="#FFC53D"/></svg>';
 const SHARE_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 // 稱號：秒數門檻（之後依實際數據調）
-const RANKS=[[40000,'發票獵人','眼明腳快，發票一張都逃不掉。'],[60000,'尋寶達人','走一圈就全找到，很有一套。'],[90000,'認真逛展','邊看邊找，該看的都看了。'],[Infinity,'慢慢欣賞派','你是真的來看展的。']];
+const RANKS=[[60000,'發票獵人','眼明腳快，發票一張都逃不掉。'],[90000,'尋寶達人','四個展區走一圈就全找到，很有一套。'],[130000,'認真逛展','邊看邊找，該看的都看了。'],[Infinity,'慢慢欣賞派','你是真的來看展的。']];
 const fmt=ms=>{const t=ms/1000;return t<60?t.toFixed(1)+' 秒':Math.floor(t/60)+' 分 '+(t%60).toFixed(1).padStart(4,'0')+' 秒'};
 const fmtClock=ms=>{const t=ms/1000;return t<60?t.toFixed(1):Math.floor(t/60)+':'+(t%60).toFixed(1).padStart(4,'0')};
 const rankOf=ms=>RANKS.findIndex(r=>ms<r[0]);
@@ -346,7 +415,7 @@ if(VS){$('vsCard').innerHTML=`<div class="h">${FIRE}朋友來嗆你了</div>朋�
 let state='intro',t0=0,elapsed=0,found=0,toastT,lastMs=0;
 function toast(h,b){$('toast').innerHTML=`<b>${h}</b>${b}`;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3200)}
 function startHunt(){state='play';found=0;$('found').textContent=0;slips.forEach(s=>{s.got=false;s.g.visible=true});
-  player.position.set(0,0,10.8);heading=Math.PI;player.rotation.y=heading;placeCam(true);t0=performance.now();elapsed=0;
+  player.position.set(0,0,18.6);heading=Math.PI;player.rotation.y=heading;placeCam(true);t0=performance.now();elapsed=0;
   intro.style.display='none';$('res').classList.remove('on');track('museum_enter',{vs:VS?1:0})}
 go.onclick=startHunt;
 function pickUp(s){s.got=true;s.g.visible=false;found++;$('found').textContent=found;
@@ -370,7 +439,8 @@ $('aStore').onclick=()=>track('store_click',{where:'result'});
 
 // ---------- 碰撞 ----------
 const R=0.3;
-function collide(p){for(const b of solids){const cx=Math.max(b.x0,Math.min(p.x,b.x1)),cz=Math.max(b.z0,Math.min(p.z,b.z1));const dx=p.x-cx,dz=p.z-cz,d=Math.hypot(dx,dz);
+function collide(p){for(const n of npcs){const dx=p.x-n.x,dz=p.z-n.z,d=Math.hypot(dx,dz),m=R+0.32;if(d<m&&d>1e-6){p.x=n.x+dx/d*m;p.z=n.z+dz/d*m}}
+  for(const b of solids){const cx=Math.max(b.x0,Math.min(p.x,b.x1)),cz=Math.max(b.z0,Math.min(p.z,b.z1));const dx=p.x-cx,dz=p.z-cz,d=Math.hypot(dx,dz);
   if(d<R){if(d>1e-6){p.x=cx+dx/d*R;p.z=cz+dz/d*R}else{const o=[p.x-b.x0,b.x1-p.x,p.z-b.z0,b.z1-p.z],m=Math.min(...o),k=o.indexOf(m);if(k===0)p.x=b.x0-R;if(k===1)p.x=b.x1+R;if(k===2)p.z=b.z0-R;if(k===3)p.z=b.z1+R}}}}
 
 // ---------- 迴圈 ----------
@@ -399,6 +469,7 @@ function loop(){
   if(state==='play'){elapsed=performance.now()-t0;$('clock').textContent=fmtClock(elapsed);
     slips.forEach(s=>{if(!s.got&&Math.hypot(s.x-player.position.x,s.z-player.position.z)<0.85)pickUp(s)})}
   const tt=performance.now()/1000;slips.forEach(s=>{s.paper.position.y=0.75+Math.sin(tt*2.4+s.i)*0.08;s.paper.rotation.y=tt*1.2+s.i;s.glow.material.opacity=0.35+0.25*Math.sin(tt*3+s.i)});
+  updateNPC(dt,tt);coin.rotation.y+=dt*0.5;sun.position.set(player.position.x+6,18,player.position.z+10);sun.target.position.set(player.position.x,0,player.position.z);
   inv.rotation.y+=dt*0.6;placeCam(false);placeJoy();
   renderer.render(scene,cam);requestAnimationFrame(loop)}
 loop();
