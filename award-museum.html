@@ -791,7 +791,7 @@ const URLS=SVGS.map(s=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)
 const SPOTS=[
   {x:-7.3,z:10.75,y:0.55,s:0.75,where:'大廳左邊的盆栽後面'},
   {x:4.5,z:9.15,y:0.2,s:0.55,where:'大廳右邊的長椅底下'},
-  {x:-4.4,z:-5.25,y:0.95,s:0.7,where:'「這一年的發票」展品後面'},
+  {x:-4.4,z:-5.25,y:0.95,s:0.7,where:'「最忙的月份」展品後面'},
   {x:6.8,z:-0.45,y:0.45,s:0.7,where:'右廳角落的盆栽後面'},
   {x:2.25,z:-11.6,y:0.95,s:0.75,where:'頒獎台旁邊'}];
 const FIND_R=1.25;
@@ -845,5 +845,180 @@ const clk=new THREE.Clock();let tt2=0;
   }
   requestAnimationFrame(tick)})();
 syncPill(false);
+})();
+</script>
+<!-- ================= 展品 3D 物件＋出口問卷（Sam 11/24，經 2C Master 轉；做法參考發票博物館 invoice-museum.html） =================
+     展品：原本五件都是立牌，改成各自不同的 3D 物件＋前方小說明牌＋地上圈圈編號（點編號走過去開說明）。
+     問卷：大廳出口工作人員；導覽走完或按「結束參觀」淡出到出口後問；5 題選擇題（答案在自己的展品裡），100 分送 100 金幣、60 分以上 50 金幣，兌換碼先空白。 -->
+<style>
+  #exitBtn{position:fixed;left:14px;top:calc(env(safe-area-inset-top,0px) + 100px);z-index:7;border:1px solid rgba(226,176,74,.6);border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;font-size:13px;cursor:pointer;background:rgba(10,10,10,.85);color:#E2B04A}
+  #qNear{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 96px);transform:translateX(-50%);z-index:6;border:0;border-radius:999px;background:#FFC423;color:#0A0A0A;font:inherit;font-weight:800;font-size:15px;padding:12px 20px;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer}
+  #fadeX{position:fixed;inset:0;z-index:30;background:#000;opacity:0;pointer-events:none;transition:opacity .45s}
+  #fadeX.on{opacity:1}
+  #quiz .box{background:#0E0E0E;color:#F2EFE6;border:1px solid rgba(255,196,35,.45)}
+  #quiz .who{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+  #quiz .who i{flex:none;width:44px;height:44px;border-radius:50%;background:#FFC423;display:flex;align-items:center;justify-content:center}
+  #quiz .who i svg{width:26px;height:26px}
+  #quiz .who b{font-size:13px;color:#E2B04A}
+  #quiz h3{margin:4px 0 8px;font-size:20px;line-height:1.45;color:#fff}
+  #quiz p{margin:0 0 12px;font-size:15px;line-height:1.7;color:#DCD7CB}
+  #quiz .qn{font-size:12px;color:#E2B04A;font-weight:800;letter-spacing:.08em}
+  #quiz .opts{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}
+  #quiz .opt{border:1px solid #3A3324;background:#151515;color:#F2EFE6;border-radius:14px;padding:13px 14px;font:inherit;font-size:16px;text-align:left;cursor:pointer}
+  #quiz .opt.ok{border-color:#7EC997;background:#13261B;color:#BFF0D2}
+  #quiz .opt.no{border-color:#EE716E;background:#2A1414;color:#F7C2C1}
+  #quiz .score{font-size:56px;font-weight:900;text-align:center;margin:6px 0;background:linear-gradient(135deg,#FBE29A,#D8A63A);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #quiz .score small{font-size:20px}
+  #quiz .gift{display:flex;gap:12px;align-items:center;background:#2A2214;border-radius:14px;padding:12px;margin:8px 0 12px;color:#F1CB68;line-height:1.6}
+  #quiz .gift svg{flex:none;width:44px;height:44px}
+  #quiz .btn{display:block;width:100%;margin-top:8px}
+  #quiz .btn.s{background:#222;color:#F2EFE6}
+  body.cm #exitBtn,body.cm #qNear{display:none!important}
+</style>
+<button id="exitBtn" type="button" hidden>結束參觀</button>
+<button id="qNear" type="button" hidden>寫問卷拿金幣</button>
+<div id="fadeX"></div>
+<div class="ov" id="quiz"><div class="box" id="qBox"></div></div>
+<script>
+(function(){
+if(noGL)return;
+const track=(n,p)=>{try{window.gtag&&gtag('event',n,Object.assign({game:'award-museum'},p||{}))}catch(_){}};
+const G=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:.6,roughness:.35},o));
+const L=c=>new THREE.MeshLambertMaterial({color:c});
+function addM(g,geo,m,x,y,z,rx=0,ry=0,rz=0){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.rotation.set(rx,ry,rz);o.castShadow=o.receiveShadow=true;g.add(o);return o}
+const GOLD=G('#E2B04A'),GOLDD=G('#A87A24'),PAPER=L('#F4F1EA'),INK=L('#141414'),DARK=L('#1C1C1C');
+const spinners=[];
+function txtTex(draw,w=512,h=256){return tex(x=>{draw(x,w,h)},w,h)}
+// 前方小說明牌：編號、展品名、主數字
+function plaqueTex(e,i,hidden){return txtTex((x,w,h)=>{x.fillStyle='#0A0A0A';x.fillRect(0,0,w,h);x.strokeStyle='rgba(255,196,35,.8)';x.lineWidth=4;x.strokeRect(6,6,w-12,h-12);
+  x.fillStyle='#E2B04A';x.font=`400 34px Anton, ${FONT}`;x.textAlign='left';x.fillText('0'+(i+1),26,56);
+  x.fillStyle='#FFFFFF';x.font=`900 40px ${FONT}`;x.fillText(e.t,90,56);
+  if(hidden){x.fillStyle='#6E6A62';x.font=`900 64px ${FONT}`;x.fillText('沒有公開',26,170)}
+  else{fitFont(x,e.big,460,900,96);x.fillStyle=goldG(x,26,100,400,200);x.fillText(e.big,26,175);if(e.sub){x.fillStyle='#DCD7CB';x.font=`700 30px ${FONT}`;x.fillText(e.sub,26,226)}}})}
+// 地上圈圈中間的編號
+function numTex(n){return txtTex((x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='rgba(10,10,10,.85)';x.beginPath();x.arc(w/2,h/2,h/2-8,0,7);x.fill();x.strokeStyle='#E2B04A';x.lineWidth=8;x.stroke();x.fillStyle='#F1CB68';x.font=`900 ${h*.55}px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText(n,w/2,h/2+6)},256,256)}
+// ---------- 五件展品的 3D 物件（站在展台上，台面 y=0.7） ----------
+const BUILD={
+  count(g,P){// 一大疊發票，最上面那張會飄
+    for(let k=0;k<14;k++)addM(g,new THREE.BoxGeometry(0.62,0.035,0.42),k%3?PAPER:L('#E9E3D4'),Math.sin(k*1.7)*0.03,0.72+k*0.037,Math.cos(k*1.3)*0.02,0,(k*37%10-5)*0.03,0);
+    const top=addM(g,new THREE.BoxGeometry(0.62,0.012,0.42),PAPER,0,1.27,0);
+    const bar=addM(g,new THREE.BoxGeometry(0.5,0.002,0.08),INK,0,1.278,-0.08);top.add(bar);bar.position.set(0,0.008,-0.08);
+    addM(g,new THREE.BoxGeometry(0.08,0.5,0.03),GOLD,0.32,1.05,0.2);
+    spinners.push((dt,t)=>{top.position.y=1.27+Math.abs(Math.sin(t*1.4))*0.18;top.rotation.y=Math.sin(t*0.9)*0.35;top.rotation.z=Math.sin(t*1.4)*0.06})},
+  month(g,P,full){// 桌曆，翻到最忙的那個月
+    addM(g,new THREE.BoxGeometry(0.9,0.06,0.45),GOLDD,0,0.73,0);
+    const pg=addM(g,new THREE.PlaneGeometry(0.82,0.82),new THREE.MeshBasicMaterial({map:txtTex((x,w,h)=>{x.fillStyle='#FAF7EF';x.fillRect(0,0,w,h);x.fillStyle='#B4141E';x.fillRect(0,0,w,90);x.fillStyle='#fff';x.font=`900 56px ${FONT}`;x.textAlign='center';x.fillText('2026',w/2,66);
+      x.fillStyle='#141414';x.font=`900 210px ${FONT}`;x.fillText(P.month.m+'月',w/2,320);x.fillStyle='#8A8478';x.font=`700 44px ${FONT}`;x.fillText(full?P.month.n+' 張發票':'最忙的一個月',w/2,420);
+      x.strokeStyle='#E2B04A';x.lineWidth=10;x.beginPath();x.arc(w/2,250,180,0,7);x.stroke()},512,512)}),0,1.18,0.02,-0.12,0,0);
+    pg.castShadow=false;for(let k=0;k<6;k++)addM(g,new THREE.TorusGeometry(0.035,0.01,6,12),GOLD,-0.3+k*0.12,1.6,0.03,0,Math.PI/2,0);
+    spinners.push((dt,t)=>{pg.rotation.x=-0.12+Math.sin(t*1.2)*0.04})},
+  place(g,P,full){// 小店面，招牌是最常去的地方
+    addM(g,new THREE.BoxGeometry(0.95,0.62,0.5),L('#2A2A2A'),0,1.01,-0.02);
+    addM(g,new THREE.BoxGeometry(0.4,0.42,0.02),L('#7FB9D8'),-0.18,0.94,0.235);addM(g,new THREE.BoxGeometry(0.22,0.46,0.02),GOLDD,0.26,0.93,0.235);
+    for(let k=0;k<6;k++)addM(g,new THREE.BoxGeometry(0.16,0.03,0.24),k%2?GOLD:L('#F4F1EA'),-0.4+k*0.16,1.36,0.3,0.35,0,0);
+    const sg=addM(g,new THREE.PlaneGeometry(0.9,0.24),new THREE.MeshBasicMaterial({map:txtTex((x,w,h)=>{x.fillStyle='#0A0A0A';x.fillRect(0,0,w,h);x.fillStyle='#F1CB68';fitFont(x,P.place.name,440,900,150);x.textAlign='center';x.fillText(P.place.name,w/2,180)},512,256)}),0,1.5,0.23);sg.castShadow=false;
+    const lamp=addM(g,new THREE.SphereGeometry(0.04,10,8),new THREE.MeshBasicMaterial({color:'#FFE9A8'}),0.42,1.42,0.3);
+    spinners.push((dt,t)=>{lamp.material.color.setHSL(0.13,1,0.6+Math.sin(t*4)*0.15)})},
+  time(g,P){// 大時鐘，指針轉；最常消費的時段亮金色
+    const hi=/8 點前/.test(P.time.label)?7:/12/.test(P.time.label)?13:/10 點後|22/.test(P.time.label)?23:19;
+    addM(g,new THREE.CylinderGeometry(0.55,0.55,0.12,40),GOLDD,0,1.32,0,Math.PI/2,0,0);
+    const face=addM(g,new THREE.CircleGeometry(0.5,48),new THREE.MeshBasicMaterial({map:txtTex((x,w,h)=>{x.fillStyle='#0E0E0E';x.beginPath();x.arc(w/2,h/2,w/2,0,7);x.fill();
+      const a0=((hi%12)-1)/12*Math.PI*2-Math.PI/2;x.fillStyle='rgba(255,196,35,.45)';x.beginPath();x.moveTo(w/2,h/2);x.arc(w/2,h/2,w/2-10,a0,a0+Math.PI/6*1.5);x.closePath();x.fill();
+      x.fillStyle='#F1CB68';x.font=`900 44px ${FONT}`;x.textAlign='center';x.textBaseline='middle';for(let k=1;k<=12;k++){const a=k/12*Math.PI*2-Math.PI/2;x.fillText(k,w/2+Math.cos(a)*200,h/2+Math.sin(a)*200)}},512,512)}),0,1.32,0.065);face.castShadow=false;
+    const hh=addM(g,new THREE.BoxGeometry(0.035,0.26,0.02),new THREE.MeshBasicMaterial({color:'#FFFFFF'}),0,1.32,0.08);hh.geometry.translate(0,0.13,0);
+    const mh=addM(g,new THREE.BoxGeometry(0.022,0.38,0.02),new THREE.MeshBasicMaterial({color:'#E2B04A'}),0,1.32,0.09);mh.geometry.translate(0,0.19,0);
+    addM(g,new THREE.BoxGeometry(0.1,0.3,0.1),GOLDD,0,0.85,0);
+    spinners.push((dt,t)=>{mh.rotation.z=-t*1.6;hh.rotation.z=-t*1.6/12-(hi%12)/12*Math.PI*2})},
+  lottery(g,P){// 開獎搖籃，裡面的球一直轉；中過獎的人有金色球
+    const drum=new THREE.Group();drum.position.set(0,1.2,0);g.add(drum);
+    for(let k=0;k<8;k++){const r=addM(drum,new THREE.TorusGeometry(0.38,0.012,6,32),GOLD,0,0,0,0,k/8*Math.PI,0)}
+    addM(drum,new THREE.TorusGeometry(0.38,0.02,6,32),GOLD,0,0,0,Math.PI/2,0,0);
+    const balls=[];for(let k=0;k<7;k++){const win=k<Math.min(P.lottery.wins,3);const b=addM(drum,new THREE.SphereGeometry(0.06,12,10),win?G('#FFC423',{metalness:.3}):L(['#F4F1EA','#7EC997','#7A9BE4','#EE716E'][k%4]),0,0,0);balls.push(b)}
+    addM(g,new THREE.BoxGeometry(0.06,0.5,0.06),GOLDD,-0.42,0.95,0);addM(g,new THREE.BoxGeometry(0.06,0.5,0.06),GOLDD,0.42,0.95,0);
+    addM(g,new THREE.CylinderGeometry(0.02,0.02,0.9,8),GOLD,0,1.2,0,0,0,Math.PI/2);
+    spinners.push((dt,t)=>{drum.rotation.x+=dt*1.1;balls.forEach((b,k)=>{const a=t*2.2+k*0.9;b.position.set(Math.sin(a*1.3)*0.22,Math.cos(a)*0.24,Math.sin(a*0.7+k)*0.2)})})},
+};
+function cover(g){// 沒公開的展品蓋上黑布
+  addM(g,new THREE.CylinderGeometry(0.42,0.5,0.75,16),L('#141414'),0,1.08,0);addM(g,new THREE.SphereGeometry(0.43,16,10,0,Math.PI*2,0,Math.PI/2),L('#141414'),0,1.45,0)}
+// 換掉 buildExhibits：先照原本蓋，再把五塊大立牌換成 3D 物件＋小說明牌＋圈圈編號
+const _build=buildExhibits;
+buildExhibits=function(){spinners.length=0;_build();const mine=st.mode==='me',full=mine||st.nums;
+  exhibits.forEach(ex=>{
+    if(ex.award){const n=new THREE.Mesh(new THREE.PlaneGeometry(0.7,0.7),new THREE.MeshBasicMaterial({map:numTex('6'),transparent:true}));n.rotation.x=-Math.PI/2;n.position.set(0,0.02,0.2);ex.g.add(n);n.userData.ex=5;pickables.push(n);return}
+    const g=ex.g;const board=g.children.find(o=>o.geometry&&o.geometry.parameters&&o.geometry.parameters.height===1.31);
+    if(board){board.visible=false;pickables=pickables.filter(o=>o!==board&&board.children.indexOf(o)<0)}
+    const before=g.children.length;
+    if(ex.hidden)cover(g);else BUILD[ex.key](g,P(),full);
+    // 說明牌（斜放在展台前緣）
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry(0.98,0.49),new THREE.MeshBasicMaterial({map:plaqueTex(ex.e,ex.i,ex.hidden)}));pl.position.set(0,0.5,0.37);pl.rotation.x=-0.5;g.add(pl);
+    const ok=new THREE.Mesh(new THREE.CircleGeometry(0.06,20),new THREE.MeshBasicMaterial({color:'#7EC997'}));ok.position.set(0.42,0.18,0.01);ok.visible=!!(ex.ok&&ex.ok.visible);pl.add(ok);ex.ok=ok;
+    const n=new THREE.Mesh(new THREE.PlaneGeometry(0.62,0.62),new THREE.MeshBasicMaterial({map:numTex(String(ex.i+1)),transparent:true}));n.rotation.x=-Math.PI/2;n.position.set(0,0.02,0.9);g.add(n);
+    g.children.slice(before).forEach(o=>{o.traverse?o.traverse(c=>{if(c.isMesh){c.userData.ex=ex.i;pickables.push(c)}}):0});
+    g.scale.setScalar(1.15)})};
+// 動畫：掛在自己的 rAF，不動主迴圈
+const ck=new THREE.Clock();let t3=0;(function sp(){const dt=Math.min(ck.getDelta(),0.05);t3+=dt;if(!cardMode)spinners.forEach(f=>f(dt,t3));requestAnimationFrame(sp)})();
+
+// ---------- 出口工作人員 ----------
+const EXIT={x:2.6,z:10.4};
+const staff=new THREE.Group();staff.position.set(EXIT.x,0,EXIT.z);staff.rotation.y=Math.PI*0.85;scene.add(staff);
+addM(staff,new THREE.CylinderGeometry(0.22,0.26,0.5,16),L('#141414'),0,0.55,0);addM(staff,new THREE.SphereGeometry(0.3,20,16),L('#F5D3B3'),0,1.05,0);
+addM(staff,new THREE.SphereGeometry(0.31,20,16,0,Math.PI*2,0,Math.PI*0.5),L('#2A211C'),0,1.08,0);addM(staff,new THREE.BoxGeometry(0.16,0.1,0.02),GOLD,0.1,0.65,0.24);
+addM(staff,new THREE.BoxGeometry(0.12,0.32,0.12),L('#2A2F40'),-0.1,0.16,0);addM(staff,new THREE.BoxGeometry(0.12,0.32,0.12),L('#2A2F40'),0.1,0.16,0);
+staff.scale.setScalar(1.3);solids.push({x0:EXIT.x-0.35,x1:EXIT.x+0.35,z0:EXIT.z-0.35,z1:EXIT.z+0.35});
+const sign=new THREE.Sprite(new THREE.SpriteMaterial({map:txtTex((x,w,h)=>{x.fillStyle='#FFC423';rr(x,6,6,w-12,h-12,36);x.fill();x.fillStyle='#0A0A0A';x.font=`900 64px ${FONT}`;x.textAlign='center';x.fillText('出口・寫問卷拿金幣',w/2,152)},768,240),depthTest:false}));
+sign.scale.set(2.6,0.81,1);sign.position.set(EXIT.x,2.6,EXIT.z);sign.renderOrder=9;scene.add(sign);
+setInterval(()=>{sign.position.y=2.6+Math.sin(performance.now()/500)*0.06;
+  const near=!cardMode&&$('intro').style.display==='none'&&Math.hypot(player.position.x-EXIT.x,player.position.z-EXIT.z)<1.9&&!$('quiz').classList.contains('on');$('qNear').hidden=!near},150);
+
+// ---------- 問卷 ----------
+const AWN=['年度財神爺','外送平台 VIP','發票全勤獎','宵夜之王','早起鳥兒獎','全聯寶寶','手搖飲全糖人生','年度堅持獎'];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function mk(q,right,wrongs){const o=shuffle([right,...wrongs.filter(w=>w!==right).slice(0,2)]);return{q,o,a:o.indexOf(right)}}
+function buildQuiz(){const Pp=P(),mine=st.mode==='me',full=mine||st.nums,sh=k=>mine||st.shown[k],who=mine?'你':Pp.name+' ',qs=[];
+  const months=[1,2,3,4,5,6,7,8,9,10,11].filter(m=>m!==Pp.month.m);
+  if(sh('month'))qs.push(mk(`${who}今年最忙的是哪個月？`,Pp.month.m+' 月',shuffle(months).slice(0,2).map(m=>m+' 月')));
+  if(sh('place'))qs.push(mk(`${who}今年最常去哪裡？`,Pp.place.name,shuffle(['全聯','7-11','全家','好市多','家樂福','萊爾富'])));
+  if(sh('time'))qs.push(mk(`${who}最常在什麼時段消費？`,Pp.time.label,shuffle(['早上 8 點前','中午 12 點到 2 點','晚上 10 點後','下午 2 點到 6 點'])));
+  if(sh('count')&&full){const n=Pp.count.n,b=n<100?'100 張以下':n<500?'100 到 500 張':n<1000?'500 到 1,000 張':'1,000 張以上';qs.push(mk(`${who}今年存了大約幾張發票？`,b,shuffle(['100 張以下','100 到 500 張','500 到 1,000 張','1,000 張以上'])))}
+  if(sh('lottery')&&full){const w=Pp.lottery.wins,r=w===0?'還沒中':w===1?'中 1 次':'中 2 次以上';qs.push(mk(`${who}今年對獎中了幾次？`,r,shuffle(['還沒中','中 1 次','中 2 次以上'])))}
+  qs.push(mk(`${who}拿到的 2026 年度風格大賞是哪一座？`,award().name,shuffle(AWN.slice())));
+  while(qs.length>5)qs.splice(qs.length-2,1);// 超過 5 題時保留最後一題（獎座），從前一題開始拿掉
+  return qs}
+const QUIZ_REWARD={full:{coins:100,code:''},pass:{coins:50,code:''}};
+const STAFF_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="#0A0A0A"/><path d="M4.5 20c.8-4 3.8-6 7.5-6s6.7 2 7.5 6" fill="#0A0A0A"/></svg>';
+const COIN_IC='<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#F2C94C" stroke="#C99A1E" stroke-width="3"/><path d="M20 10v20M15 14h7a4 4 0 0 1 0 8h-6a4 4 0 0 0 0 8h8" fill="none" stroke="#8A5A00" stroke-width="3" stroke-linecap="round"/></svg>';
+let QZ=[],qi=0,qScore=0,quizDone={};
+function closeQuiz(){$('quiz').classList.remove('on')}
+function qShow(h){$('qBox').innerHTML=h;$('quiz').classList.add('on');$('qBox').scrollTop=0}
+function askQuiz(){const key=st.mode+st.p;if(quizDone[key]){toast('問卷已經寫過了，謝謝你來看展！');return}QZ=buildQuiz();const mine=st.mode==='me';track('quiz_ask',{seen:seen.size,mode:st.mode});
+  qShow(`<div class="who"><i>${STAFF_IC}</i><b>回顧館工作人員</b></div><h3>${mine?'謝謝你來逛自己的回顧館！':`謝謝你來逛 ${esc(P().name)} 的回顧館！`}要不要寫一份 ${QZ.length} 題的小問卷？</h3><p>${mine?'考考你有多了解自己的 2026。':`看看你有多了解 ${esc(P().name)}。`}答對 60 分以上送 <b>50 金幣</b>，滿分送 <b>100 金幣</b>。答案都在館裡的展品上。</p><button class="btn p" id="qGo" type="button">好啊，寫問卷</button><button class="btn s" id="qNo" type="button">先不用</button>`);
+  $('qGo').onclick=()=>{qi=0;qScore=0;track('quiz_start');qAsk()};$('qNo').onclick=()=>{track('quiz_skip');closeQuiz()}}
+function qAsk(){const it=QZ[qi],per=Math.round(100/QZ.length);qShow(`<div class="qn">第 ${qi+1} / ${QZ.length} 題</div><h3>${esc(it.q)}</h3><div class="opts">${it.o.map((o,k)=>`<button class="opt" data-k="${k}" type="button">${esc(o)}</button>`).join('')}</div>`);
+  $('qBox').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.parentNode.dataset.done)return;b.parentNode.dataset.done=1;const k=+b.dataset.k,ok=k===it.a;if(ok)qScore+=per;
+    b.classList.add(ok?'ok':'no');if(!ok)b.parentNode.children[it.a].classList.add('ok');track('quiz_answer',{q:qi+1,correct:ok?1:0});
+    setTimeout(()=>{qi++;qi<QZ.length?qAsk():qEnd()},ok?650:1300)})}
+function qEnd(){qScore=Math.min(100,qi===QZ.length&&qScore>=Math.round(100/QZ.length)*QZ.length?100:qScore);track('quiz_finish',{score:qScore});
+  const rw=qScore>=100?QUIZ_REWARD.full:qScore>=60?QUIZ_REWARD.pass:null,mine=st.mode==='me';
+  const dl='https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=award_museum&af_sub2=quiz';
+  let h=`<div class="qn">問卷結果</div><div class="score">${qScore}<small> 分</small></div>`;
+  if(rw){quizDone[st.mode+st.p]=true;h+=`<div class="gift">${COIN_IC}<div>恭喜拿到 <b>${rw.coins} 金幣</b>！<br>${rw.code?`打開發票存摺輸入兌換碼 <b>${rw.code}</b>`:'兌換碼準備中，請稍後再回來看看。'}</div></div><a class="btn p" id="qDl" href="${dl}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">打開發票存摺領金幣</a>`}
+  else h+=`<p style="text-align:center">差一點！60 分以上就有金幣。<br>回去看看展品，再寫一次。</p><button class="btn p" id="qRe" type="button">再寫一次</button>`;
+  h+=`<button class="btn s" id="qShare" type="button">${mine?'邀請好友來逛':'分享給朋友'}</button><button class="btn s" id="qBack" type="button">繼續逛</button><p id="qHint" style="font-size:13px;text-align:center;margin:8px 0 0"></p>`;
+  qShow(h);if($('qDl'))$('qDl').onclick=()=>track('store_click',{where:'quiz'});if($('qRe'))$('qRe').onclick=()=>{qi=0;qScore=0;QZ=buildQuiz();track('quiz_retry');qAsk()};
+  $('qBack').onclick=closeQuiz;
+  $('qShare').onclick=()=>{track('share',{where:'quiz'});closeQuiz();if(mine)openInvite();else{const u='https://invosdata-mkt.github.io/h5-games/award-museum.html';try{navigator.clipboard.writeText(u).then(()=>toast('連結已複製，貼給朋友就好'),()=>toast(u))}catch(e){toast(u)}}}}
+$('quiz').onclick=e=>{if(e.target===$('quiz'))closeQuiz()};
+$('qNear').onclick=()=>askQuiz();
+// 淡出到出口再問
+function goExit(){if(touring)endTour(false,true);$('card').classList.remove('on');const f=$('fadeX');f.classList.add('on');
+  setTimeout(()=>{target=null;pendingOpen=null;player.position.set(EXIT.x-0.2,0,EXIT.z-1.4);heading=Math.PI*0;player.rotation.y=0;placeCam(true);
+    setTimeout(()=>{f.classList.remove('on');setTimeout(askQuiz,450)},120)},460)}
+$('exitBtn').onclick=()=>{track('exit_click',{seen:seen.size});goExit()};
+// 導覽走完就到出口問
+const _endTour=endTour;endTour=function(done,silent){const was=touring;_endTour(done,silent);if(was&&done)setTimeout(goExit,1200)};
+// 結束參觀按鈕：進館後才出現
+const _sm=setMode;setMode=function(m){_sm(m);$('exitBtn').hidden=false;closeQuiz()};
+// 已經蓋好的館（開頁時）也換成新展品
+if(exhibits.length)buildExhibits();
 })();
 </script>
