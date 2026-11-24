@@ -769,8 +769,8 @@ function startHunt(){state='play';found=0;$('found').textContent=0;slips.forEach
   player.position.set(0,0,18.6);heading=Math.PI;player.rotation.y=heading;placeCam(true);t0=performance.now();elapsed=0;
   intro.style.display='none';$('res').classList.remove('on');showHdr(false);track('museum_enter',{vs:VS?1:0,mode:NIGHT?'night':'day'})}
 function goFull(){try{const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;if(f&&!document.fullscreenElement&&!document.webkitFullscreenElement){const r=f.call(d,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{})}}catch(e){}}
-go.onclick=()=>{goFull();startVisit(NIGHT?'free':'guided')};
-$('goFree').onclick=()=>{goFull();startVisit('free')};
+go.onclick=()=>{startVisit(NIGHT?'free':'guided')};
+$('goFree').onclick=()=>{startVisit('free')};
 // ---------- 進場：專人導覽／自己逛 ----------
 function setHud(){$('hudBtn').textContent=mode==='guided'?'改成自己逛':'結束參觀'}
 function startVisit(m){mode=m;state='play';intro.style.display='none';showHdr(false);closeQuiz();
@@ -845,7 +845,7 @@ const shareText=()=>NIGHT?`我半夜拿手電筒溜進發票博物館，只花 $
 $('bShare').onclick=async()=>{const url=shareUrl(),text=shareText();
   if(navigator.share){track('share',{method:'native',ms:lastMs});try{await navigator.share({title:'發票博物館',text,url});return}catch(e){if(e&&e.name==='AbortError'){track('share_cancel');return}}}
   track('share',{method:'copy',ms:lastMs});try{await navigator.clipboard.writeText(text+'\n'+url);$('rHint').textContent='挑戰連結已複製，貼給朋友就好。'}catch(e){$('rHint').textContent='複製這個連結傳給朋友：'+url}};
-$('bAgain').onclick=()=>{goFull();track('replay');startHunt()};
+$('bAgain').onclick=()=>{track('replay');startHunt()};
 $('bLook').onclick=()=>{$('res').classList.remove('on');state='look';showHdr(false);track('stay_look')};
 $('aStore').onclick=()=>track('store_click',{where:'result'});
 
