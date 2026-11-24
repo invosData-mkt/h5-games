@@ -34,6 +34,7 @@
   #card .x svg{width:18px;height:18px}
   #card img{display:block;width:100%;aspect-ratio:640/520;max-height:28vh;object-fit:cover;border-radius:14px;margin-bottom:12px}
   #card img.ph{object-fit:contain;aspect-ratio:auto;height:30vh;max-height:30vh;padding:6px}
+  #card img.gal{object-fit:contain;aspect-ratio:auto;height:auto;max-height:46vh;background:#EFEAE0;padding:6px;margin:4px 0 12px}
   #card .cap{font-size:12px;color:#677;line-height:1.5;margin:-6px 0 12px}
   #card .cap a{color:#899}
   #card .seenl{font-size:12px;color:#899;float:right;margin-top:1px}
@@ -50,6 +51,9 @@
   #card td{padding:6px 8px;border-bottom:1px solid #EFEAE0}
   #card td:last-child{text-align:right;font-weight:800;font-family:ui-monospace,Menlo,monospace}
   #card tr.hi td{color:#C0262D}
+  #card ol.howto{margin:0;padding:0;list-style:none;counter-reset:hw}
+  #card ol.howto li{counter-increment:hw;position:relative;padding:9px 10px 9px 38px;background:#F1F4FB;border-radius:12px;margin-bottom:6px;font-size:14.5px;line-height:1.6}
+  #card ol.howto li::before{content:counter(hw);position:absolute;left:10px;top:9px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;font-weight:900;text-align:center;line-height:20px}
   #card .src{font-size:11.5px;color:#899;margin:12px 0 6px}
   #card .pause{font-size:12px;color:#899;text-align:center;margin:8px 0 0}
   #intro .hours{display:flex;gap:8px;align-items:flex-start;text-align:left;background:#fff;border-radius:14px;padding:10px 14px;margin:0 0 16px;font-size:14px;line-height:1.55;max-width:min(92vw,400px);box-shadow:0 2px 10px rgba(0,0,0,.06)}
@@ -130,7 +134,7 @@
   <div class="vsc" id="vsCard" hidden></div>
   <p id="introP">展廳裡藏了 <b>8 張發票</b>，你要幾秒才找齊？<br>每張發票都藏著一段統一發票的故事。</p>
   <button class="btn p go" id="go" type="button">開始尋寶 ▶</button>
-  <small>四個展區・一局約 1–2 分鐘・免下載</small>
+  <small>五個展區・一局約 1–2 分鐘・免下載</small>
 </div>
 <div id="hud"><span class="t" id="prog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 22z" fill="#00B386"/><path d="M9 7h6M9 11h6M9 15h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>找到 <b id="found">0</b> / 8</span><span class="t time" id="clock">00.0</span></div>
 <div id="toast"></div>
@@ -152,7 +156,7 @@
 <div id="joy"><div id="knob"></div></div>
 <div id="card"><div class="box">
   <button class="x" id="cX" type="button" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#1F2A30" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-  <div class="sc" id="cSc"><img id="cImg" alt=""><p class="cap" id="cCap" hidden></p><div class="no"><span id="cNo"></span><span class="seenl">已看 <b id="seen">0</b> / 6 件展品</span></div><h2 id="cT"></h2><div id="cBody"></div></div>
+  <div class="sc" id="cSc"><img id="cImg" alt=""><p class="cap" id="cCap" hidden></p><div class="no"><span id="cNo"></span><span class="seenl">已看 <b id="seen">0</b> / <span id="seenN">6</span> 件展品</span></div><h2 id="cT"></h2><div id="cBody"></div></div>
   <div class="row"><button class="btn s" id="cClose" type="button">繼續逛</button><button class="btn p" id="cCta" type="button" hidden>下載發票存摺</button></div>
   <p class="pause" id="cPause" hidden>看展品時，尋寶計時會暫停</p>
 </div></div>
@@ -185,6 +189,41 @@ const EXHIBITS = [
    lead:'2019 年起可以用手機 App 兌獎，不用再跑郵局或超商。發票存摺會幫你歸戶、開獎自動對獎，中獎第一時間通知你。',
    nums:[['6 次','一年開獎'],['3 個月','每期領獎期限']],
    facts:['一年 6 次開獎、每次都有 3 個月領獎期限，忘記對獎，獎金就歸國庫了。交給 App 提醒最保險。']},
+  // ---- Ⅴ 發票存摺體驗館（功能說明依 2026-11 版本；比價只講發票算得出的價格，不說最低價、不說省下） ----
+  {no:'發票存摺｜自動對獎', t:'開獎自動幫你對', art:'feature', glyph:'對獎', color:'#00B386', cta:true, app:true,
+   lead:'手機條碼載具歸戶到發票存摺後，每次開獎都自動幫你對完；紙本發票用相機掃一下也能存。中了第一時間通知你，不怕忘記領。',
+   nums:[['950 萬','累積下載'],['6 次','一年開獎都幫你對']],
+   howto:['下載發票存摺，綁定手機條碼載具','紙本發票打開相機掃一下','開獎日收到通知，中了馬上知道']},
+  {no:'發票存摺｜比價', t:'這次買得划算嗎？', art:'feature', glyph:'比價', color:'#7A9BE4', cta:true, app:true,
+   lead:'輸入商品，看你自己通常買多少、買過最低多少，還有其他會員在哪裡用多少錢買到。價格都來自真實的發票紀錄。',
+   nums:[['你的','歷史實付價'],['會員','在哪買到多少']],
+   howto:['在比價輸入商品，例如衛生紙','看自己過去每次實付多少','對照其他會員在哪裡、用多少錢買到'],
+   note:'價格來自發票紀錄，不是店家的即時售價。'},
+  {no:'發票存摺｜訂閱提醒', t:'扣款前先提醒你', art:'feature', glyph:'提醒', color:'#F6AA5E', cta:true, app:true,
+   lead:'影音、雲端空間、健身房……訂閱服務的扣款會開發票。發票存摺從發票找出你的訂閱，扣款前先提醒你，每筆扣款一頁看清楚，要不要續由你決定。',
+   nums:[['扣款前','先提醒'],['一頁','看所有訂閱']],
+   howto:['發票存摺從發票找出訂閱扣款','扣款前收到提醒','一頁看所有訂閱，自己決定要不要續']},
+  {no:'發票存摺｜預算管理', t:'這個月花到哪了', art:'feature', glyph:'預算', color:'#B78ED8', cta:true, app:true,
+   lead:'設定每月預算，發票自動整理成消費紀錄，不用一筆一筆記帳。花到哪裡、還剩多少，一眼就知道。',
+   nums:[['自動','發票變記帳'],['每月','預算進度']],
+   howto:['設定這個月的預算','消費開了發票就自動記進去','隨時看花到哪裡、還剩多少']},
+  {no:'發票存摺｜消費快篩', t:'出事時馬上幫你查', art:'feature', glyph:'快篩', color:'#EE716E', cta:true, app:true,
+   lead:'食安事件一爆發，大家最想知道的是：我有沒有買到？消費快篩直接從你的發票幫你查，最近有沒有買到出問題的商品，讓你馬上安心。',
+   nums:[['馬上','查有沒有買到'],['發票','就是你的紀錄']],
+   howto:['看到食安新聞時打開消費快篩','發票存摺幫你比對最近的消費','有買到就提醒你，沒買到就安心']},
+  // ---- 2025 活動回顧（內容依 MKT Notion 專案頁：B2C 消費地圖挑戰賽 MVP-漢堡、年度發票回顧） ----
+  {no:'2025 活動回顧｜地圖挑戰賽', t:'一起吃飽堡：用發票點亮台灣', art:'feature', glyph:'地圖', color:'#F6AA5E', cta:true,
+   photo:{src:'img/museum/burger-post.jpg',cap:'2025 年 10 月的活動宣傳圖：吃漢堡解任務。'}, gallery:[{src:'img/museum/map-challenge-page.jpg',cap:'挑戰賽頁面：符合任務的發票會在台灣地圖上插旗。'}],
+   lead:'2025 年 10 月，發票存摺推出第一個「地圖挑戰賽」，主題是漢堡。去指定的店吃漢堡、發票存進手機條碼載具，符合任務的發票就會在台灣地圖上插一支旗子，完成任務還能拿到徽章。',
+   nums:[['6 關','漢堡任務'],['台灣地圖','插旗拿徽章']],
+   list:{h:'六個任務',items:['大俠愛吃漢堡堡：到一間指定連鎖速食店吃一次','早上也要吃飽堡：早餐時段到指定通路吃漢堡','米漢堡也是寶：買一個米漢堡或珍珠堡','台灣特色堡：去一間台灣在地速食店','到哪都想吃漢堡：在 2 個不同行政區吃指定速食店','一起來尋堡：在超商、超市買一個品名有「堡」的商品']},
+   src:'資料來源：發票存摺 2025 年活動紀錄'},
+  {no:'2025 活動回顧｜年度發票回顧', t:'你是哪一種消費人格？', art:'feature', glyph:'回顧', color:'#4A7BF7', cta:true,
+   photo:{src:'img/museum/annual-review-launch.jpg',cap:'2025 年度發票回顧的上線宣傳圖，主角是五隻年度回顧小精靈。'},
+   lead:'把一整年的發票變成一份年度回顧：全年存了幾張發票、哪個月最忙、最常去哪裡、中了幾次獎，最後幫你鑑定出 2025 年的消費人格，還告訴你和哪一型最合拍。',
+   nums:[['5 種','消費人格'],['理性型','最多人是這一型']],
+   list:{h:'五種消費人格',items:['探索型：消費足跡遍布各地，總能在平凡日常中挖掘出新鮮事。','理性型：懂得把每一筆消費用在刀口上，是理性購物模範生。','衝動型：看準了就出手、靈感來就下單，消費節奏自由奔放。','品味型：每張消費都很講究，只為生活中的美好事物買單。','規律型：步調堅定又規律，默默累積出自己的生活厚度。']},
+   src:'資料來源：發票存摺 2025 年度發票回顧活動紀錄；人格依全年消費金額與發票張數分類'},
 ];
 const PRIZES=[['特別獎','8 碼全對','1,000 萬',1],['特獎','8 碼全對','200 萬',1],['頭獎','8 碼全對','20 萬',0],['二獎','末 7 碼','4 萬',0],['三獎','末 6 碼','1 萬',0],['四獎','末 5 碼','4,000',0],['五獎','末 4 碼','1,000',0],['六獎','末 3 碼','200',0]];
 // 藏在展廳的 8 張發票，每張一段冷知識（同上來源）
@@ -200,7 +239,7 @@ const FACTS = [
 ];
 
 // ---------- 基本場景：俯瞰跟拍、均勻光（不做聚光燈） ----------
-const W=24, D=40, WH=2.2;          // 展廳寬、深、牆高（牆矮，俯瞰才看得到人）
+const W=24, D=40, WH=2.2, ROOM5=14;   // ROOM5＝最裡面的「Ⅴ 發票存摺體驗館」深度          // 展廳寬、深、牆高（牆矮，俯瞰才看得到人）
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
@@ -228,6 +267,7 @@ const floors=[
   floorZone(0,W/2,-4,12,tileT('#F4EDE0','#E2D5BF',6,8)),            // Ⅱ 千萬特別獎
   floorZone(-W/2,0,-D/2,-4,tileT('#E3EEF0','#C9DCE0',6,8)),         // Ⅲ 載具時代
   floorZone(0,W/2,-D/2,-4,tileT('#E6F4EE','#C6E6D8',6,8)),          // Ⅳ 把發票帶回家
+  floorZone(-W/2,W/2,-D/2-ROOM5,-D/2,tileT('#EAF7F1','#BFE6D4',8,4)),   // Ⅴ 發票存摺體驗館
 ];
 // Ⅱ 廳紅地毯（裝飾）
 {const c=new THREE.Mesh(new THREE.PlaneGeometry(3,15),mat(0xffffff,{map:carpetT}));c.rotation.x=-Math.PI/2;c.position.set(6,0.008,4.2);c.receiveShadow=true;scene.add(c)}
@@ -244,7 +284,8 @@ function wallSeg(a,b,fixed,alongX,fade=false){const len=b-a,c=(a+b)/2,t=0.25;con
   else{o=box(t,WH,len,fixed,WH/2,c,m);box(t+0.02,0.08,len,fixed,WH+0.04,c,trimM,false,false)}
   for(let k=solids.length-1;k>=0;k--){const b=solids[k];if(Math.abs((b.x0+b.x1)/2-o.position.x)<1e-6&&Math.abs((b.z0+b.z1)/2-o.position.z)<1e-6){b.wall=true;break}}
   if(fade){o.userData.z=fixed;fadeWalls.push(o)}return o}
-wallSeg(-W/2,W/2,-D/2,true);wallSeg(-W/2,W/2,D/2,true,true);wallSeg(-D/2,D/2,-W/2,false);wallSeg(-D/2,D/2,W/2,false);
+wallSeg(-W/2,-3.5,-D/2,true,true);wallSeg(-1,1,-D/2,true,true);wallSeg(3.5,W/2,-D/2,true,true);   // Ⅲ／Ⅳ 往 Ⅴ 各開一道門
+wallSeg(-W/2,W/2,-D/2-ROOM5,true);wallSeg(-W/2,W/2,D/2,true,true);wallSeg(-D/2-ROOM5,D/2,-W/2,false);wallSeg(-D/2-ROOM5,D/2,W/2,false);
 function crossWall(z,DOOR){wallSeg(-W/2,DOOR[0][0],z,true,true);wallSeg(DOOR[0][1],DOOR[1][0],z,true,true);wallSeg(DOOR[1][1],W/2,z,true,true)}
 crossWall(12,[[-8,-4],[4,8]]);crossWall(-4,[[-8,-4],[4,8]]);
 // 中間牆：Ⅰ↔Ⅱ、Ⅲ↔Ⅳ 各開一道門
@@ -257,11 +298,12 @@ function wallLabel(s,sub,x,z,w){const m=label(s,sub,{w});m.position.set(x,WH*0.6
 wallLabel('發票博物館','INVOICE MUSEUM',0,12,5);
 wallLabel('Ⅰ 發票的歷史','1951 → 今天',-2.1,-4,3.6);
 wallLabel('Ⅱ 千萬特別獎','2011 起每期 1 組',2.1,-4,3.6);
-wallLabel('Ⅲ 載具時代','發票不再是紙',-6,-D/2,5);
-wallLabel('Ⅳ 把發票帶回家','App 對獎、領獎',6,-D/2,5);
+wallLabel('Ⅲ 載具時代','發票不再是紙',-6.2,-D/2,4.4);
+wallLabel('Ⅳ 把發票帶回家','App 對獎、領獎',6.2,-D/2,4.4);
+wallLabel('Ⅴ 發票存摺體驗館','你的發票，幫你做更多事',0,-D/2-ROOM5,6);
 // 地上的指引
 function floorText(s,x,z,w=2.6,rot=0){const m=label(s,null,{w,fg:'#00B386',size:72});m.rotation.x=-Math.PI/2;m.rotation.z=rot;m.position.set(x,0.01,z);scene.add(m)}
-floorText('↑ Ⅰ 歷史',-6,13.2,2.4);floorText('↑ Ⅱ 千萬',6,13.2,2.4);floorText('↑ Ⅲ 載具',-6,-2.9,2.4);floorText('↑ Ⅳ 帶回家',6,-2.9,2.6);
+floorText('↑ Ⅰ 歷史',-6,13.2,2.4);floorText('↑ Ⅱ 千萬',6,13.2,2.4);floorText('↑ Ⅲ 載具',-6,-2.9,2.4);floorText('↑ Ⅳ 帶回家',6,-2.9,2.6);floorText('↑ Ⅴ 發票存摺',-2.3,-18.4,2.6);floorText('↑ Ⅴ 發票存摺',2.3,-18.4,2.6);floorText('2025 活動回顧',-8.4,-21.2,2.8);floorText('2025 活動回顧',8.4,-21.2,2.8);
 floorText('售票閘門',0,15.4,2);floorText('開放 09:00–18:00',0,16.7,3.2);
 
 // ---------- 展品：展台＋立牌（面向鏡頭） ----------
@@ -277,10 +319,11 @@ function artTex(e){return tex((x)=>{
   if(e.art==='paper'){for(let k=0;k<4;k++){x.save();x.rotate((k-1.5)*0.18);x.fillStyle=wh;x.fillRect(-90+k*12,-170+k*8,180,320);x.fillStyle='#C8CCD0';for(let r=0;r<8;r++)x.fillRect(-70+k*12,-140+k*8+r*30,140-(r%3)*30,10);x.restore()}}
   if(e.art==='barcode'){x.fillStyle=wh;rr(x,-150,-210,300,420,30);x.fill();x.fillStyle=ink;for(let k=0;k<26;k++){const w=[3,6,9][(k*7)%3];x.fillRect(-120+k*9.5,-60,w,140)}x.font='bold 40px monospace';x.textAlign='center';x.fillText('/ABC+123',0,140);x.font='bold 28px sans-serif';x.fillText('手機條碼',0,-110)}
   if(e.art==='cloud'){x.fillStyle=wh;[[-80,0,90],[20,-40,110],[110,10,80],[0,40,90]].forEach(([a,b,r])=>{x.beginPath();x.arc(a,b,r,0,7);x.fill()});x.fillStyle=e.color;x.font='bold 46px sans-serif';x.textAlign='center';x.fillText('專屬獎',10,30)}
+  if(e.art==='feature'){x.fillStyle=wh;rr(x,-170,-170,340,340,70);x.fill();x.fillStyle=e.color;x.font='900 120px "PingFang TC",sans-serif';x.textAlign='center';x.fillText(e.glyph,0,45)}
   if(e.art==='app'){x.fillStyle=wh;rr(x,-130,-220,260,440,36);x.fill();x.fillStyle=e.color;rr(x,-95,-170,190,120,18);x.fill();x.fillStyle=wh;x.font='bold 34px sans-serif';x.textAlign='center';x.fillText('中獎了！',0,-100);x.fillStyle='#C8CCD0';for(let r=0;r<4;r++){rr(x,-95,-20+r*55,190,38,10);x.fill()}}
   x.restore()},640,800)}
 // 位置：左廳 01–03、右廳 04–05、後廳 06（都面向 +z，也就是鏡頭）
-const SPOTS=[[-10.3,8.2],[-10.3,1.4],[-2.2,-2.2],[10.3,-1.8],[-9.4,-15.6],[6.4,-15.4]];
+const SPOTS=[[-10.3,8.2],[-10.3,1.4],[-2.2,-2.2],[10.3,-1.8],[-9.4,-15.6],[6.4,-15.4],[0,-27.4],[-9.6,-32.0],[-4.8,-32.0],[4.8,-32.0],[9.6,-32.0],[-8.4,-24.8],[8.4,-24.8]];
 const exhibits=[],pickables=[];
 // 每件展品是不同的 3D 物件（書桌、開獎搖籃、收銀機、開獎看板、超商結帳台、大手機），前面一塊小說明牌
 function addM(g,geo,m,x,y,z,rx=0,ry=0,rz=0){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.rotation.set(rx,ry,rz);o.castShadow=o.receiveShadow=true;g.add(o);return o}
@@ -334,7 +377,70 @@ const BUILD=[
     bubble=new THREE.Mesh(new THREE.PlaneGeometry(1.1,0.36),new THREE.MeshBasicMaterial({transparent:true,map:tex((x,w,h)=>{x.fillStyle='#FFDD5E';rr(x,4,4,w-8,h-8,40);x.fill();x.fillStyle='#1F2A30';x.font='900 52px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('叮！開獎囉，幫你對好了',w/2,98)},640,150)}));
     bubble.position.set(0.25,2.25,0.25);bubble.userData.keepBasic=1;g.add(bubble);
     return {w:1.3,d:0.6}},
+  // Ⅴ-1 自動對獎：會轉的巨大 App 圖示＋繞圈的小發票
+  g=>{addM(g,CY(0.85,0.95,0.5,32),mat('#FFFFFF'),0,0.25,0);addM(g,CY(0.87,0.87,0.06,32),mat('#00B386'),0,0.52,0);
+    const icT=tex((x,w,h)=>{x.fillStyle='#00B386';rr(x,0,0,w,h,90);x.fill();x.fillStyle='#fff';rr(x,110,70,180,230,18);x.fill();x.fillStyle='#00B386';for(let r=0;r<4;r++)x.fillRect(140,110+r*40,120-(r%2)*40,14);x.fillStyle='#fff';x.font='900 52px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('發票存摺',w/2,360)},400,400);
+    const ic=new THREE.Group();ic.position.y=1.55;g.add(ic);const side=mat('#00B386');addM(ic,B(1.1,1.1,0.22),[side,side,side,side,new THREE.MeshBasicMaterial({map:icT}),new THREE.MeshBasicMaterial({map:icT})],0,0,0);
+    const orb=new THREE.Group();orb.position.y=1.5;g.add(orb);for(let k=0;k<6;k++){const a=k/6*Math.PI*2;addM(orb,B(0.2,0.26,0.01),mat('#FFFFFF'),Math.cos(a)*1.0,Math.sin(k*1.7)*0.15,Math.sin(a)*1.0,0,-a,0)}
+    spinners.push(dt=>{ic.rotation.y+=dt*0.7;orb.rotation.y-=dt*0.5});
+    return {w:1.9,d:1.9}},
+  // Ⅴ-2 比價：超市貨架＋價格牌
+  g=>{const fr=mat('#EDEFF2');addM(g,B(1.7,1.7,0.08),fr,0,0.85,-0.24);[-0.83,0.83].forEach(x=>addM(g,B(0.06,1.7,0.52),fr,x,0.85,0));
+    [0.1,0.6,1.1].forEach((y,r)=>{addM(g,B(1.62,0.05,0.5),mat('#FFFFFF'),0,y,0);
+      for(let k=0;k<5;k++){const c=['#7A9BE4','#EE716E','#FFDD5E','#7EC997','#F6AA5E','#B78ED8'][(k+r*2)%6],x=-0.62+k*0.31;
+        if((k+r)%2)addM(g,CY(0.08,0.08,0.34,14),mat(c),x,y+0.2,0.02);else addM(g,B(0.22,0.36,0.2),mat(c),x,y+0.21,0.02);
+        const tag=new THREE.Mesh(new THREE.PlaneGeometry(0.2,0.08),new THREE.MeshBasicMaterial({map:priceTag[(k+r)%3]}));tag.position.set(x,y-0.005,0.256);tag.userData.keepBasic=1;g.add(tag)}});
+    const sgn=new THREE.Mesh(new THREE.PlaneGeometry(1.1,0.3),new THREE.MeshBasicMaterial({map:tex((x,w,h)=>{x.fillStyle='#7A9BE4';rr(x,0,0,w,h,30);x.fill();x.fillStyle='#fff';x.font='900 58px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('上次買多少？',w/2,74)},400,110)}));sgn.position.set(0,1.95,-0.2);g.add(sgn);
+    return {w:1.75,d:0.6}},
+  // Ⅴ-3 訂閱提醒：大月曆＋會搖的鬧鐘
+  g=>{addM(g,B(0.08,1.0,0.08),mat('#2B3A40'),0,0.5,-0.1);
+    addM(g,B(1.4,1.25,0.06),[mat('#FFF'),mat('#FFF'),mat('#FFF'),mat('#FFF'),mat(0xffffff,{map:tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#F6AA5E';x.fillRect(0,0,w,70);x.fillStyle='#fff';x.font='900 40px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('這個月的扣款',w/2,50);
+      x.fillStyle='#1F2A30';x.font='bold 22px sans-serif';for(let d=0;d<30;d++){const c=d%7,r=Math.floor(d/7);x.fillText(String(d+1),45+c*55,120+r*52)}
+      [[2,0],[4,2],[1,3]].forEach(([c,r])=>{x.strokeStyle='#EE716E';x.lineWidth=5;x.beginPath();x.arc(45+c*55,112+r*52,22,0,7);x.stroke()});x.fillStyle='#EE716E';x.font='bold 22px sans-serif';x.fillText('扣款前一天提醒你',w/2,h-18)},420,380)}),mat('#FFF')],0,1.6,-0.1);
+    const ck=new THREE.Group();ck.position.set(0.52,0.36,0.22);g.add(ck);addM(ck,CY(0.26,0.26,0.12,28),mat('#EE716E'),0,0.3,0,Math.PI/2);
+    const face=new THREE.Mesh(new THREE.CircleGeometry(0.21,28),mat('#FFFFFF'));face.position.set(0,0.3,0.065);ck.add(face);addM(ck,B(0.02,0.14,0.01),mat('#1F2A30'),0,0.35,0.07);addM(ck,B(0.11,0.02,0.01),mat('#1F2A30'),0.04,0.3,0.07);
+    [-0.15,0.15].forEach(x=>addM(ck,new THREE.SphereGeometry(0.09,12,10),mat('#FFDD5E'),x,0.56,0));[-0.15,0.15].forEach(x=>addM(ck,B(0.04,0.1,0.04),mat('#1F2A30'),x,0.05,0));
+    spinners.push((dt,t)=>{ck.rotation.z=Math.sin(t*28)*0.08*(Math.sin(t*0.9)>0.6?1:0)});
+    return {w:1.45,d:0.7}},
+  // Ⅴ-4 預算管理：甜甜圈圖＋一疊錢幣
+  g=>{addM(g,B(0.08,1.05,0.08),mat('#2B3A40'),0,0.52,-0.1);const dn=new THREE.Group();dn.position.set(0,1.62,-0.06);g.add(dn);
+    let a0=Math.PI/2;[[0.34,'#B78ED8'],[0.2,'#7A9BE4'],[0.08,'#F6AA5E'],[0.38,'#E8E2D4']].forEach(([f,c])=>{const m=new THREE.Mesh(new THREE.RingGeometry(0.34,0.68,40,1,a0,f*Math.PI*2),new THREE.MeshBasicMaterial({color:c}));dn.add(m);a0+=f*Math.PI*2});
+    const ctr=new THREE.Mesh(new THREE.CircleGeometry(0.33,32),new THREE.MeshBasicMaterial({map:tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#1F2A30';x.textAlign='center';x.font='bold 26px "PingFang TC",sans-serif';x.fillText('本月還剩',w/2,100);x.font='900 64px ui-monospace,Menlo,monospace';x.fillStyle='#8E5CC8';x.fillText('38%',w/2,170)},256,256)}));ctr.position.z=0.002;dn.add(ctr);
+    for(let k=0;k<6;k++)addM(g,CY(0.16,0.16,0.05,24),mat('#F2C94C'),-0.48,0.03+k*0.055,0.25);for(let k=0;k<3;k++)addM(g,CY(0.16,0.16,0.05,24),mat('#F2C94C'),-0.15,0.03+k*0.055,0.32);
+    return {w:1.45,d:0.75}},
+  // Ⅴ-5 消費快篩：大張發票＋上下掃描的放大鏡
+  g=>{addM(g,B(1.0,1.9,0.04),[mat('#FFF'),mat('#FFF'),mat('#FFF'),mat('#FFF'),mat(0xffffff,{map:tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#1F2A30';x.font='bold 30px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('最近的發票',w/2,50);x.textAlign='left';x.font='22px "PingFang TC",sans-serif';
+      ['鮮奶 2 瓶','吐司','雞蛋 10 入','衛生紙','炒菜油','洗衣精','優格','咖啡豆','餅乾','礦泉水'].forEach((t,k)=>{x.fillStyle='#1F2A30';x.fillText(t,30,105+k*48);x.fillStyle='#C8CCD0';x.fillRect(200,95+k*48,70,6)});
+      x.strokeStyle='#EE716E';x.lineWidth=4;x.strokeRect(18,330,w-36,40)},300,580)}),mat('#FFF')],0,1.05,-0.15);
+    addM(g,B(0.12,0.1,0.12),mat('#2B3A40'),0,0.05,-0.15);
+    const mg=new THREE.Group();mg.position.set(0.1,1.2,0.12);g.add(mg);const rimG=new THREE.TorusGeometry(0.24,0.04,10,32);addM(mg,rimG,mat('#2B3A40'),0,0,0);
+    const lens=new THREE.Mesh(new THREE.CircleGeometry(0.22,28),new THREE.MeshBasicMaterial({color:'#BFE6FF',transparent:true,opacity:0.35}));lens.userData.keepBasic=1;mg.add(lens);addM(mg,CY(0.035,0.035,0.4,10),mat('#8B5A3C'),0.26,-0.26,0,0,0,Math.PI/4);
+    spinners.push((dt,t)=>{mg.position.y=1.2+Math.sin(t*0.8)*0.55;mg.position.x=0.1+Math.sin(t*1.6)*0.12});
+    return {w:1.1,d:0.5}},
+  // 地圖挑戰賽：平放的台灣地圖桌＋插旗＋大漢堡
+  g=>{addM(g,B(1.2,0.62,1.3),mat('#FFFFFF'),-0.45,0.31,0);
+    const mapT=tex((x,w,h)=>{x.fillStyle='#BFE3F2';x.fillRect(0,0,w,h);const P=[[185,20],[215,40],[228,95],[232,165],[218,250],[196,330],[160,400],[140,396],[118,330],[94,262],[80,190],[90,122],[120,70],[150,34]];
+      x.fillStyle='#9BD3A8';x.beginPath();P.forEach(([a,b],k)=>k?x.lineTo(a,b):x.moveTo(a,b));x.closePath();x.fill();x.strokeStyle='#5FA86E';x.lineWidth=4;x.stroke();
+      x.fillStyle='#1F2A30';x.font='900 30px "PingFang TC",sans-serif';x.fillText('一起吃飽堡',12,40);x.font='bold 18px sans-serif';x.fillText('發票點亮台灣',14,66)},300,420);
+    addM(g,B(1.14,0.02,1.24),[mat('#FFF'),mat('#FFF'),mat(0xffffff,{map:mapT}),mat('#FFF'),mat('#FFF'),mat('#FFF')],-0.45,0.63,0);
+    [[-0.32,-0.38],[-0.36,-0.1],[-0.5,0.12],[-0.42,0.3],[-0.6,-0.05],[-0.55,0.4]].forEach(([x,z],k)=>{addM(g,CY(0.012,0.012,0.3,6),mat('#2B3A40'),x,0.79,z);const f=new THREE.Mesh(new THREE.PlaneGeometry(0.16,0.1),mat(['#EE716E','#FFDD5E','#7A9BE4','#7EC997','#B78ED8','#F6AA5E'][k],{side:THREE.DoubleSide}));f.position.set(x+0.08,0.9,z);g.add(f)});
+    const bg=new THREE.Group();bg.position.set(0.62,0,0.05);g.add(bg);const bun=mat('#E0A458');
+    addM(bg,CY(0.42,0.38,0.16,28),bun,0,0.1,0);addM(bg,CY(0.46,0.46,0.04,28),mat('#7EC997'),0,0.2,0);addM(bg,CY(0.44,0.44,0.13,28),mat('#6B3E26'),0,0.28,0);
+    addM(bg,B(0.66,0.03,0.66),mat('#FFD34D'),0,0.36,0,0,Math.PI/4,0);const top=addM(bg,new THREE.SphereGeometry(0.43,28,16,0,Math.PI*2,0,Math.PI/2),bun,0,0.37,0);top.scale.y=0.7;
+    for(let k=0;k<12;k++){const a=k*2.4,r=0.12+(k%3)*0.09;addM(bg,new THREE.SphereGeometry(0.025,6,6),mat('#FFF6DA'),Math.cos(a)*r,0.37+Math.sqrt(Math.max(0,0.43*0.43-r*r))*0.7,Math.sin(a)*r)}
+    spinners.push((dt,t)=>{bg.rotation.y=Math.sin(t*0.6)*0.4});
+    return {w:1.9,d:1.3}},
+  // 年度發票回顧：「2025」大字＋五隻會跳的小精靈
+  g=>{addM(g,CY(0.95,1.0,0.28,40),mat('#FFFFFF'),0,0.14,0);addM(g,CY(0.97,0.97,0.05,40),mat('#4A7BF7'),0,0.29,0);
+    const sg=new THREE.Mesh(new THREE.PlaneGeometry(1.7,0.6),new THREE.MeshBasicMaterial({transparent:true,map:tex((x,w,h)=>{x.fillStyle='#1F2A30';rr(x,4,4,w-8,h-8,40);x.fill();x.fillStyle='#FFD34D';x.font='900 92px ui-monospace,Menlo,monospace';x.textAlign='center';x.fillText('2025',w/2-90,118);x.fillStyle='#fff';x.font='900 44px "PingFang TC",sans-serif';x.fillText('年度回顧',w/2+150,110)},560,190)}));
+    sg.position.set(0,1.55,-0.55);g.add(sg);addM(g,B(0.06,1.3,0.06),mat('#2B3A40'),-0.6,0.65,-0.58);addM(g,B(0.06,1.3,0.06),mat('#2B3A40'),0.6,0.65,-0.58);
+    const eye=mat('#1F2A30'),sp=[];['#4A7BF7','#EE4B4B','#18B39A','#3CC8E8','#FFC83D'].forEach((c,k)=>{const a=-Math.PI*0.85+k*Math.PI*0.425,e=new THREE.Group();e.position.set(Math.cos(a)*0.55,0.55,-Math.sin(a)*0.35+0.15);g.add(e);
+      addM(e,new THREE.SphereGeometry(0.2,20,16),mat(c),0,0,0);[-0.07,0.07].forEach(dx=>addM(e,new THREE.SphereGeometry(0.03,8,8),eye,dx,0.04,0.18));sp.push(e)});
+    spinners.push((dt,t)=>sp.forEach((e,k)=>{e.position.y=0.55+Math.abs(Math.sin(t*3+k*0.9))*0.18}));
+    return {w:2.0,d:1.3}},
 ];
+const spinners=[];
+const priceTag=['$45','$89','$129'].map(p=>tex((x,w,h)=>{x.fillStyle='#FFDD5E';x.fillRect(0,0,w,h);x.fillStyle='#C0262D';x.font='900 46px ui-monospace,Menlo,monospace';x.textAlign='center';x.fillText(p,w/2,52)},160,64));
 function plaqueTex(e){return tex((x,w,h)=>{x.fillStyle='#FFFDF7';x.fillRect(0,0,w,h);x.fillStyle=e.color;x.fillRect(0,0,16,h);x.fillStyle='#008F6B';x.font='bold 30px sans-serif';x.fillText(e.no,36,52);x.fillStyle='#1F2A30';x.font='900 40px "PingFang TC",sans-serif';wrap(x,e.t,36,104,w-60,46)},512,200)}
 EXHIBITS.forEach((e,i)=>{
   const [px,pz]=SPOTS[i];
@@ -408,7 +514,7 @@ const scr=new THREE.Mesh(new THREE.PlaneGeometry(0.24,0.46),new THREE.MeshBasicM
 vitrine(-4.2,-9.2,phone);
 
 // ---------- 藏起來的 8 張發票 ----------
-const HIDE=[[-11.1,17.4],[-11.2,-3.1],[-1.0,10.6],[11.2,-3.1],[1.0,0.6],[-11.2,-19.1],[-1.0,-6.0],[11.2,-19.1]];
+const HIDE=[[-11.1,17.4],[-11.2,-3.1],[-1.0,10.6],[11.2,-3.1],[1.0,0.6],[-7.2,-33.0],[-1.0,-6.0],[7.2,-33.0]];
 const slipTex=tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#00B386';x.fillRect(0,0,w,26);x.fillStyle='#1F2A30';x.font='bold 22px sans-serif';x.textAlign='center';x.fillText('統一發票',w/2,62);
   x.font='bold 26px monospace';x.fillText('AB-'+String(Math.floor(Math.random()*9e7+1e7)),w/2,104);for(let k=0;k<22;k++)x.fillRect(20+k*8,124,[2,4,5][k%3],40);x.fillStyle='#C8CCD0';for(let r=0;r<4;r++)x.fillRect(30,182+r*18,w-60-(r%2)*40,8)},220,260);
 const slips=HIDE.map(([x,z],i)=>{const g=new THREE.Group();
@@ -540,15 +646,19 @@ function placeJoy(){_pv.set(player.position.x,0,player.position.z).project(cam);
 // ---------- 展品卡、靠近提示 ----------
 const seen=new Set();let near=null;
 let cardOn=false,pauseAt=0;
-function openCard(i){const e=EXHIBITS[i];target=null;pendingOpen=null;
+let curEx=0;
+function openCard(i){const e=EXHIBITS[i];curEx=i;target=null;pendingOpen=null;
   $('cImg').src=e.photo?e.photo.src:e.img;$('cImg').classList.toggle('ph',!!e.photo);$('cImg').style.background=e.photo?'#EFEAE0':e.color;
-  $('cCap').innerHTML=e.photo?`${e.photo.cap}<br><a href="${e.photo.url}" target="_blank" rel="noopener">照片：${e.photo.credit}</a>`:'';$('cCap').hidden=!e.photo;$('cNo').textContent=e.no;$('cT').textContent=e.t;
+  $('cCap').innerHTML=e.photo?e.photo.cap+(e.photo.url?`<br><a href="${e.photo.url}" target="_blank" rel="noopener">照片：${e.photo.credit}</a>`:''):'';$('cCap').hidden=!e.photo;$('cNo').textContent=e.no;$('cT').textContent=e.t;
   let h=`<p class="lead">${e.lead}</p>`;
   if(e.nums)h+=`<div class="nums">${e.nums.map(([b,l])=>`<div><b>${b}</b><span>${l}</span></div>`).join('')}</div>`;
   if(e.table)h+=`<h4>怎麼對獎</h4><table>${PRIZES.map(([n,r,m,hi])=>`<tr class="${hi?'hi':''}"><td>${n}</td><td>${r}</td><td>${m}</td></tr>`).join('')}</table><p class="src" style="margin-top:4px">二獎到六獎都是對頭獎號碼的末幾碼。</p>`;
-  h+=`<h4>冷知識</h4><ul class="facts">${e.facts.map(f=>`<li>${f}</li>`).join('')}</ul>`;
-  h+=`<p class="src">資料來源：財政部財政史料陳列室、財政部賦稅署與新聞報導（2025–2026）整理；照片取自維基共享資源</p>`;
-  $('cBody').innerHTML=h;$('cSc').scrollTop=0;cCta.hidden=!e.cta;$('cPause').hidden=state!=='play';
+  if(e.howto)h+=`<h4>怎麼用</h4><ol class="howto">${e.howto.map(f=>`<li>${f}</li>`).join('')}</ol>`+(e.note?`<p class="src">${e.note}</p>`:'');
+  if(e.gallery)h+=e.gallery.map(g=>`<img class="gal" src="${g.src}" alt=""><p class="cap">${g.cap}</p>`).join('');
+  if(e.list)h+=`<h4>${e.list.h}</h4><ol class="howto">${e.list.items.map(f=>`<li>${f}</li>`).join('')}</ol>`;
+  if(e.facts)h+=`<h4>冷知識</h4><ul class="facts">${e.facts.map(f=>`<li>${f}</li>`).join('')}</ul>`;
+  h+=e.src?`<p class="src">${e.src}</p>`:e.app?`<p class="src">功能說明依發票存摺 App（2026 年 11 月版本）</p>`:`<p class="src">資料來源：財政部財政史料陳列室、財政部賦稅署與新聞報導（2025–2026）整理；照片取自維基共享資源</p>`;
+  $('cBody').innerHTML=h;$('cSc').scrollTop=0;cCta.hidden=!e.cta;cCta.textContent=e.app?'免費下載發票存摺':'下載發票存摺';$('cPause').hidden=state!=='play';
   if(!cardOn&&state==='play')pauseAt=performance.now();cardOn=true;cardEl.classList.add('on');
   seen.add(i);$('seen').textContent=seen.size;exhibits[i].ok.visible=true;
   track('exhibit_open',{exhibit:i+1});if(seen.size===EXHIBITS.length)track('museum_complete')}
@@ -556,7 +666,7 @@ const cardEl=document.getElementById('card');
 function closeCard(){if(!cardOn)return;cardOn=false;cardEl.classList.remove('on');if(state==='play'&&pauseAt){t0+=performance.now()-pauseAt;pauseAt=0}}
 cClose.onclick=closeCard;document.getElementById('cX').onclick=closeCard;
 cardEl.onclick=e=>{if(e.target===cardEl)closeCard()};
-cCta.onclick=()=>{track('store_click',{where:'exhibit'});open('https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&af_sub2=exhibit','_blank')};
+cCta.onclick=()=>{track('store_click',{where:'exhibit',exhibit:curEx+1});open('https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&af_sub2=exhibit','_blank')};
 const nearBtn=document.getElementById('near');nearBtn.onclick=()=>{if(near!==null)openCard(near)};
 let tipHidden=false;function hideTip(){if(tipHidden)return;tipHidden=true;tip.style.opacity=0}
 function track(name,p){try{window.gtag&&gtag('event',name,p||{})}catch(_){}}
@@ -565,7 +675,7 @@ const $=id=>document.getElementById(id);
 const FIRE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2.5c.6 3.1 3.9 5 4.9 8.6 1.1 4-1.6 8.4-5.4 8.4-3.6 0-6.2-3-5.5-6.6.4-2 1.6-3.3 2.6-4.3.1 1.9.8 3.2 2 3.7-.6-3.4.2-6.4 1.4-9.8z" fill="#F0592A"/><path d="M12.2 12.5c1.6 1.3 2.6 2.7 2.4 4.3-.2 1.5-1.3 2.4-2.6 2.4s-2.5-1-2.5-2.5c0-1.4.9-2.4 2.7-4.2z" fill="#FFC53D"/></svg>';
 const SHARE_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 // 稱號：秒數門檻（之後依實際數據調）
-const RANKS=[[60000,'發票獵人','眼明腳快，發票一張都逃不掉。'],[90000,'尋寶達人','四個展區走一圈就全找到，很有一套。'],[130000,'認真逛展','邊看邊找，該看的都看了。'],[Infinity,'慢慢欣賞派','你是真的來看展的。']];
+const RANKS=[[60000,'發票獵人','眼明腳快，發票一張都逃不掉。'],[90000,'尋寶達人','五個展區走一圈就全找到，很有一套。'],[130000,'認真逛展','邊看邊找，該看的都看了。'],[Infinity,'慢慢欣賞派','你是真的來看展的。']];
 const fmt=ms=>{const t=ms/1000;return t<60?t.toFixed(1)+' 秒':Math.floor(t/60)+' 分 '+(t%60).toFixed(1).padStart(4,'0')+' 秒'};
 const fmtClock=ms=>{const t=ms/1000;return t<60?t.toFixed(1):Math.floor(t/60)+':'+(t%60).toFixed(1).padStart(4,'0')};
 const rankOf=ms=>RANKS.findIndex(r=>ms<r[0]);
@@ -611,6 +721,8 @@ function collide(p){for(const n of npcs){if(n.off)continue;const dx=p.x-n.x,dz=p
   for(const b of solids){const cx=Math.max(b.x0,Math.min(p.x,b.x1)),cz=Math.max(b.z0,Math.min(p.z,b.z1));const dx=p.x-cx,dz=p.z-cz,d=Math.hypot(dx,dz);
   if(d<R){if(d>1e-6){p.x=cx+dx/d*R;p.z=cz+dz/d*R}else{const o=[p.x-b.x0,b.x1-p.x,p.z-b.z0,b.z1-p.z],m=Math.min(...o),k=o.indexOf(m);if(k===0)p.x=b.x0-R;if(k===1)p.x=b.x1+R;if(k===2)p.z=b.z0-R;if(k===3)p.z=b.z1+R}}}}
 
+// 牆上（Ⅲ／Ⅳ 與 Ⅴ 之間）的標題與掛畫：人在 Ⅴ 時跟著牆一起變透明
+const fadeDeco=[];scene.traverse(o=>{if(o.isMesh&&o.position.y>0.5&&o.position.z>-D/2+0.1&&o.position.z<-D/2+0.25&&!o.parent.isGroup){[].concat(o.material).forEach(m=>m.transparent=true);fadeDeco.push(o)}});
 // ---------- 迴圈 ----------
 const clock=new THREE.Clock();let walkT=0;
 function loop(){
@@ -633,6 +745,7 @@ function loop(){
   let best=null,bd=1.6;exhibits.forEach(ex=>{const d=Math.hypot(ex.x-player.position.x,ex.z-player.position.z);ex.ring.material.opacity=d<1.6?0.75:0.25;if(d<bd){bd=d;best=ex.i}});
   if(best!==near){near=best;if(near===null)nearBtn.classList.remove('on');else{nearBtn.textContent='看展品：'+EXHIBITS[near].t;nearBtn.classList.add('on')}}
   // 擋住小人的牆變半透明
+  fadeDeco.forEach(m=>{const inFront=-D/2>player.position.z&&-D/2-player.position.z<5;m.material.opacity+=((inFront?0.15:1)-m.material.opacity)*Math.min(1,dt*8)});
   fadeWalls.forEach(w=>{const z=w.userData.z,inFront=z>player.position.z&&z-player.position.z<5;const o=inFront?0.18:1;w.material.opacity+=(o-w.material.opacity)*Math.min(1,dt*8);w.castShadow=w.material.opacity>0.9});
   if(state==='play'&&!cardOn){elapsed=performance.now()-t0;$('clock').textContent=fmtClock(elapsed);
     slips.forEach(s=>{if(!s.got&&Math.hypot(s.x-player.position.x,s.z-player.position.z)<0.85)pickUp(s)})}
@@ -640,9 +753,11 @@ function loop(){
     if(state==='play'){t0-=5000;toast('被警衛照到了！','計時 +5 秒，快躲到牆後面。')}else toast('噓——','警衛在巡邏，別被照到。');track('guard_caught',{state})}}
   const tt=performance.now()/1000;slips.forEach(s=>{s.paper.position.y=0.75+Math.sin(tt*2.4+s.i)*0.08;s.paper.rotation.y=tt*1.2+s.i;s.glow.material.opacity=0.35+0.25*Math.sin(tt*3+s.i)});
   updateNPC(dt,tt);coin.rotation.y+=dt*0.5;if(drum)drum.rotation.x+=dt*0.9;if(cloud)cloud.position.y=2.45+Math.sin(tt*1.3)*0.08;if(bubble){bubble.position.y=2.25+Math.sin(tt*2)*0.06;bubble.quaternion.copy(cam.quaternion)}
+  spinners.forEach(f=>f(dt,tt));
   digTiles.forEach(o=>{o.acc+=dt;if(o.acc>o.sp){o.acc=0;o.d=(o.d+1)%10;o.t.material.map=DIG[o.d]}});sun.position.set(player.position.x+6,18,player.position.z+10);sun.target.position.set(player.position.x,0,player.position.z);
   inv.rotation.y+=dt*0.6;placeCam(false);placeJoy();
   renderer.render(scene,cam);requestAnimationFrame(loop)}
+document.getElementById('seenN').textContent=EXHIBITS.length;
 loop();
 addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.fov=fovFor();cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);placeCam(true)});
 </script>
