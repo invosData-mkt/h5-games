@@ -761,7 +761,7 @@ if(VS){$('vsCard').innerHTML=`<div class="h">${FIRE}朋友來嗆你了</div>朋�
 let state='intro',t0=0,elapsed=0,found=0,toastT,lastMs=0;
 const MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="#FFD866"/></svg>';
 const SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.6" fill="#F6AA5E"/><g stroke="#F6AA5E" stroke-width="2" stroke-linecap="round"><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"/></g></svg>';
-$('hours').innerHTML=NIGHT?`${MOON}<div><b>已閉館</b>・開放時間 09:00–18:00<small>晚上沒有導覽員，只能拿手電筒自己偷偷溜進去，小心別被警衛照到。</small></div>`
+$('hours').innerHTML=NIGHT?`${MOON}<div><b>已閉館</b>・開放時間 09:00–18:00<small>晚上沒有導覽員，只能拿手電筒自己偷偷溜進去。</small></div>`
   :`${SUN}<div><b>開館中</b>・開放時間 09:00–18:00<small>晚上 6 點閉館後再來，博物館會不一樣。</small></div>`;
 if(NIGHT){go.textContent='拿手電筒溜進去 ▶';$('goFree').hidden=true;$('introP').innerHTML='<b>13 件展品、五個展區</b>，看懂台灣發票 75 年。<br>閉館了，導覽員都下班了。';tip.textContent='按住拖曳走路・手電筒照得到才看得清楚・小心警衛'}
 function toast(h,b){$('toast').innerHTML=`<b>${h}</b>${b}`;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3200)}
@@ -793,14 +793,19 @@ const QUIZ=[
   {q:'中獎的發票，領獎期限大約多久？',o:['1 個月','3 個月','1 年'],a:1},
 ];
 // 兌換碼由行銷提供後填入（App 內輸入兌換碼領金幣）；空白時畫面顯示「兌換碼準備中」
-const QUIZ_REWARD={full:{coins:100,code:''},pass:{coins:50,code:''}};
+const QUIZ_REWARD={full:{coins:100,code:''},pass:{coins:50,code:''},night:{coins:100,code:''}};   // night＝夜闖成功（晚上沒被警衛抓到、看完全部展品）另外加碼
 const STAFF_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="#fff"/><path d="M4.5 20c.8-4 3.8-6 7.5-6s6.7 2 7.5 6" fill="#fff"/></svg>';
 const COIN_IC='<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#F2C94C" stroke="#C99A1E" stroke-width="3"/><path d="M20 10v20M15 14h7a4 4 0 0 1 0 8h-6a4 4 0 0 0 0 8h8" fill="none" stroke="#8A5A00" stroke-width="3" stroke-linecap="round"/></svg>';
 let qi=0,qScore=0;
 function closeQuiz(){$('quiz').classList.remove('on')}
 function qShow(h){$('qBox').innerHTML=h;$('quiz').classList.add('on');$('qBox').scrollTop=0}
+let nightBonus=false;
+function nightPerfect(){return NIGHT&&seen.size>=EXHIBITS.length&&caughtN===0}
+function giftHTML(coins,code,lead){return `<div class="gift">${COIN_IC}<div>${lead}<b>${coins} 金幣</b>！<br>${code?`打開發票存摺輸入兌換碼 <span class="code">${code}</span>`:'兌換碼準備中，請稍後再回來看看。'}</div></div>`}
 function askQuiz(){if(quizDone){toast('問卷已經寫過了','謝謝你來看展！');return}track('quiz_ask',{seen:seen.size,mode});
-  qShow(`<div class="who"><i>${STAFF_IC}</i><b>博物館工作人員</b></div><h3>謝謝你來看展！要不要寫一份 5 題的小問卷？</h3><p>答對 60 分以上送 <b>50 金幣</b>，滿分 100 分送 <b>100 金幣</b>。題目都在展品說明裡。</p><button class="btn p" id="qGo" type="button">好啊，寫問卷</button><button class="btn s" id="qNo" type="button">先不用</button>`);
+  if(nightPerfect()&&!nightBonus){nightBonus=true;track('night_perfect',{seen:seen.size})}
+  const nb=nightBonus?giftHTML(QUIZ_REWARD.night.coins,QUIZ_REWARD.night.code,'夜闖成功！躲過警衛又看完全部展品，加碼送你 '):NIGHT?`<p style="font-size:13px;color:#788">小提示：晚上躲過警衛、看完全部 ${EXHIBITS.length} 件展品，還能再多拿 ${QUIZ_REWARD.night.coins} 金幣。</p>`:'';
+  qShow(`<div class="who"><i>${STAFF_IC}</i><b>博物館工作人員</b></div>${nb}<h3>謝謝你來看展！要不要寫一份 5 題的小問卷？</h3><p>答對 60 分以上送 <b>50 金幣</b>，滿分 100 分送 <b>100 金幣</b>。題目都在展品說明裡。</p><button class="btn p" id="qGo" type="button">好啊，寫問卷</button><button class="btn s" id="qNo" type="button">先不用</button>`);
   $('qGo').onclick=()=>{qi=0;qScore=0;track('quiz_start');qAsk()};$('qNo').onclick=()=>{track('quiz_skip');closeQuiz()}}
 function qAsk(){const it=QUIZ[qi];qShow(`<div class="qn">第 ${qi+1} / ${QUIZ.length} 題</div><h3>${it.q}</h3><div class="opts">${it.o.map((o,k)=>`<button class="opt" data-k="${k}" type="button">${o}</button>`).join('')}</div>`);
   $('qBox').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.parentNode.dataset.done)return;b.parentNode.dataset.done=1;const k=+b.dataset.k,ok=k===it.a;if(ok)qScore+=20;
@@ -809,7 +814,8 @@ function qAsk(){const it=QUIZ[qi];qShow(`<div class="qn">第 ${qi+1} / ${QUIZ.le
 function qEnd(){track('quiz_finish',{score:qScore});const rw=qScore>=100?QUIZ_REWARD.full:qScore>=60?QUIZ_REWARD.pass:null;
   const dl='https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&af_sub2=quiz';
   let h=`<div class="qn">問卷結果</div><div class="score">${qScore}<small> 分</small></div>`;
-  if(rw){quizDone=true;h+=`<div class="gift">${COIN_IC}<div>恭喜拿到 <b>${rw.coins} 金幣</b>！<br>${rw.code?`打開發票存摺輸入兌換碼 <span class="code">${rw.code}</span>`:'兌換碼準備中，請稍後再回來看看。'}</div></div><a class="btn p" id="qDl" href="${dl}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">打開發票存摺領金幣</a>`}
+  if(nightBonus)h+=giftHTML(QUIZ_REWARD.night.coins,QUIZ_REWARD.night.code,'夜闖加碼 ');
+  if(rw){quizDone=true;h+=giftHTML(rw.coins,rw.code,'問卷拿到 ')+(nightBonus?`<p style="text-align:center;font-weight:800">今晚合計 ${rw.coins+QUIZ_REWARD.night.coins} 金幣</p>`:'')+`<a class="btn p" id="qDl" href="${dl}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">打開發票存摺領金幣</a>`}
   else h+=`<p style="text-align:center">差一點！60 分以上就有金幣。<br>回去看看展品說明，再寫一次。</p><button class="btn p" id="qRe" type="button">再寫一次</button>`;
   h+=`<button class="btn s" id="qShare" type="button">分享發票博物館給朋友</button><button class="btn s" id="qBack" type="button">繼續逛</button><p id="qHint" style="font-size:13px;text-align:center;margin:8px 0 0"></p>`;
   qShow(h);if($('qDl'))$('qDl').onclick=()=>track('store_click',{where:'quiz'});if($('qRe'))$('qRe').onclick=()=>{qi=0;qScore=0;track('quiz_retry');qAsk()};
@@ -817,7 +823,16 @@ function qEnd(){track('quiz_finish',{score:qScore});const rw=qScore>=100?QUIZ_RE
   $('qShare').onclick=async()=>{const url=location.origin+location.pathname+'?'+new URLSearchParams({utm_source:'friend',utm_medium:'share',utm_campaign:'invoice_museum_share'}),text='我逛完發票博物館了，一站一站看懂台灣發票 75 年，你也來逛逛：';
     if(navigator.share){track('share',{method:'native',where:'quiz'});try{await navigator.share({title:'發票博物館',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
     track('share',{method:'copy',where:'quiz'});try{await navigator.clipboard.writeText(text+url);$('qHint').textContent='連結已複製，貼給朋友就好。'}catch(e){$('qHint').textContent=url}}}
-$('quiz').onclick=e=>{if(e.target===$('quiz'))closeQuiz()};
+$('quiz').onclick=e=>{if(e.target===$('quiz')){if(state==='caught')release();else closeQuiz()}};
+// ---------- 夜間被警衛抓到：被請回大廳門口，再溜進去一次 ----------
+const GUARD_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9.5h14l-1.2-3.2c-.3-.8-1-1.3-1.9-1.3H8.1c-.9 0-1.6.5-1.9 1.3z" fill="#fff"/><circle cx="12" cy="13.5" r="4" fill="#fff"/><path d="M5 21c.9-3.2 3.7-5 7-5s6.1 1.8 7 5" fill="#fff"/></svg>';
+let caughtN=0;
+function caught(){state='caught';caughtN++;target=null;pendingOpen=null;jx=jy=0;
+  gd.g.rotation.y=Math.atan2(player.position.x-gd.x,player.position.z-gd.z);track('guard_caught',{n:caughtN,seen:seen.size});
+  qShow(`<div class="who"><i style="background:#22304A">${GUARD_IC}</i><b>夜班警衛</b></div><h3>嗶——被抓到了！</h3><p>閉館時間不能偷偷進來看展喔。<br>你被請回大廳門口${caughtN>1?`（今晚第 ${caughtN} 次了）`:''}。</p><button class="btn p" id="qRelease" type="button">再溜進去一次</button>`);
+  $('qRelease').onclick=release}
+function release(){closeQuiz();const f=$('fade');f.classList.add('on');setTimeout(()=>{player.position.set(0,0,18.6);heading=Math.PI;player.rotation.y=heading;placeCam(true);
+  state='play';gd.spot=0;gd.cool=3;setTimeout(()=>f.classList.remove('on'),120);track('guard_release',{n:caughtN})},460)}
 // ---------- 官網導覽列：開場顯示；遊戲中從最上緣往下滑（或點上緣小把手）叫出來，往上滑或點別處收起 ----------
 const siteHdr=$('siteHdr'),hdrPull=$('hdrPull'),hdrNav=$('hdrNav'),hdrMenu=$('hdrMenu');
 function showHdr(on,why){if(siteHdr.classList.contains('on')===on)return;siteHdr.classList.toggle('on',on);hdrPull.hidden=on;if(!on){hdrNav.hidden=true;hdrMenu.setAttribute('aria-expanded','false')}else track('header_open',{via:why||'auto'})}
@@ -899,8 +914,9 @@ function loop(){
   fadeWalls.forEach(w=>{const z=w.userData.z,inFront=z>player.position.z&&z-player.position.z<5;const o=inFront?0.18:1;w.material.opacity+=(o-w.material.opacity)*Math.min(1,dt*8);w.castShadow=w.material.opacity>0.9});
   if(state==='play'&&!cardOn){elapsed=performance.now()-t0;$('clock').textContent=fmtClock(elapsed);
     slips.forEach(s=>{if(!s.got&&Math.hypot(s.x-player.position.x,s.z-player.position.z)<0.85)pickUp(s)})}
-  if(NIGHT&&!cardOn&&state!=='intro'){gd.cool-=dt;if(gd.cool<=0&&seenByGuard()){gd.cool=5;
-    toast('被警衛照到了！','快躲到牆後面，別被發現。');track('guard_caught',{state})}}
+  // 夜間：被警衛的手電筒連續照到 0.35 秒就被抓（剛被放出來有 3 秒緩衝）
+  if(NIGHT&&!cardOn&&state==='play'&&!$('quiz').classList.contains('on')){gd.cool-=dt;
+    if(gd.cool<=0&&seenByGuard()){gd.spot=(gd.spot||0)+dt;if(gd.spot>0.35)caught()}else gd.spot=0}
   const tt=performance.now()/1000;slips.forEach(s=>{s.paper.position.y=0.75+Math.sin(tt*2.4+s.i)*0.08;s.paper.rotation.y=tt*1.2+s.i;s.glow.material.opacity=0.35+0.25*Math.sin(tt*3+s.i)});
   updateNPC(dt,tt);coin.rotation.y+=dt*0.5;if(drum)drum.rotation.x+=dt*0.9;if(cloud)cloud.position.y=2.45+Math.sin(tt*1.3)*0.08;if(bubble){bubble.position.y=2.25+Math.sin(tt*2)*0.06;bubble.quaternion.copy(cam.quaternion)}
   spinners.forEach(f=>f(dt,tt));
