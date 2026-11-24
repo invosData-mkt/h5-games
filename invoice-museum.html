@@ -7,11 +7,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>發票博物館｜8 張發票藏在展廳，你幾秒找齊？・發票存摺 invos</title>
+<title>發票博物館｜一站一站看懂台灣發票 75 年・發票存摺 invos</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="展廳裡藏了 8 張發票，找齊要幾秒？順便看懂台灣統一發票 75 年的故事。">
-<meta property="og:title" content="發票博物館｜8 張發票藏在展廳，你幾秒找齊？">
-<meta property="og:description" content="邊逛邊找，看懂統一發票 75 年。找齊後嗆朋友來比速度。">
+<meta name="description" content="跟著導覽員或自己逛，13 件展品從 1951 年說到手機條碼載具；逛完寫問卷拿金幣。">
+<meta property="og:title" content="發票博物館｜一站一站看懂台灣發票 75 年">
+<meta property="og:description" content="專人導覽或自己逛，13 件展品從 1951 年說到手機條碼載具。逛完寫問卷拿金幣。">
 <meta property="og:type" content="website">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-82LNTS7C14"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-82LNTS7C14',{page_title:'發票博物館（H5）'});</script>
@@ -124,19 +124,75 @@
   #rHint{font-size:13px;color:#566;min-height:18px;margin:8px 0 0}
   #res a.dl{display:block;margin-top:12px;font-size:14px;color:var(--gd);font-weight:700}
   #res .src{font-size:11px;color:#899;margin-top:14px}
+  /* 官網導覽列（同 invos.com.tw #invos-header）：開場／結果畫面顯示，遊戲中從最上緣往下滑叫出來 */
+  #siteHdr{position:fixed;left:0;right:0;top:0;z-index:60;background:rgba(255,255,255,.93);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid rgba(16,17,25,.06);box-shadow:0 8px 24px rgba(16,17,25,.06);padding-top:env(safe-area-inset-top);transform:translateY(-110%);transition:transform .25s ease;touch-action:none}
+  #siteHdr.on{transform:none}
+  #siteHdr .in{height:56px;display:flex;align-items:center;gap:12px;padding:0 14px;max-width:1200px;margin:0 auto}
+  #siteHdr .logo img{height:30px;width:auto;display:block}
+  #siteHdr .top{display:none;gap:18px;margin-left:auto;font-size:14px;font-weight:700}
+  #siteHdr a{color:#3b3c43;text-decoration:none}
+  #siteHdr .dl{margin-left:auto;display:inline-flex;align-items:center;background:#3560ff;color:#fff;font-size:13px;font-weight:800;padding:9px 16px;border-radius:999px;box-shadow:0 8px 22px rgba(53,96,255,.28);white-space:nowrap}
+  #siteHdr .mb{background:transparent;border:0;padding:6px;color:#101119;display:inline-flex;cursor:pointer}
+  #siteHdr .mb svg{width:26px;height:26px}
+  #hdrNav{display:flex;flex-direction:column;padding:2px 22px 14px;font-size:15px;font-weight:700}
+  #hdrNav[hidden]{display:none}
+  #hdrNav a{padding:12px 0;border-bottom:1px solid rgba(16,17,25,.05)}
+  #hdrNav a:last-child{border-bottom:0}
+  @media(min-width:1025px){#siteHdr .top{display:flex}#siteHdr .dl{margin-left:12px}#siteHdr .mb{display:none}}
+  #hdrPull{position:fixed;left:0;right:0;top:0;height:calc(env(safe-area-inset-top) + 20px);z-index:55;display:flex;justify-content:center;align-items:flex-end;padding-bottom:5px;touch-action:none}
+  #hdrPull span{width:46px;height:5px;border-radius:9px;background:rgba(31,42,48,.32)}
+  body.night #hdrPull span{background:rgba(255,255,255,.45)}
+  #hdrPull[hidden]{display:none}
+  #intro .pick{display:flex;flex-direction:column;gap:10px;align-items:center}
+  #intro .go2{flex:none;padding:13px 40px;font-size:16px;background:#fff;color:var(--ink);border:2px solid #DCD4C4}
+  body.night #intro .go2{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+  #hud .hb{pointer-events:auto;border:0;cursor:pointer;color:var(--ink);font-family:inherit}
+  #fade{position:fixed;inset:0;background:#0C1424;opacity:0;pointer-events:none;z-index:40;transition:opacity .45s}
+  #fade.on{opacity:1;pointer-events:auto}
+  #quiz{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center}
+  #quiz.on{display:flex}
+  #quiz .box{background:var(--paper);width:100%;max-width:480px;max-height:90vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px 18px max(22px,env(safe-area-inset-bottom));animation:up .3s ease-out}
+  @media(min-width:700px){#quiz{align-items:center}#quiz .box{border-radius:22px}}
+  #quiz .who{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+  #quiz .who i{flex:none;width:44px;height:44px;border-radius:50%;background:#00B386;display:flex;align-items:center;justify-content:center}
+  #quiz .who i svg{width:26px;height:26px}
+  #quiz .who b{font-size:13px;color:var(--gd)}
+  #quiz h3{margin:4px 0 8px;font-size:20px;line-height:1.45}
+  #quiz p{margin:0 0 12px;font-size:15px;line-height:1.7;color:#455}
+  #quiz .qn{font-size:12px;color:var(--gd);font-weight:800;letter-spacing:.08em}
+  #quiz .opts{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px}
+  #quiz .opt{border:2px solid #E6E0D3;background:#fff;border-radius:14px;padding:13px 14px;font-size:16px;font-weight:700;text-align:left;cursor:pointer;color:var(--ink);font-family:inherit}
+  #quiz .opt.ok{border-color:#00B386;background:#E8F7F2}#quiz .opt.no{border-color:#EE716E;background:#FFEDEC}
+  #quiz .btn{display:block;width:100%;margin-top:10px;padding:14px;font-size:16px}
+  #quiz .score{font-family:ui-monospace,Menlo,monospace;font-size:60px;font-weight:900;text-align:center;margin:2px 0 0;color:var(--ink)}
+  #quiz .score small{font-size:20px}
+  #quiz .gift{display:flex;gap:10px;align-items:center;background:#FFF4CC;border:2px solid #F2C94C;border-radius:16px;padding:12px 14px;margin:10px 0 4px;font-size:15px;line-height:1.6}
+  #quiz .gift svg{flex:none;width:40px;height:40px}
+  #quiz .code{font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:900;letter-spacing:.06em}
 </style>
 </head>
 <body>
+<div id="siteHdr" class="on"><div class="in">
+  <a class="logo" href="https://invos.com.tw/"><img src="https://invos.com.tw/wp-content/uploads/Logo_Name-monotone_color-navy-1.png" alt="發票存摺"></a>
+  <nav class="top"><a href="https://invos.com.tw/uniform-invoice-winning-numbers">發票中獎號碼</a><a href="https://invos.com.tw/category/invos-teach/org/">發票載具歸戶</a><a href="https://invos.com.tw/blog/">常見問題</a><a href="https://invos.com.tw/campaign/">最新優惠</a><a href="https://invos.com.tw/donation">愛心捐贈</a><a href="https://invos.com.tw/business">商業合作</a></nav>
+  <a class="dl" id="hdrDl" href="https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&amp;af_sub2=header" target="_blank" rel="noopener">立即下載 App</a>
+  <button class="mb" id="hdrMenu" type="button" aria-label="開啟選單" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</div>
+<nav id="hdrNav" hidden><a href="https://invos.com.tw/uniform-invoice-winning-numbers">發票中獎號碼</a><a href="https://invos.com.tw/category/invos-teach/org/">發票載具歸戶</a><a href="https://invos.com.tw/blog/">常見問題</a><a href="https://invos.com.tw/campaign/">最新優惠</a><a href="https://invos.com.tw/donation">愛心捐贈</a><a href="https://invos.com.tw/business">商業合作</a><a href="https://invos.com.tw/">回發票存摺首頁</a></nav>
+</div>
+<div id="hdrPull" hidden aria-label="往下滑顯示網站選單"><span></span></div>
 <div id="intro">
   <div class="k">INVOICE MUSEUM</div>
   <h1>發票博物館</h1>
   <div class="hours" id="hours"></div>
   <div class="vsc" id="vsCard" hidden></div>
-  <p id="introP">展廳裡藏了 <b>8 張發票</b>，你要幾秒才找齊？<br>每張發票都藏著一段統一發票的故事。</p>
-  <button class="btn p go" id="go" type="button">開始尋寶 ▶</button>
-  <small>五個展區・一局約 1–2 分鐘・免下載</small>
+  <p id="introP"><b>13 件展品、五個展區</b>，看懂台灣發票 75 年。<br>要專人帶你逛，還是自己慢慢看？</p>
+  <div class="pick"><button class="btn p go" id="go" type="button">專人導覽 ▶</button><button class="btn go2" id="goFree" type="button">自己逛</button></div>
+  <small id="introS">免下載・逛完寫問卷拿金幣</small>
 </div>
-<div id="hud"><span class="t" id="prog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 22z" fill="#00B386"/><path d="M9 7h6M9 11h6M9 15h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>找到 <b id="found">0</b> / 8</span><span class="t time" id="clock">00.0</span></div>
+<div id="hud"><span class="t" id="prog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 22z" fill="#00B386"/><path d="M9 7h6M9 11h6M9 15h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>已看 <b id="seenH">0</b> / 13<span id="found" hidden></span><span id="clock" hidden></span></span><button class="t hb" id="hudBtn" type="button">結束參觀</button></div>
+<div id="fade"></div>
+<div id="quiz"><div class="box" id="qBox"></div></div>
 <div id="toast"></div>
 <div id="res"><div class="box">
   <div class="k">找齊 8 張發票</div>
@@ -151,7 +207,7 @@
   <a class="dl" id="aStore" target="_blank" rel="noopener" href="https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&amp;af_sub2=result">發票存摺幫你自動對獎、中獎通知 → 免費下載</a>
   <div class="src">展品內容依財政部財政史料陳列室與新聞報導整理</div>
 </div></div>
-<div id="tip">按住畫面拖曳走路・走過發票就撿起來</div>
+<div id="tip">按住畫面拖曳走路・點地上的號碼直接走過去</div>
 <button id="near" type="button"></button>
 <div id="joy"><div id="knob"></div></div>
 <div id="card"><div class="box">
@@ -441,6 +497,8 @@ const BUILD=[
 ];
 const spinners=[];
 const priceTag=['$45','$89','$129'].map(p=>tex((x,w,h)=>{x.fillStyle='#FFDD5E';x.fillRect(0,0,w,h);x.fillStyle='#C0262D';x.font='900 46px ui-monospace,Menlo,monospace';x.textAlign='center';x.fillText(p,w/2,52)},160,64));
+const TOUR_ORDER=[0,1,2,3,4,5,11,7,8,6,9,10,12];   // 導覽順序＝地上圈圈的編號
+const numTex=n=>tex((x,w,h)=>{x.fillStyle='#00B386';x.beginPath();x.arc(w/2,h/2,w/2-4,0,7);x.fill();x.strokeStyle='#fff';x.lineWidth=10;x.stroke();x.fillStyle='#fff';x.font='900 '+(n>9?96:118)+'px ui-monospace,Menlo,monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(String(n),w/2,h/2+6)},256,256);
 function plaqueTex(e){return tex((x,w,h)=>{x.fillStyle='#FFFDF7';x.fillRect(0,0,w,h);x.fillStyle=e.color;x.fillRect(0,0,16,h);x.fillStyle='#008F6B';x.font='bold 30px sans-serif';x.fillText(e.no,36,52);x.fillStyle='#1F2A30';x.font='900 40px "PingFang TC",sans-serif';wrap(x,e.t,36,104,w-60,46)},512,200)}
 EXHIBITS.forEach((e,i)=>{
   const [px,pz]=SPOTS[i];
@@ -452,8 +510,9 @@ EXHIBITS.forEach((e,i)=>{
   const ok=new THREE.Mesh(new THREE.CircleGeometry(0.06,20),new THREE.MeshBasicMaterial({color:'#00B386'}));ok.position.set(0.27,0.09,0.002);ok.visible=false;ok.userData.keepBasic=1;pl.add(ok);
   {const pic=artTex(e);const c=document.createElement('canvas');c.width=640;c.height=520;c.getContext('2d').drawImage(pic.image,0,0,640,520,0,0,640,520);e.img=c.toDataURL('image/jpeg',0.86)}
   const ring=new THREE.Mesh(new THREE.RingGeometry(0.75,0.9,40),new THREE.MeshBasicMaterial({color:'#00B386',transparent:true,opacity:0.25}));ring.rotation.x=-Math.PI/2;ring.position.set(0,0.015,d/2+0.75);ring.userData.keepBasic=1;g.add(ring);
+  {const nd=new THREE.Mesh(new THREE.CircleGeometry(0.34,32),new THREE.MeshBasicMaterial({map:numTex(TOUR_ORDER.indexOf(i)+1),transparent:true}));nd.rotation.x=-Math.PI/2;nd.position.set(0,0.025,d/2+0.75);nd.userData.keepBasic=1;g.add(nd)}
   solids.push({x0:px-w*SC/2,x1:px+w*SC/2,z0:pz-d*SC/2,z1:pz+(d/2+0.05)*SC});
-  g.traverse(o=>{if(o.isMesh&&o!==ring){o.userData.ex=i;pickables.push(o)}});
+  g.traverse(o=>{if(o.isMesh){o.userData.ex=i;pickables.push(o)}});
   exhibits.push({g,ok,ring,x:px,z:pz+(d/2+0.75)*SC,i});
 });
 
@@ -514,7 +573,7 @@ const scr=new THREE.Mesh(new THREE.PlaneGeometry(0.24,0.46),new THREE.MeshBasicM
 vitrine(-4.2,-9.2,phone);
 
 // ---------- 藏起來的 8 張發票 ----------
-const HIDE=[[-11.1,17.4],[-11.2,-3.1],[-1.0,10.6],[11.2,-3.1],[1.0,0.6],[-7.2,-33.0],[-1.0,-6.0],[7.2,-33.0]];
+const HIDE=[];   // 2026-11-24 Sam：不用找發票，改成導覽／自己逛
 const slipTex=tex((x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#00B386';x.fillRect(0,0,w,26);x.fillStyle='#1F2A30';x.font='bold 22px sans-serif';x.textAlign='center';x.fillText('統一發票',w/2,62);
   x.font='bold 26px monospace';x.fillText('AB-'+String(Math.floor(Math.random()*9e7+1e7)),w/2,104);for(let k=0;k<22;k++)x.fillRect(20+k*8,124,[2,4,5][k%3],40);x.fillStyle='#C8CCD0';for(let r=0;r<4;r++)x.fillRect(30,182+r*18,w-60-(r%2)*40,8)},220,260);
 const slips=HIDE.map(([x,z],i)=>{const g=new THREE.Group();
@@ -603,6 +662,20 @@ function applyMode(){
   scene.traverse(o=>{if(!o.isMesh||o.userData.keepBasic)return;o.material=Array.isArray(o.material)?o.material.map(sw):sw(o.material)});
   slips.forEach(s=>s.glow.material.opacity=0.5)}
 applyMode();
+// ---------- 專人導覽（只有白天）：導覽員沿固定路線帶路，到每一站停下來跳說明 ----------
+const guide=person(77);guide.g.visible=false;
+{const vest=mat('#00B386');guide.g.children[0].material=vest;const fl=new THREE.Group();fl.position.set(0.3,0.95,0);guide.g.add(fl);
+  addM(fl,CY(0.015,0.015,0.9,6),mat('#2B3A40'),0,0.3,0);const fg=new THREE.Mesh(new THREE.PlaneGeometry(0.36,0.22),new THREE.MeshBasicMaterial({side:THREE.DoubleSide,map:tex((x,w,h)=>{x.fillStyle='#00B386';x.fillRect(0,0,w,h);x.fillStyle='#fff';x.font='900 56px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('導覽',w/2,74)},160,100)}));fg.position.set(0.18,0.66,0);fg.userData.keepBasic=1;fl.add(fg)}
+const TOUR_PATH=[[0,18.6],[0,14.3],[-6,13.2],[-6,11],'S0',[-8.3,9.5],[-8.3,3.5],'S1',[-8.3,1.0],[-4.0,-0.6],'S2',[-1.5,4.5],[1.5,4.5],[4,0.8],[9,0.2],'S3',[6,-2.5],[6,-6],[2,-11.5],[-2,-11.5],[-7.5,-13.2],'S4',[-2,-11.8],[2,-11.8],'S5',[4.2,-14.5],[2.25,-18.5],[2.25,-21.5],'S11',[-5.8,-24.5],[-6.5,-29.5],'S7','S8',[-2.2,-27.4],[-1.5,-25.1],'S6',[2.2,-27.4],'S9','S10',[6.3,-29],[6.0,-24.5],'S12'];
+const TP=[],TS=[];TOUR_PATH.forEach(w=>{const st=typeof w==='string',i=st?+w.slice(1):-1,p=st?[exhibits[i].x,exhibits[i].z]:w,pr=TP[TP.length-1];
+  TP.push({x:p[0],z:p[1],s:pr?pr.s+Math.hypot(p[0]-pr.x,p[1]-pr.z):0});if(st)TS.push({i,s:TP[TP.length-1].s})});
+const TLEN=TP[TP.length-1].s;
+function tourAt(s){s=Math.max(0,Math.min(TLEN,s));let k=1;while(k<TP.length-1&&TP[k].s<s)k++;const a=TP[k-1],b=TP[k],f=b.s>a.s?(s-a.s)/(b.s-a.s):1;return {x:a.x+(b.x-a.x)*f,z:a.z+(b.z-a.z)*f,dx:b.x-a.x,dz:b.z-a.z}}
+let mode='free',tour={k:-1,s:0,moving:false},quizDone=false;
+// 出口的工作人員（大廳）：問要不要寫問卷
+const EXITP={x:5.2,z:16.0};const staff=person(55);staff.g.position.set(EXITP.x,0,EXITP.z);staff.g.rotation.y=0;staff.g.children[0].material=mat('#22304A');
+solids.push({x0:EXITP.x-0.35,x1:EXITP.x+0.35,z0:EXITP.z-0.35,z1:EXITP.z+0.35});
+{const sg=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.5),new THREE.MeshBasicMaterial({transparent:true,map:tex((x,w,h)=>{x.fillStyle='#FFDD5E';rr(x,4,4,w-8,h-8,40);x.fill();x.fillStyle='#1F2A30';x.font='900 64px "PingFang TC",sans-serif';x.textAlign='center';x.fillText('出口・寫問卷拿金幣',w/2,108)},640,170)}));sg.position.set(EXITP.x,2.25,EXITP.z);sg.userData.keepBasic=1;scene.add(sg);staff.sign=sg}
 // 警衛視線：距離 4.5 內、手電筒角度內、中間沒有牆
 function blocked(x0,z0,x1,z1){const dx=x1-x0,dz=z1-z0;
   for(const b of solids){if(!b.wall)continue;let t0=0,t1=1,miss=false;
@@ -632,6 +705,7 @@ el.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;let dx=e.clien
   if(dragging){dragging=false;jx=jy=0;knob.style.transform='translate(-50%,-50%)';joy.classList.remove('on');return}
   if(t==='pointercancel')return;tapAt(e)}));
 function tapAt(e){
+  if(mode==='guided'&&state==='play')return;
   v2.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(v2,cam);
   const hit=ray.intersectObjects([...pickables,...floors],false)[0];if(!hit)return;hideTip();
   if(hit.object.userData.ex!==undefined){const ex=exhibits[hit.object.userData.ex];
@@ -641,7 +715,7 @@ function tapAt(e){
 const keys={};addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
 // 搖桿位置跟著小人（畫在腳邊）
 const _pv=new THREE.Vector3();
-function placeJoy(){_pv.set(player.position.x,0,player.position.z).project(cam);joy.style.left=((_pv.x+1)/2*innerWidth)+'px';joy.style.top=((1-_pv.y)/2*innerHeight)+'px'}
+function placeJoy(){joy.style.display=mode==='guided'&&state==='play'?'none':'';_pv.set(player.position.x,0,player.position.z).project(cam);joy.style.left=((_pv.x+1)/2*innerWidth)+'px';joy.style.top=((1-_pv.y)/2*innerHeight)+'px'}
 
 // ---------- 展品卡、靠近提示 ----------
 const seen=new Set();let near=null;
@@ -658,16 +732,16 @@ function openCard(i){const e=EXHIBITS[i];curEx=i;target=null;pendingOpen=null;
   if(e.list)h+=`<h4>${e.list.h}</h4><ol class="howto">${e.list.items.map(f=>`<li>${f}</li>`).join('')}</ol>`;
   if(e.facts)h+=`<h4>冷知識</h4><ul class="facts">${e.facts.map(f=>`<li>${f}</li>`).join('')}</ul>`;
   h+=e.src?`<p class="src">${e.src}</p>`:e.app?`<p class="src">功能說明依發票存摺 App（2026 年 11 月版本）</p>`:`<p class="src">資料來源：財政部財政史料陳列室、財政部賦稅署與新聞報導（2025–2026）整理；照片取自維基共享資源</p>`;
-  $('cBody').innerHTML=h;$('cSc').scrollTop=0;cCta.hidden=!e.cta;cCta.textContent=e.app?'免費下載發票存摺':'下載發票存摺';$('cPause').hidden=state!=='play';
+  $('cBody').innerHTML=h;$('cSc').scrollTop=0;cCta.hidden=!e.cta;cClose.textContent=mode==='guided'&&state==='play'?(tour.k>=TS.length-1?'前往出口':'帶我到下一站'):'繼續逛';cCta.textContent=e.app?'免費下載發票存摺':'下載發票存摺';$('cPause').hidden=true;
   if(!cardOn&&state==='play')pauseAt=performance.now();cardOn=true;cardEl.classList.add('on');
-  seen.add(i);$('seen').textContent=seen.size;exhibits[i].ok.visible=true;
+  seen.add(i);$('seen').textContent=seen.size;$('seenH').textContent=seen.size;exhibits[i].ok.visible=true;
   track('exhibit_open',{exhibit:i+1});if(seen.size===EXHIBITS.length)track('museum_complete')}
 const cardEl=document.getElementById('card');
 function closeCard(){if(!cardOn)return;cardOn=false;cardEl.classList.remove('on');if(state==='play'&&pauseAt){t0+=performance.now()-pauseAt;pauseAt=0}}
-cClose.onclick=closeCard;document.getElementById('cX').onclick=closeCard;
+cClose.onclick=()=>{closeCard();if(mode==='guided'&&state==='play')tourNext()};document.getElementById('cX').onclick=closeCard;
 cardEl.onclick=e=>{if(e.target===cardEl)closeCard()};
 cCta.onclick=()=>{track('store_click',{where:'exhibit',exhibit:curEx+1});open('https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&af_sub2=exhibit','_blank')};
-const nearBtn=document.getElementById('near');nearBtn.onclick=()=>{if(near!==null)openCard(near)};
+const nearBtn=document.getElementById('near');nearBtn.onclick=()=>{const w=nearBtn.dataset.w||'';if(w.startsWith('帶我')||w.startsWith('前往'))tourNext();else if(w.startsWith('寫問卷'))askQuiz();else if(near!==null)openCard(near)};
 let tipHidden=false;function hideTip(){if(tipHidden)return;tipHidden=true;tip.style.opacity=0}
 function track(name,p){try{window.gtag&&gtag('event',name,p||{})}catch(_){}}
 // ---------- 尋寶：計時、撿發票、結果、挑戰 ----------
@@ -687,15 +761,75 @@ if(VS){$('vsCard').innerHTML=`<div class="h">${FIRE}朋友來嗆你了</div>朋�
 let state='intro',t0=0,elapsed=0,found=0,toastT,lastMs=0;
 const MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="#FFD866"/></svg>';
 const SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.6" fill="#F6AA5E"/><g stroke="#F6AA5E" stroke-width="2" stroke-linecap="round"><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"/></g></svg>';
-$('hours').innerHTML=NIGHT?`${MOON}<div><b>已閉館</b>・開放時間 09:00–18:00<small>警衛在巡邏，只能拿手電筒偷偷溜進去。被照到計時 +5 秒。</small></div>`
+$('hours').innerHTML=NIGHT?`${MOON}<div><b>已閉館</b>・開放時間 09:00–18:00<small>晚上沒有導覽員，只能拿手電筒自己偷偷溜進去，小心別被警衛照到。</small></div>`
   :`${SUN}<div><b>開館中</b>・開放時間 09:00–18:00<small>晚上 6 點閉館後再來，博物館會不一樣。</small></div>`;
-if(NIGHT){go.textContent=VS?'溜進去接受挑戰 ▶':'拿手電筒溜進去 ▶';tip.textContent='按住拖曳走路・手電筒照得到才看得清楚・小心警衛'}
+if(NIGHT){go.textContent='拿手電筒溜進去 ▶';$('goFree').hidden=true;$('introP').innerHTML='<b>13 件展品、五個展區</b>，看懂台灣發票 75 年。<br>閉館了，導覽員都下班了。';tip.textContent='按住拖曳走路・手電筒照得到才看得清楚・小心警衛'}
 function toast(h,b){$('toast').innerHTML=`<b>${h}</b>${b}`;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3200)}
 function startHunt(){state='play';found=0;$('found').textContent=0;slips.forEach(s=>{s.got=false;s.g.visible=true});
   player.position.set(0,0,18.6);heading=Math.PI;player.rotation.y=heading;placeCam(true);t0=performance.now();elapsed=0;
-  intro.style.display='none';$('res').classList.remove('on');track('museum_enter',{vs:VS?1:0,mode:NIGHT?'night':'day'})}
+  intro.style.display='none';$('res').classList.remove('on');showHdr(false);track('museum_enter',{vs:VS?1:0,mode:NIGHT?'night':'day'})}
 function goFull(){try{const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;if(f&&!document.fullscreenElement&&!document.webkitFullscreenElement){const r=f.call(d,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{})}}catch(e){}}
-go.onclick=()=>{goFull();startHunt()};
+go.onclick=()=>{goFull();startVisit(NIGHT?'free':'guided')};
+$('goFree').onclick=()=>{goFull();startVisit('free')};
+// ---------- 進場：專人導覽／自己逛 ----------
+function setHud(){$('hudBtn').textContent=mode==='guided'?'改成自己逛':'結束參觀'}
+function startVisit(m){mode=m;state='play';intro.style.display='none';showHdr(false);closeQuiz();
+  player.position.set(0,0,18.6);heading=Math.PI;player.rotation.y=heading;placeCam(true);
+  guide.g.visible=m==='guided';tour={k:-1,s:0,moving:false};setHud();
+  if(m==='guided'){tip.style.opacity=0;tourNext()}else{tip.style.opacity=1}
+  track('museum_enter',{mode:m,time:NIGHT?'night':'day'})}
+function tourNext(){if(tour.k>=TS.length-1){track('tour_done');goExit();return}tour.k++;tour.moving=true;track('tour_next',{stop:tour.k+1})}
+$('hudBtn').onclick=()=>{if(mode==='guided'){mode='free';tour.moving=false;setHud();tip.style.opacity=1;track('tour_switch_free',{stop:tour.k+1})}else{track('exit_click',{seen:seen.size});goExit()}};
+function goExit(){closeCard();const f=$('fade');f.classList.add('on');setTimeout(()=>{mode='free';tour.moving=false;setHud();
+  player.position.set(EXITP.x,0,EXITP.z+1.5);heading=Math.PI;player.rotation.y=heading;target=null;pendingOpen=null;
+  if(guide.g.visible){guide.g.position.set(EXITP.x-1.3,0,EXITP.z+1.1);guide.g.rotation.y=Math.PI*0.7}placeCam(true);
+  setTimeout(()=>{f.classList.remove('on');setTimeout(askQuiz,450)},120)},460)}
+// ---------- 出口問卷：5 題，每題 20 分；100 分送 100 金幣、60 分以上送 50 金幣 ----------
+const QUIZ=[
+  {q:'統一發票是哪一年開始的？',o:['1951 年','1971 年','1987 年'],a:0},
+  {q:'早期的發票，是借什麼號碼來對獎？',o:['愛國獎券的特獎號碼','樂透彩的號碼','刮刮樂的號碼'],a:0},
+  {q:'統一發票多久開一次獎？',o:['每個月','每兩個月','每三個月'],a:1},
+  {q:'手機條碼載具是用哪個符號開頭？',o:['#','@','/'],a:2},
+  {q:'中獎的發票，領獎期限大約多久？',o:['1 個月','3 個月','1 年'],a:1},
+];
+// 兌換碼由行銷提供後填入（App 內輸入兌換碼領金幣）；空白時畫面顯示「兌換碼準備中」
+const QUIZ_REWARD={full:{coins:100,code:''},pass:{coins:50,code:''}};
+const STAFF_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="#fff"/><path d="M4.5 20c.8-4 3.8-6 7.5-6s6.7 2 7.5 6" fill="#fff"/></svg>';
+const COIN_IC='<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#F2C94C" stroke="#C99A1E" stroke-width="3"/><path d="M20 10v20M15 14h7a4 4 0 0 1 0 8h-6a4 4 0 0 0 0 8h8" fill="none" stroke="#8A5A00" stroke-width="3" stroke-linecap="round"/></svg>';
+let qi=0,qScore=0;
+function closeQuiz(){$('quiz').classList.remove('on')}
+function qShow(h){$('qBox').innerHTML=h;$('quiz').classList.add('on');$('qBox').scrollTop=0}
+function askQuiz(){if(quizDone){toast('問卷已經寫過了','謝謝你來看展！');return}track('quiz_ask',{seen:seen.size,mode});
+  qShow(`<div class="who"><i>${STAFF_IC}</i><b>博物館工作人員</b></div><h3>謝謝你來看展！要不要寫一份 5 題的小問卷？</h3><p>答對 60 分以上送 <b>50 金幣</b>，滿分 100 分送 <b>100 金幣</b>。題目都在展品說明裡。</p><button class="btn p" id="qGo" type="button">好啊，寫問卷</button><button class="btn s" id="qNo" type="button">先不用</button>`);
+  $('qGo').onclick=()=>{qi=0;qScore=0;track('quiz_start');qAsk()};$('qNo').onclick=()=>{track('quiz_skip');closeQuiz()}}
+function qAsk(){const it=QUIZ[qi];qShow(`<div class="qn">第 ${qi+1} / ${QUIZ.length} 題</div><h3>${it.q}</h3><div class="opts">${it.o.map((o,k)=>`<button class="opt" data-k="${k}" type="button">${o}</button>`).join('')}</div>`);
+  $('qBox').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.parentNode.dataset.done)return;b.parentNode.dataset.done=1;const k=+b.dataset.k,ok=k===it.a;if(ok)qScore+=20;
+    b.classList.add(ok?'ok':'no');if(!ok)b.parentNode.children[it.a].classList.add('ok');track('quiz_answer',{q:qi+1,correct:ok?1:0});
+    setTimeout(()=>{qi++;qi<QUIZ.length?qAsk():qEnd()},ok?650:1300)})}
+function qEnd(){track('quiz_finish',{score:qScore});const rw=qScore>=100?QUIZ_REWARD.full:qScore>=60?QUIZ_REWARD.pass:null;
+  const dl='https://invos.onelink.me/SGHp/g9ykg3jw?af_sub1=invoice_museum&af_sub2=quiz';
+  let h=`<div class="qn">問卷結果</div><div class="score">${qScore}<small> 分</small></div>`;
+  if(rw){quizDone=true;h+=`<div class="gift">${COIN_IC}<div>恭喜拿到 <b>${rw.coins} 金幣</b>！<br>${rw.code?`打開發票存摺輸入兌換碼 <span class="code">${rw.code}</span>`:'兌換碼準備中，請稍後再回來看看。'}</div></div><a class="btn p" id="qDl" href="${dl}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">打開發票存摺領金幣</a>`}
+  else h+=`<p style="text-align:center">差一點！60 分以上就有金幣。<br>回去看看展品說明，再寫一次。</p><button class="btn p" id="qRe" type="button">再寫一次</button>`;
+  h+=`<button class="btn s" id="qShare" type="button">分享發票博物館給朋友</button><button class="btn s" id="qBack" type="button">繼續逛</button><p id="qHint" style="font-size:13px;text-align:center;margin:8px 0 0"></p>`;
+  qShow(h);if($('qDl'))$('qDl').onclick=()=>track('store_click',{where:'quiz'});if($('qRe'))$('qRe').onclick=()=>{qi=0;qScore=0;track('quiz_retry');qAsk()};
+  $('qBack').onclick=closeQuiz;
+  $('qShare').onclick=async()=>{const url=location.origin+location.pathname+'?'+new URLSearchParams({utm_source:'friend',utm_medium:'share',utm_campaign:'invoice_museum_share'}),text='我逛完發票博物館了，一站一站看懂台灣發票 75 年，你也來逛逛：';
+    if(navigator.share){track('share',{method:'native',where:'quiz'});try{await navigator.share({title:'發票博物館',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+    track('share',{method:'copy',where:'quiz'});try{await navigator.clipboard.writeText(text+url);$('qHint').textContent='連結已複製，貼給朋友就好。'}catch(e){$('qHint').textContent=url}}}
+$('quiz').onclick=e=>{if(e.target===$('quiz'))closeQuiz()};
+// ---------- 官網導覽列：開場顯示；遊戲中從最上緣往下滑（或點上緣小把手）叫出來，往上滑或點別處收起 ----------
+const siteHdr=$('siteHdr'),hdrPull=$('hdrPull'),hdrNav=$('hdrNav'),hdrMenu=$('hdrMenu');
+function showHdr(on,why){if(siteHdr.classList.contains('on')===on)return;siteHdr.classList.toggle('on',on);hdrPull.hidden=on;if(!on){hdrNav.hidden=true;hdrMenu.setAttribute('aria-expanded','false')}else track('header_open',{via:why||'auto'})}
+hdrMenu.onclick=()=>{const o=hdrNav.hidden;hdrNav.hidden=!o;hdrMenu.setAttribute('aria-expanded',String(o))};
+$('hdrDl').onclick=()=>track('store_click',{where:'header'});
+{let y0=null;hdrPull.addEventListener('pointerdown',e=>{y0=e.clientY;try{hdrPull.setPointerCapture(e.pointerId)}catch(_){}});
+  hdrPull.addEventListener('pointermove',e=>{if(y0!==null&&e.clientY-y0>14){y0=null;showHdr(true,'swipe')}});
+  hdrPull.addEventListener('pointerup',()=>{if(y0!==null){y0=null;showHdr(true,'tap')}});}
+{let y0=null;siteHdr.addEventListener('pointerdown',e=>{y0=e.clientY});
+  siteHdr.addEventListener('pointerup',e=>{if(y0!==null&&e.clientY-y0<-24&&state!=='intro')showHdr(false);y0=null});}
+addEventListener('pointerdown',e=>{if(siteHdr.classList.contains('on')&&state==='play'&&!siteHdr.contains(e.target)&&e.target!==hdrPull&&!hdrPull.contains(e.target))showHdr(false)},true);
+addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&state!=='play')showHdr(true,'exit_fullscreen')});
 function pickUp(s){s.got=true;s.g.visible=false;found++;$('found').textContent=found;
   track('invoice_found',{n:found,ms:Math.round(elapsed)});toast(`第 ${found} 張發票`,FACTS[s.i]);if(found===slips.length)finish()}
 function finish(){state='done';lastMs=Math.round(elapsed);const k=rankOf(lastMs);
@@ -705,14 +839,14 @@ function finish(){state='done';lastMs=Math.round(elapsed);const k=rankOf(lastMs)
     v.innerHTML=res==='win'?`<b>你贏朋友 ${fmt(-gap)}！</b>你 ${fmt(lastMs)}，朋友 ${fmt(VS)}。`:res==='lose'?`<b>輸朋友 ${fmt(gap)}</b>你 ${fmt(lastMs)}，朋友 ${fmt(VS)}。`:`<b>平手</b>你們都是 ${fmt(VS)}。`;
     v.hidden=false;track('vs_result',{result:res})}else v.hidden=true;
   $('bShare').innerHTML=SHARE_IC+(res==='win'?'贏了！傳回去嗆朋友':res==='lose'?'不服，換我出題嗆別人':'嗆朋友來比');$('rHint').textContent='';
-  setTimeout(()=>$('res').classList.add('on'),900);track('museum_finish',{ms:lastMs,rank:RANKS[k][1],vs:res,mode:NIGHT?'night':'day'})}
+  setTimeout(()=>{$('res').classList.add('on');showHdr(true,'result')},900);track('museum_finish',{ms:lastMs,rank:RANKS[k][1],vs:res,mode:NIGHT?'night':'day'})}
 function shareUrl(){return location.origin+location.pathname+'?'+new URLSearchParams({vs:lastMs,utm_source:'friend',utm_medium:'share',utm_campaign:'invoice_museum_vs'})}
 const shareText=()=>NIGHT?`我半夜拿手電筒溜進發票博物館，只花 ${fmt(lastMs)}就找齊 8 張發票，你敢來比嗎？`:`我在發票博物館只花 ${fmt(lastMs)}就找齊 8 張發票，點連結跟我比，你能更快嗎？`;
 $('bShare').onclick=async()=>{const url=shareUrl(),text=shareText();
   if(navigator.share){track('share',{method:'native',ms:lastMs});try{await navigator.share({title:'發票博物館',text,url});return}catch(e){if(e&&e.name==='AbortError'){track('share_cancel');return}}}
   track('share',{method:'copy',ms:lastMs});try{await navigator.clipboard.writeText(text+'\n'+url);$('rHint').textContent='挑戰連結已複製，貼給朋友就好。'}catch(e){$('rHint').textContent='複製這個連結傳給朋友：'+url}};
 $('bAgain').onclick=()=>{goFull();track('replay');startHunt()};
-$('bLook').onclick=()=>{$('res').classList.remove('on');state='look';track('stay_look')};
+$('bLook').onclick=()=>{$('res').classList.remove('on');state='look';showHdr(false);track('stay_look')};
 $('aStore').onclick=()=>track('store_click',{where:'result'});
 
 // ---------- 碰撞 ----------
@@ -727,6 +861,16 @@ const fadeDeco=[];scene.traverse(o=>{if(o.isMesh&&o.position.y>0.5&&o.position.z
 const clock=new THREE.Clock();let walkT=0;
 function loop(){
   const dt=Math.min(clock.getDelta(),0.05);
+  if(mode==='guided'&&state==='play'){
+    if(tour.moving){const goal=TS[tour.k].s;tour.s=Math.min(goal,tour.s+2.8*dt);const p=tourAt(tour.s);player.position.x=p.x;player.position.z=p.z;
+      let df=Math.atan2(p.dx,p.dz)-heading;df=Math.atan2(Math.sin(df),Math.cos(df));heading+=df*Math.min(1,dt*10);player.rotation.y=heading;
+      walkT+=dt*10;legL.position.z=Math.sin(walkT)*0.08;legR.position.z=-Math.sin(walkT)*0.08;player.position.y=Math.abs(Math.sin(walkT))*0.04;
+      if(tour.s>=goal-1e-3){tour.moving=false;const ex=exhibits[TS[tour.k].i];heading=Math.atan2(ex.g.position.x-p.x,ex.g.position.z-p.z);player.rotation.y=heading;legL.position.z=legR.position.z=0;player.position.y=0;openCard(ex.i)}}
+    const ahead=Math.min(tour.s+1.3,TLEN),gp=tourAt(ahead),g=guide.g;
+    if(TLEN-tour.s<1.2){g.position.set(player.position.x+1.1,0,player.position.z+0.2)}else g.position.set(gp.x,0,gp.z);
+    const gw=tour.moving?Math.atan2(gp.dx,gp.dz):Math.atan2(player.position.x-g.position.x,player.position.z-g.position.z);let gd2=gw-g.rotation.y;gd2=Math.atan2(Math.sin(gd2),Math.cos(gd2));g.rotation.y+=gd2*Math.min(1,dt*8);
+    const gwalk=tour.moving?Math.sin(walkT):0;guide.l1.position.z=gwalk*0.07;guide.l2.position.z=-gwalk*0.07;
+  }else{
   // 方向：搖桿／鍵盤是「畫面方向」（上＝往裡走）
   let mx=jx+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0);
   let mz=jy+((keys['s']||keys['arrowdown'])?1:0)-((keys['w']||keys['arrowup'])?1:0);
@@ -741,16 +885,22 @@ function loop(){
     const want=Math.atan2(mx,mz);let df=want-heading;df=Math.atan2(Math.sin(df),Math.cos(df));heading+=df*Math.min(1,dt*10);player.rotation.y=heading;
     walkT+=dt*10;legL.position.z=Math.sin(walkT)*0.08;legR.position.z=-Math.sin(walkT)*0.08;player.position.y=Math.abs(Math.sin(walkT))*0.04}
   else{legL.position.z=legR.position.z=0;player.position.y=0}
+  }
   // 靠近展品：光圈變亮＋底部按鈕
   let best=null,bd=1.6;exhibits.forEach(ex=>{const d=Math.hypot(ex.x-player.position.x,ex.z-player.position.z);ex.ring.material.opacity=d<1.6?0.75:0.25;if(d<bd){bd=d;best=ex.i}});
-  if(best!==near){near=best;if(near===null)nearBtn.classList.remove('on');else{nearBtn.textContent='看展品：'+EXHIBITS[near].t;nearBtn.classList.add('on')}}
+  {let want=null;
+    if(mode==='guided'&&state==='play'){if(!tour.moving&&!cardOn&&tour.k>=0)want=tour.k>=TS.length-1?'前往出口 ▶':'帶我到下一站 ▶'}
+    else if(state==='play'&&!quizDone&&Math.hypot(EXITP.x-player.position.x,EXITP.z-player.position.z)<2.0)want='寫問卷拿金幣';
+    else if(best!==null)want='看展品：'+EXHIBITS[best].t;
+    near=best;if(want!==nearBtn.dataset.w){nearBtn.dataset.w=want||'';if(!want)nearBtn.classList.remove('on');else{nearBtn.textContent=want;nearBtn.classList.add('on')}}}
+  if(staff.sign)staff.sign.quaternion.copy(cam.quaternion);
   // 擋住小人的牆變半透明
   fadeDeco.forEach(m=>{const inFront=-D/2>player.position.z&&-D/2-player.position.z<5;m.material.opacity+=((inFront?0.15:1)-m.material.opacity)*Math.min(1,dt*8)});
   fadeWalls.forEach(w=>{const z=w.userData.z,inFront=z>player.position.z&&z-player.position.z<5;const o=inFront?0.18:1;w.material.opacity+=(o-w.material.opacity)*Math.min(1,dt*8);w.castShadow=w.material.opacity>0.9});
   if(state==='play'&&!cardOn){elapsed=performance.now()-t0;$('clock').textContent=fmtClock(elapsed);
     slips.forEach(s=>{if(!s.got&&Math.hypot(s.x-player.position.x,s.z-player.position.z)<0.85)pickUp(s)})}
   if(NIGHT&&!cardOn&&state!=='intro'){gd.cool-=dt;if(gd.cool<=0&&seenByGuard()){gd.cool=5;
-    if(state==='play'){t0-=5000;toast('被警衛照到了！','計時 +5 秒，快躲到牆後面。')}else toast('噓——','警衛在巡邏，別被照到。');track('guard_caught',{state})}}
+    toast('被警衛照到了！','快躲到牆後面，別被發現。');track('guard_caught',{state})}}
   const tt=performance.now()/1000;slips.forEach(s=>{s.paper.position.y=0.75+Math.sin(tt*2.4+s.i)*0.08;s.paper.rotation.y=tt*1.2+s.i;s.glow.material.opacity=0.35+0.25*Math.sin(tt*3+s.i)});
   updateNPC(dt,tt);coin.rotation.y+=dt*0.5;if(drum)drum.rotation.x+=dt*0.9;if(cloud)cloud.position.y=2.45+Math.sin(tt*1.3)*0.08;if(bubble){bubble.position.y=2.25+Math.sin(tt*2)*0.06;bubble.quaternion.copy(cam.quaternion)}
   spinners.forEach(f=>f(dt,tt));
